@@ -1,18 +1,19 @@
 // Package sajari provides functionality for interacting with Sajari APIs.
-package sajari // import "code.sajari.com/sajari-sdk-go"
+package sajari // import "code.sajari.com/sdk-go"
 
 import (
-	"golang.org/x/net/context"
+	"context"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
-	"code.sajari.com/sajari-sdk-go/internal"
+	"code.sajari.com/sdk-go/internal"
 )
 
 const (
-	endpoint  = "api.sajari.com:443"
-	userAgent = "sdk-go-07072016"
+	endpoint         = "api.sajari.com:443"
+	userAgent        = "sdk-go-07072016"
+	overrideHostname = "api.sajari.com"
 )
 
 // New creates a new Client which can be used to make requests to Sajari services.
@@ -25,7 +26,7 @@ func New(project, collection string, opts ...Opt) (*Client, error) {
 	defaultOpts := []Opt{
 		WithEndpoint(endpoint),
 		WithGRPCDialOption(grpc.WithUserAgent(userAgent)),
-		WithGRPCDialOption(grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(nil, "api.sajari.com"))),
+		WithGRPCDialOption(grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(nil, overrideHostname))),
 	}
 
 	opts = append(defaultOpts, opts...)

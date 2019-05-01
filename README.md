@@ -1,4 +1,4 @@
-# Sajari APIs Go Client &middot; [![Build Status](https://travis-ci.org/sajari/sajari-sdk-go.svg?branch=master)](https://travis-ci.org/sajari/sajari-sdk-go)
+# Sajari APIs Go Client &middot; [![Build Status](https://travis-ci.org/sajari/sdk-go.svg?branch=master)](https://travis-ci.org/sajari/sdk-go)
 
 This repository provides functionality for interacting with Sajari APIs.
 
@@ -8,7 +8,7 @@ If you haven't setup Go before, you need to first set a `GOPATH` (see [https://g
 
 To fetch and build the code:
 
-    $ go get code.sajari.com/sajari-sdk-go/...
+    $ go get code.sajari.com/sdk-go/...
 
 This will also build the command line tools (in particular `query`, `csv-importer`, `schema` and `pipeline` which can be used to interaction with Sajari collections) into `$GOPATH/bin` (assumed to be in your `PATH` already).
 
@@ -22,7 +22,7 @@ import (
 
 	"golang.org/x/net/context"
 
-	"code.sajari.com/sajari-sdk-go"
+	"code.sajari.com/sdk-go"
 )
 
 func main() {

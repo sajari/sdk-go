@@ -1,15 +1,10 @@
 package sajari
 
 import (
+	"context"
 	"fmt"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-
-	"golang.org/x/net/context"
-
-	pb "code.sajari.com/protogen-go/sajari/engine/schema"
-	rpcpb "code.sajari.com/protogen-go/sajari/rpc"
+	pb "code.sajari.com/protogen-go/sajari/engine/v2"
 )
 
 // Schema returns the schema (list of fields) for the collection.
@@ -26,30 +21,64 @@ type Schema struct {
 }
 
 // Fields returns the fields in the collection.
-func (s *Schema) Fields(ctx context.Context) ([]Field, error) {
-	schema, err := pb.NewSchemaClient(s.c.ClientConn).GetFields(s.c.newContext(ctx), &rpcpb.Empty{})
-	if err != nil {
-		return nil, err
-	}
+func (s *Schema) ListFields(ctx context.Context) ([]Field, error) {
+	pageToken := ""
 
-	out := make([]Field, 0, len(schema.Fields))
-	for _, f := range schema.Fields {
-		t, err := typeFromProto(f.Type)
+	var fs []Field
+	for {
+		resp, err := pb.NewSchemaClient(s.c.ClientConn).ListFields(s.c.newContext(ctx),
+			&pb.ListFieldsRequest{
+				PageToken: pageToken,
+			})
 		if err != nil {
 			return nil, err
 		}
 
-		out = append(out, Field{
-			Name:        f.Name,
-			Description: f.Description,
-			Type:        t,
-			Repeated:    f.Repeated,
-			Required:    f.Required,
-			Indexed:     f.Indexed,
-			Unique:      f.Unique,
+		for _, pbField := range resp.GetFields() {
+			f, err := fieldFromProto(pbField)
+			if err != nil {
+				return nil, err
+			}
+			fs = append(fs, f)
+		}
+
+		nextPageToken := resp.GetNextPageToken()
+		if nextPageToken == "" {
+			break
+		}
+		pageToken = nextPageToken
+	}
+	return fs, nil
+}
+
+func fieldFromProto(f *pb.Field) (Field, error) {
+	t, err := typeFromProto(f.GetType())
+	if err != nil {
+		return Field{}, err
+	}
+
+	m, err := modeFromProto(f.GetMode())
+	if err != nil {
+		return Field{}, err
+	}
+
+	pbIndexes := f.GetIndexes()
+	indexes := make([]FieldIndex, 0, len(pbIndexes))
+	for _, pbIndex := range pbIndexes {
+		indexes = append(indexes, FieldIndex{
+			Spec:        pbIndex.GetSpec(),
+			Description: pbIndex.GetDescription(),
 		})
 	}
-	return out, nil
+
+	return Field{
+		Name:        f.GetName(),
+		Description: f.GetDescription(),
+		Type:        t,
+		Mode:        m,
+		Repeated:    f.GetRepeated(),
+		Indexes:     indexes,
+	}, nil
 }
 
 // Field represents a meta field which can be assigned in a collection record.
@@ -61,22 +90,40 @@ type Field struct {
 	Description string
 
 	// Type defines the type of the field.
-	Type Type
+	Type FieldType
+
+	// Mode of the field.
+	Mode FieldMode
 
 	// Repeated indicates that this field can hold a list of values.
 	Repeated bool
 
-	// Required indicates that this field should always be set on all records.
-	Required bool
+	// Indexes is a list of the field's indexes.
+	Indexes []FieldIndex
+}
 
-	// Indexed indicates that the field should be indexed.  This is only valid for
-	// String or StringArray fields (see TypeString, TypeStringArray).
-	Indexed bool
+func (f Field) Index(spec string) (FieldIndex, bool) {
+	for _, idx := range f.Indexes {
+		if idx.Spec == spec {
+			return idx, true
+		}
+	}
+	return FieldIndex{}, false
+}
 
-	// Unique indicates that the field is unique (and this will
-	// be encoforced when new records are added).  Unique fields can
-	// be used to retrieve/delete records.
-	Unique bool
+// FieldIndex is a field index.
+type FieldIndex struct {
+	// Spec is the identifier/specification for the creation of the index.
+	Spec string
+	// Description is a description of the index.
+	Description string
+}
+
+func (f FieldIndex) proto() *pb.FieldIndex {
+	return &pb.FieldIndex{
+		Spec:        f.Spec,
+		Description: f.Description,
+	}
 }
 
 func (f Field) proto() (*pb.Field, error) {
@@ -84,35 +131,22 @@ func (f Field) proto() (*pb.Field, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	m, err := f.Mode.proto()
+	if err != nil {
+		return nil, err
+	}
+
 	return &pb.Field{
 		Name:        f.Name,
 		Description: f.Description,
 		Type:        t,
+		Mode:        m,
 		Repeated:    f.Repeated,
-		Required:    f.Required,
-		Indexed:     f.Indexed,
-		Unique:      f.Unique,
 	}, nil
 }
 
-type fields []Field
-
-func (fs fields) proto() (*pb.Fields, error) {
-	pbfs := make([]*pb.Field, 0, len(fs))
-	for _, f := range fs {
-		pbf, err := f.proto()
-		if err != nil {
-			return nil, err
-		}
-		pbfs = append(pbfs, pbf)
-	}
-
-	return &pb.Fields{
-		Fields: pbfs,
-	}, nil
-}
-
-func typeFromProto(t pb.Field_Type) (Type, error) {
+func typeFromProto(t pb.Field_Type) (FieldType, error) {
 	switch t {
 	case pb.Field_STRING:
 		return TypeString, nil
@@ -123,28 +157,73 @@ func typeFromProto(t pb.Field_Type) (Type, error) {
 	case pb.Field_FLOAT:
 		return TypeFloat, nil
 
+	case pb.Field_DOUBLE:
+		return TypeDouble, nil
+
 	case pb.Field_BOOLEAN:
 		return TypeBoolean, nil
 
 	case pb.Field_TIMESTAMP:
 		return TypeTimestamp, nil
 
+	default:
+		return TypeString, fmt.Errorf("unknown type: '%v'", t)
 	}
-	return TypeString, fmt.Errorf("unknown type: '%v'", string(t))
 }
 
-// Type defines field data types.
-type Type string
+func modeFromProto(m pb.Field_Mode) (FieldMode, error) {
+	switch m {
+	case pb.Field_NULLABLE:
+		return ModeNullable, nil
 
+	case pb.Field_REQUIRED:
+		return ModeRequired, nil
+
+	case pb.Field_UNIQUE:
+		return ModeUnique, nil
+
+	default:
+		return ModeNullable, fmt.Errorf("unknown mode: '%v'", m)
+	}
+}
+
+// FieldMode defines field modes.
+type FieldMode string
+
+// Enumeration of field modes.
 const (
-	TypeString    Type = "STRING"
-	TypeInteger   Type = "INTEGER"
-	TypeFloat     Type = "FLOAT"
-	TypeBoolean   Type = "BOOLEAN"
-	TypeTimestamp Type = "TIMESTAMP"
+	ModeNullable FieldMode = "NULLABLE" // Don't require a value.
+	ModeRequired FieldMode = "REQUIRED" // Field value must be set.
+	ModeUnique   FieldMode = "UNIQUE"   // Field value must be unique (and hence also set).
 )
 
-func (t Type) proto() (pb.Field_Type, error) {
+func (m FieldMode) proto() (pb.Field_Mode, error) {
+	switch m {
+	case ModeNullable:
+		return pb.Field_NULLABLE, nil
+	case ModeRequired:
+		return pb.Field_REQUIRED, nil
+	case ModeUnique:
+		return pb.Field_UNIQUE, nil
+	default:
+		return pb.Field_NULLABLE, fmt.Errorf("unknown mode: %q", string(m))
+	}
+}
+
+// FieldType defines field data types.
+type FieldType string
+
+// Enumeration of field types.
+const (
+	TypeString    FieldType = "STRING"
+	TypeInteger   FieldType = "INTEGER"
+	TypeFloat     FieldType = "FLOAT"
+	TypeDouble    FieldType = "DOUBLE"
+	TypeBoolean   FieldType = "BOOLEAN"
+	TypeTimestamp FieldType = "TIMESTAMP"
+)
+
+func (t FieldType) proto() (pb.Field_Type, error) {
 	switch t {
 	case TypeString:
 		return pb.Field_STRING, nil
@@ -155,6 +234,9 @@ func (t Type) proto() (pb.Field_Type, error) {
 	case TypeFloat:
 		return pb.Field_FLOAT, nil
 
+	case TypeDouble:
+		return pb.Field_DOUBLE, nil
+
 	case TypeBoolean:
 		return pb.Field_BOOLEAN, nil
 
@@ -164,62 +246,36 @@ func (t Type) proto() (pb.Field_Type, error) {
 	return pb.Field_STRING, fmt.Errorf("unknown type: '%v'", string(t))
 }
 
-func multiErrorFromSchemaStatusProto(status []*rpcpb.Status) error {
-	out := make([]error, 0, len(status))
-	empty := true
-	for _, s := range status {
-		var err error
-		switch c := codes.Code(s.Code); c {
-		case codes.OK:
-			// Skip
-
-		default:
-			// For the moment we wrap the error into a grpc error.
-			err = grpc.Errorf(c, s.Message)
-			empty = false
-		}
-		out = append(out, err)
-	}
-	if empty {
-		return nil
-	}
-	return MultiError(out)
-}
-
-// Add adds Fields to the collection schema.
-func (s *Schema) Add(ctx context.Context, fs ...Field) error {
-	pbfs, err := fields(fs).proto()
-	if err != nil {
-		return err
-	}
-	resp, err := pb.NewSchemaClient(s.c.ClientConn).AddFields(s.c.newContext(ctx), pbfs)
-	if err != nil {
-		return err
-	}
-	return multiErrorFromSchemaStatusProto(resp.Status)
-}
-
-// MutateField mutates a field identifier by name.  Each mutation is performed in the order
-// in which it is specified.  If any fail, then the rest are ignored.
-func (s *Schema) MutateField(ctx context.Context, name string, muts ...Mutation) error {
-	pbMuts, err := mutations(muts).proto()
+// CreateField creates a new field in the schema.
+func (s *Schema) CreateField(ctx context.Context, f Field) error {
+	pbf, err := f.proto()
 	if err != nil {
 		return err
 	}
 
-	resp, err := pb.NewSchemaClient(s.c.ClientConn).MutateField(ctx, &pb.MutateFieldRequest{
-		Name:      name,
-		Mutations: pbMuts,
+	_, err = pb.NewSchemaClient(s.c.ClientConn).CreateField(s.c.newContext(ctx), &pb.CreateFieldRequest{
+		Field: pbf,
 	})
+	return err
+}
+
+// MutateField mutates the field identified by name.
+func (s *Schema) MutateField(ctx context.Context, name string, m FieldMutation) error {
+	pbm, err := m.proto()
 	if err != nil {
 		return err
 	}
-	return multiErrorFromSchemaStatusProto(resp.Status)
+
+	_, err = pb.NewSchemaClient(s.c.ClientConn).MutateField(ctx, &pb.MutateFieldRequest{
+		Name:     name,
+		Mutation: pbm,
+	})
+	return err
 }
 
-type mutations []Mutation
+type fieldMutations []FieldMutation
 
-func (ms mutations) proto() ([]*pb.MutateFieldRequest_Mutation, error) {
+func (ms fieldMutations) proto() ([]*pb.MutateFieldRequest_Mutation, error) {
 	out := make([]*pb.MutateFieldRequest_Mutation, 0, len(ms))
 	for _, m := range ms {
 		x, err := m.proto()
@@ -231,14 +287,14 @@ func (ms mutations) proto() ([]*pb.MutateFieldRequest_Mutation, error) {
 	return out, nil
 }
 
-// NameMutation creates a schema field mutation which changes the name of a field.
-func NameMutation(name string) Mutation {
-	return nameMutation(name)
+// FieldNameMutation creates a schema field mutation which changes the name of a field.
+func FieldNameMutation(name string) FieldMutation {
+	return fieldNameMutation(name)
 }
 
-type nameMutation string
+type fieldNameMutation string
 
-func (n nameMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
+func (n fieldNameMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
 	return &pb.MutateFieldRequest_Mutation{
 		Mutation: &pb.MutateFieldRequest_Mutation_Name{
 			Name: string(n),
@@ -246,15 +302,15 @@ func (n nameMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
 	}, nil
 }
 
-// TypeMutation creates a schema field mutation which changes the type of a field.
-func TypeMutation(ty Type) Mutation {
-	return typeMutation(ty)
+// FieldTypeMutation creates a schema field mutation which changes the type of a field.
+func FieldTypeMutation(ty FieldType) FieldMutation {
+	return fieldTypeMutation(ty)
 }
 
-type typeMutation Type
+type fieldTypeMutation FieldType
 
-func (t typeMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
-	ty, err := Type(t).proto()
+func (t fieldTypeMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
+	ty, err := FieldType(t).proto()
 	if err != nil {
 		return nil, err
 	}
@@ -265,44 +321,49 @@ func (t typeMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
 	}, nil
 }
 
-// UniqueMutation creates a schema field mutation which changes the unique constraint on a field.
-func UniqueMutation(unique bool) Mutation {
-	return uniqueMutation(unique)
+// FieldModeMutation creates a schema field mutation which changes the unique constraint on a field.
+func FieldModeMutation(m FieldMode) FieldMutation {
+	return fieldModeMutation(m)
 }
 
-type uniqueMutation bool
+type fieldModeMutation FieldMode
 
-func (u uniqueMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
+func (m fieldModeMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
+	pbm, err := FieldMode(m).proto()
+	if err != nil {
+		return nil, err
+	}
+
 	return &pb.MutateFieldRequest_Mutation{
-		Mutation: &pb.MutateFieldRequest_Mutation_Unique{
-			Unique: bool(u),
+		Mutation: &pb.MutateFieldRequest_Mutation_Mode{
+			Mode: pbm,
 		},
 	}, nil
 }
 
-// IndexedMutation creates a schema field mutation which changes the indexed property on a field.
-func IndexedMutation(indexed bool) Mutation {
-	return indexedMutation(indexed)
+// FieldAddIndexMutation adds a schema field mutation which adds an index to a field.
+func FieldAddIndexMutation(x FieldIndex) FieldMutation {
+	return fieldAddIndexMutation(x)
 }
 
-type indexedMutation bool
+type fieldAddIndexMutation FieldIndex
 
-func (i indexedMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
+func (i fieldAddIndexMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
 	return &pb.MutateFieldRequest_Mutation{
-		Mutation: &pb.MutateFieldRequest_Mutation_Indexed{
-			Indexed: bool(i),
+		Mutation: &pb.MutateFieldRequest_Mutation_AddIndex{
+			AddIndex: FieldIndex(i).proto(),
 		},
 	}, nil
 }
 
-// RepeatedMutation creates a schema field mutation which changes the repeated property on a field.
-func RepeatedMutation(repeated bool) Mutation {
-	return repeatedMutation(repeated)
+// FieldRepeatedMutation creates a schema field mutation which changes the repeated property on a field.
+func FieldRepeatedMutation(repeated bool) FieldMutation {
+	return fieldRepeatedMutation(repeated)
 }
 
-type repeatedMutation bool
+type fieldRepeatedMutation bool
 
-func (u repeatedMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
+func (u fieldRepeatedMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
 	return &pb.MutateFieldRequest_Mutation{
 		Mutation: &pb.MutateFieldRequest_Mutation_Repeated{
 			Repeated: bool(u),
@@ -310,22 +371,7 @@ func (u repeatedMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
 	}, nil
 }
 
-// RequiredMutation creates a schema field mutation which changes the required constraint on a field.
-func RequiredMutation(required bool) Mutation {
-	return requiredMutation(required)
-}
-
-type requiredMutation bool
-
-func (u requiredMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
-	return &pb.MutateFieldRequest_Mutation{
-		Mutation: &pb.MutateFieldRequest_Mutation_Required{
-			Required: bool(u),
-		},
-	}, nil
-}
-
-// Mutation is an interface which is satisfied by schema field mutations.
-type Mutation interface {
+// FieldMutation is an interface which is satisfied by schema field mutations.
+type FieldMutation interface {
 	proto() (*pb.MutateFieldRequest_Mutation, error)
 }

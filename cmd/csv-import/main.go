@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/csv"
 	"encoding/json"
 	"flag"
@@ -11,9 +12,7 @@ import (
 	"strings"
 	"sync"
 
-	"golang.org/x/net/context"
-
-	"code.sajari.com/sajari-sdk-go"
+	"code.sajari.com/sdk-go"
 )
 
 var (
@@ -21,6 +20,9 @@ var (
 	project    = flag.String("project", "", "project `ID` to use")
 	collection = flag.String("collection", "", "collection `name` to import into (should already exist)")
 	creds      = flag.String("creds", "", "calling credentials in the form `key-id,key-secret`")
+	pipeline   = flag.String("pipeline", "", "use `pipeline` to create records")
+	version    = flag.String("version", "", "pipeline `version` to use, uses default version if empty")
+	values     = flag.String("values", "{}", "JSON string of values to use with the pipeline")
 
 	workers   = flag.Int("workers", 8, "use `N` workers to process data, queue and send")
 	batchSize = flag.Int("batch-size", 100, "submit records in groups of at most `N`")
@@ -32,13 +34,11 @@ func usage() {
 	flag.PrintDefaults()
 }
 
-var client *sajari.Client
-
 func main() {
 	flag.Parse()
 
-	file := flag.Arg(0)
-	if file == "" {
+	path := flag.Arg(0)
+	if path == "" {
 		usage()
 		return
 	}
@@ -58,21 +58,24 @@ func main() {
 		opts = append(opts, sajari.WithCredentials(kc))
 	}
 
-	var err error
-	client, err = sajari.New(*project, *collection, opts...)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error dialing endpoint: %v\n", err)
+	var valuesMap map[string]string
+	if err := json.Unmarshal([]byte(*values), &valuesMap); err != nil {
+		log.Fatalf("Could not parse JSON values: %v", err)
 	}
 
-	if err := importCSV(file); err != nil {
-		fmt.Fprintf(os.Stderr, "Error importing data: %v\n", err)
-		return
+	client, err := sajari.New(*project, *collection, opts...)
+	if err != nil {
+		log.Fatalf("Could not dial endpoint: %v\n", err)
+	}
+
+	if err := importCSV(path); err != nil {
+		log.Fatalf("COuld not import CSV data: %v\n", err)
 	}
 }
 
-func sendList(list []sajari.Record) {
+func sendList(p *sajari.Pipeline, values map[string]string, list []sajari.Record) {
 	if !*debug {
-		_, err := client.AddMulti(context.Background(), list)
+		_, err := p.CreateRecord(context.Background(), values)
 		if err != nil {
 			log.Printf("error adding records: %v", err)
 			return

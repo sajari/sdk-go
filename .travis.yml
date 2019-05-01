@@ -6,7 +6,7 @@ go:
 - 1.8
 - 1.9
 - tip
-go_import_path: code.sajari.com/sajari-sdk-go
+go_import_path: code.sajari.com/sdk-go
 notifications:
   email:
     - infra@sajari.com

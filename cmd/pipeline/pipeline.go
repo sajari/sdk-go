@@ -11,7 +11,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"code.sajari.com/sajari-sdk-go"
+	"code.sajari.com/sdk-go"
 )
 
 var (

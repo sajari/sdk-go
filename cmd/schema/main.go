@@ -12,7 +12,7 @@ import (
 
 	"golang.org/x/net/context"
 
-	sajari "code.sajari.com/sajari-sdk-go"
+	sajari "code.sajari.com/sdk-go"
 )
 
 var (
@@ -45,11 +45,11 @@ func main() {
 	}
 
 	if *project == "" {
-		log.Fatal("project not set")
+		log.Fatal("-project not set")
 	}
 
 	if *collection == "" {
-		log.Fatal("collection not set")
+		log.Fatal("-collection not set")
 	}
 
 	client, err := sajari.New(*project, *collection, opts...)
@@ -73,16 +73,19 @@ func main() {
 	schema := client.Schema()
 
 	if *add != "" {
-		if err := schema.Add(context.Background(), getFields(*add, ignoreFieldsMap)...); err != nil {
-			log.Fatalf("error adding fields: %v", err)
+		fs := getFields(*add, ignoreFieldsMap)
+		for _, f := range fs {
+			if err := schema.CreateField(context.Background(), f); err != nil {
+				log.Printf("Could not create field %q: %v", f.Name, err)
+			}
 		}
 		return
 	}
 
 	if *fetch != "" {
-		fields, err := schema.Fields(context.Background())
+		fields, err := schema.ListFields(context.Background())
 		if err != nil {
-			log.Fatalf("error fetching schema: %v", err)
+			log.Fatalf("Could not fetch schema: %v", err)
 		}
 
 		flds := make([]Field, 0, len(fields))
@@ -93,9 +96,8 @@ func main() {
 					Description: field.Description,
 					Type:        field.Type,
 					Repeated:    field.Repeated,
-					Required:    field.Required,
-					Indexed:     field.Indexed,
-					Unique:      field.Unique,
+					Mode:        field.Mode,
+					Indexes:     field.Indexes,
 				})
 			}
 		}
@@ -106,17 +108,21 @@ func main() {
 
 		b, err := json.MarshalIndent(sch, "", "  ")
 		if err != nil {
-			log.Fatalf("error marshalling JSON: %v", err)
+			log.Fatalf("Could not marshal JSON: %v", err)
 		}
 
 		var out io.Writer = os.Stdout
 		if *fetch != "-" {
 			f, err := os.Create(*fetch)
 			if err != nil {
-				log.Fatalf("error creating file for schema: %v", err)
+				log.Fatalf("Could not create file for schema: %v", err)
 			}
 			out = f
-			defer f.Close()
+			defer func() {
+				if err := f.Close(); err != nil {
+					log.Printf("Could not close output file: %v", err)
+				}
+			}()
 		}
 		fmt.Fprintf(out, "%s\n", b)
 		return
@@ -142,9 +148,8 @@ func getFields(path string, ignoreFieldsMap map[string]bool) []sajari.Field {
 				Description: f.Description,
 				Type:        f.Type,
 				Repeated:    f.Repeated,
-				Required:    f.Required,
-				Indexed:     f.Indexed,
-				Unique:      f.Unique,
+				Mode:        f.Mode,
+				Indexes:     f.Indexes,
 			})
 		}
 	}
@@ -152,13 +157,12 @@ func getFields(path string, ignoreFieldsMap map[string]bool) []sajari.Field {
 }
 
 type Field struct {
-	Name        string      `json:"name"`
-	Description string      `json:"description"`
-	Type        sajari.Type `json:"type"`
-	Repeated    bool        `json:"repeated"`
-	Required    bool        `json:"required"`
-	Indexed     bool        `json:"indexed"`
-	Unique      bool        `json:"unique"`
+	Name        string              `json:"name"`
+	Description string              `json:"description"`
+	Type        sajari.FieldType    `json:"type"`
+	Repeated    bool                `json:"repeated"`
+	Mode        sajari.FieldMode    `json:"mode"`
+	Indexes     []sajari.FieldIndex `json:"indexes"`
 }
 
 type Schema struct {
