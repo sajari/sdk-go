@@ -186,8 +186,8 @@ func (c *Client) Keys(ctx context.Context, field string, limit int) *KeyIterator
 	}
 }
 
-// ErrDone is returned when the end of the list is reached for ListKeys.
-var ErrDone = errors.New("no more items in iterator")
+// ErrDone is returned when the iteration is complete
+var ErrDone = errors.New("done")
 
 // KeyIterator iterates through a list of keys.
 type KeyIterator struct {
