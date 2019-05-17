@@ -176,8 +176,8 @@ func (c *Client) GetRecord(ctx context.Context, k *Key) (Record, error) {
 	return recordFromProto(resp.GetRecord())
 }
 
-// ListKeys returns an iterator for a list of keys in a collection
-func (c *Client) ListKeys(ctx context.Context, field string, limit int) *KeyIterator {
+// Keys returns an iterator for a list of keys in a collection.
+func (c *Client) Keys(ctx context.Context, field string, limit int) *KeyIterator {
 	return &KeyIterator{
 		ctx:   ctx,
 		c:     c,
@@ -187,9 +187,9 @@ func (c *Client) ListKeys(ctx context.Context, field string, limit int) *KeyIter
 }
 
 // ErrDone is returned when the end of the list is reached for ListKeys.
-var ErrDone = errors.New("end of list reached")
+var ErrDone = errors.New("no more items in iterator")
 
-// KeyIterator is used to iterate a list of keys after calling ListKeys.
+// KeyIterator iterates through a list of keys.
 type KeyIterator struct {
 	ctx     context.Context
 	c       *Client
@@ -201,7 +201,8 @@ type KeyIterator struct {
 	lastErr error
 }
 
-// Next retreives the next key in the list for ListKeys.
+// Next returns the next key in the iteration, or nil, ErrDone if there
+// are no more keys remaining.
 func (it *KeyIterator) Next() (*Key, error) {
 	if it.lastErr != nil {
 		return nil, it.lastErr

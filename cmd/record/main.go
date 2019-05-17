@@ -115,7 +115,7 @@ func main() {
 
 	if *listKeys != "" {
 		limit := 1000
-		it := newClient().ListKeys(context.Background(), *listKeys, limit)
+		it := newClient().Keys(context.Background(), *listKeys, limit)
 		var total int
 		for {
 			_, err := it.Next()
