@@ -20,7 +20,7 @@ type Schema struct {
 	c *Client
 }
 
-// Fields returns an iterator to the fields in a schema
+// Fields returns an iterator which retrieves all the fields in the collection.
 func (s *Schema) Fields(ctx context.Context) *FieldIterator {
 	return &FieldIterator{
 		ctx: ctx,
@@ -28,7 +28,7 @@ func (s *Schema) Fields(ctx context.Context) *FieldIterator {
 	}
 }
 
-// FieldIterator iterates through a list of fields
+// FieldIterator iterates through a list of fields.
 type FieldIterator struct {
 	ctx     context.Context
 	c       *Client

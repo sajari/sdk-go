@@ -176,7 +176,10 @@ func (c *Client) GetRecord(ctx context.Context, k *Key) (Record, error) {
 	return recordFromProto(resp.GetRecord())
 }
 
-// Keys returns an iterator for a list of keys in a collection.
+// Keys returns an iterator which will retrieve the given key field value
+// for each record in the collection. If changes to the collection are made
+// whilst iterating, the iterator may become invalid or return keys already
+// visited.
 func (c *Client) Keys(ctx context.Context, field string, limit int) *KeyIterator {
 	return &KeyIterator{
 		ctx:   ctx,
@@ -186,7 +189,7 @@ func (c *Client) Keys(ctx context.Context, field string, limit int) *KeyIterator
 	}
 }
 
-// ErrDone is returned when the iteration is complete
+// ErrDone is returned when the iteration is complete.
 var ErrDone = errors.New("done")
 
 // KeyIterator iterates through a list of keys.
