@@ -176,33 +176,73 @@ func (c *Client) GetRecord(ctx context.Context, k *Key) (Record, error) {
 	return recordFromProto(resp.GetRecord())
 }
 
-// Cursor is used to paginate calls to ListKeys.
-type Cursor struct {
-	data string
+// Keys returns an iterator which will retrieve the given key field value
+// for each record in the collection. If changes to the collection are made
+// whilst iterating, the iterator may become invalid or return keys already
+// visited.
+func (c *Client) Keys(ctx context.Context, field string, limit int) *KeyIterator {
+	return &KeyIterator{
+		ctx:   ctx,
+		c:     c,
+		field: field,
+		limit: limit,
+	}
 }
 
-// Empty indicates that the cursor is empty.
-func (c Cursor) Empty() bool { return c.data == "" }
+// ErrDone is returned when the iteration is complete.
+var ErrDone = errors.New("done")
 
-// String representation of the cursor.
-func (c Cursor) String() string { return c.data }
+// KeyIterator iterates through a list of keys.
+type KeyIterator struct {
+	ctx     context.Context
+	c       *Client
+	field   string
+	limit   int
+	token   string
+	keys    []*Key
+	end     bool
+	lastErr error
+}
 
-// ListKeys lists all keys in a collection.
-func (c *Client) ListKeys(ctx context.Context, field string, limit int, cursor Cursor) ([]*Key, Cursor, error) {
-	resp, err := enginepb.NewStoreClient(c.ClientConn).ListKeys(c.newContext(ctx), &enginepb.ListKeysRequest{
-		Field:     field,
-		PageSize:  int32(limit),
-		PageToken: cursor.String(),
+// Next returns the next key in the iteration, or nil, ErrDone if there
+// are no more keys remaining.
+func (it *KeyIterator) Next() (*Key, error) {
+	if it.lastErr != nil {
+		return nil, it.lastErr
+	}
+	if len(it.keys) == 0 && it.end {
+		return nil, ErrDone
+	}
+
+	if len(it.keys) == 0 {
+		if it.keys, it.token, it.lastErr = it.fetch(it.ctx); it.lastErr != nil {
+			return nil, it.lastErr
+		}
+		if it.token == "" {
+			it.end = true
+		}
+	}
+
+	k := it.keys[0]
+	it.keys = it.keys[1:]
+	return k, nil
+}
+
+func (it *KeyIterator) fetch(ctx context.Context) (ks []*Key, token string, err error) {
+	resp, err := enginepb.NewStoreClient(it.c.ClientConn).ListKeys(it.c.newContext(ctx), &enginepb.ListKeysRequest{
+		Field:     it.field,
+		PageSize:  int32(it.limit),
+		PageToken: it.token,
 	})
 	if err != nil {
-		return nil, Cursor{}, err
+		return nil, "", err
 	}
 
-	ks, err := pbKeys(resp.GetKeys()).keys()
+	ks, err = pbKeys(resp.GetKeys()).keys()
 	if err != nil {
-		return nil, Cursor{}, err
+		return nil, "", err
 	}
-	return ks, Cursor{data: resp.GetNextPageToken()}, nil
+	return ks, resp.GetNextPageToken(), nil
 }
 
 // SetFields is a convenience method for creating field mutations

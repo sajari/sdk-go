@@ -83,27 +83,34 @@ func main() {
 	}
 
 	if *fetch != "" {
-		fields, err := schema.ListFields(context.Background())
-		if err != nil {
-			log.Fatalf("Could not fetch schema: %v", err)
-		}
 
-		flds := make([]Field, 0, len(fields))
-		for _, field := range fields {
-			if !ignoreFieldsMap[field.Name] {
-				flds = append(flds, Field{
-					Name:        field.Name,
-					Description: field.Description,
-					Type:        field.Type,
-					Repeated:    field.Repeated,
-					Mode:        field.Mode,
-					Indexes:     field.Indexes,
-				})
+		it := schema.Fields(context.Background())
+		var fields []Field
+		for {
+			f, err := it.Next()
+			if err == sajari.ErrDone {
+				break
 			}
+			if err != nil {
+				log.Fatalf("Could not fetch schema: %v", err)
+			}
+
+			if ignoreFieldsMap[f.Name] {
+				continue
+			}
+
+			fields = append(fields, Field{
+				Name:        f.Name,
+				Description: f.Description,
+				Type:        f.Type,
+				Repeated:    f.Repeated,
+				Mode:        f.Mode,
+				Indexes:     f.Indexes,
+			})
 		}
 
 		sch := Schema{
-			Fields: flds,
+			Fields: fields,
 		}
 
 		b, err := json.MarshalIndent(sch, "", "  ")

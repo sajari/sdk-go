@@ -11,7 +11,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"code.sajari.com/sdk-go"
+	sajari "code.sajari.com/sdk-go"
 )
 
 var (
@@ -114,24 +114,18 @@ func main() {
 	}
 
 	if *listKeys != "" {
-		var cursor sajari.Cursor
-		var total int
 		limit := 1000
+		it := newClient().Keys(context.Background(), *listKeys, limit)
+		var total int
 		for {
-			var ks []*sajari.Key
-			var err error
-
-			ks, cursor, err = newClient().ListKeys(context.Background(), *listKeys, limit, cursor)
-			if err != nil {
-				log.Fatalf("Could not list keys: %v", err)
-			}
-			log.Printf("Got %d keys", len(ks))
-			log.Printf("Total %d keys", total)
-			total += len(ks)
-
-			if cursor.Empty() {
+			_, err := it.Next()
+			if err == sajari.ErrDone {
 				break
 			}
+			if err != nil {
+				log.Fatalf("Could not get key: %v", err)
+			}
+			total++
 		}
 		log.Printf("Total: %d keys", total)
 		return

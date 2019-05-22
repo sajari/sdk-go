@@ -20,35 +20,66 @@ type Schema struct {
 	c *Client
 }
 
-// Fields returns the fields in the collection.
-func (s *Schema) ListFields(ctx context.Context) ([]Field, error) {
-	pageToken := ""
-
-	var fs []Field
-	for {
-		resp, err := pb.NewSchemaClient(s.c.ClientConn).ListFields(s.c.newContext(ctx),
-			&pb.ListFieldsRequest{
-				PageToken: pageToken,
-			})
-		if err != nil {
-			return nil, err
-		}
-
-		for _, pbField := range resp.GetFields() {
-			f, err := fieldFromProto(pbField)
-			if err != nil {
-				return nil, err
-			}
-			fs = append(fs, f)
-		}
-
-		nextPageToken := resp.GetNextPageToken()
-		if nextPageToken == "" {
-			break
-		}
-		pageToken = nextPageToken
+// Fields returns an iterator which retrieves all the fields in the collection.
+func (s *Schema) Fields(ctx context.Context) *FieldIterator {
+	return &FieldIterator{
+		ctx: ctx,
+		c:   s.c,
 	}
-	return fs, nil
+}
+
+// FieldIterator iterates through a list of fields.
+type FieldIterator struct {
+	ctx     context.Context
+	c       *Client
+	token   string
+	fields  []Field
+	end     bool
+	lastErr error
+}
+
+// Next returns the next field in the iteration, or Field{}, ErrDone if there
+// are no more fields remaining.
+func (it *FieldIterator) Next() (Field, error) {
+	if it.lastErr != nil {
+		return Field{}, it.lastErr
+	}
+	if len(it.fields) == 0 && it.end {
+		return Field{}, ErrDone
+	}
+
+	if len(it.fields) == 0 {
+		if it.fields, it.token, it.lastErr = it.fetch(it.ctx); it.lastErr != nil {
+			return Field{}, it.lastErr
+		}
+		if it.token == "" {
+			it.end = true
+		}
+	}
+
+	f := it.fields[0]
+	it.fields = it.fields[1:]
+	return f, nil
+}
+
+func (it *FieldIterator) fetch(ctx context.Context) ([]Field, string, error) {
+	resp, err := pb.NewSchemaClient(it.c.ClientConn).ListFields(it.c.newContext(ctx),
+		&pb.ListFieldsRequest{
+			PageToken: it.token,
+		})
+	if err != nil {
+		return nil, "", err
+	}
+
+	fs := make([]Field, 0, len(resp.GetFields()))
+	for _, pbField := range resp.GetFields() {
+		f, err := fieldFromProto(pbField)
+		if err != nil {
+			return nil, "", err
+		}
+		fs = append(fs, f)
+	}
+	return fs, resp.GetNextPageToken(), nil
 }
 
 func fieldFromProto(f *pb.Field) (Field, error) {
