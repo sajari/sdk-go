@@ -274,8 +274,13 @@ func (p *Pipeline) CreateRecord(ctx context.Context, values map[string]string, r
 // ReplaceRecord adds a record to a collection using a pipeline, returning a list of Keys which
 // can be used to retrieve the respective record.  If any of the adds fail then a MultiError will
 // be returned with errors set in the respective indexes.
-func (p *Pipeline) ReplaceRecord(ctx context.Context, values map[string]string, r Record) (*Key, map[string]string, error) {
+func (p *Pipeline) ReplaceRecord(ctx context.Context, values map[string]string, key *Key, r Record) (*Key, map[string]string, error) {
 	pbr, err := r.proto()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	pbk, err := key.proto()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -284,6 +289,7 @@ func (p *Pipeline) ReplaceRecord(ctx context.Context, values map[string]string, 
 		Pipeline: p.proto(),
 		Values:   protoutil.Struct(values),
 		Record:   pbr,
+		Key:      pbk,
 	})
 	if err != nil {
 		return nil, nil, err

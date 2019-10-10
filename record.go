@@ -78,6 +78,10 @@ func (k *Key) proto() (*enginepb.Key, error) {
 }
 
 func keyFromProto(k *enginepb.Key) (*Key, error) {
+	if k == nil {
+		return nil, nil
+	}
+
 	if k.Field == "" && k.Value == nil {
 		return nil, nil
 	}
