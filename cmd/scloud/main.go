@@ -49,7 +49,11 @@ func main() {
 
 	p, ok := c.Get(c.Active)
 	if !ok {
-		exit("No profile set. Run `scloud init` to get started or use `scloud config set <profile> to use an existing saved profile`")
+		// The active profile is gone. Should not happen
+		if cmd == "config" {
+			c.Settings(params)
+		}
+		exit("No default profile set. Run `scloud init` to get started or use `scloud config set <profile>` to use an existing saved profile")
 	}
 	client, fn, err := p.Client()
 	if err != nil {

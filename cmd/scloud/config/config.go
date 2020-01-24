@@ -197,6 +197,9 @@ func (c *config) Settings(args []string) {
 		scanner := bufio.NewScanner(os.Stdin)
 		if confirmInput(scanner, "Delete profile. Are you sure? y/n") {
 			delete(c.Profiles, name)
+			if c.Active == name {
+				c.Active = ""
+			}
 		} else {
 			return
 		}
