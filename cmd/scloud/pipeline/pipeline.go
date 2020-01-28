@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -29,14 +30,11 @@ import (
 )
 
 var (
-	topLevelCommands = []string{"get", "create", "delete", "list", "usage", "step", "steps", "get-default", "set-default"}
+	topLevelCommands = []string{"get", "create", "delete", "list", "usage", "step", "steps", "get-default", "set-default", "query", "record"}
 )
 
+// Run executes pipeline control based operations
 func Run(client *sajari.Client, args []string) {
-	if len(args) == 0 {
-		fmt.Printf("usage: scloud pipeline <%v> [options...]\n", strings.Join(topLevelCommands, "|"))
-		return
-	}
 
 	iflags := flag.NewFlagSet("pipeline", flag.ExitOnError)
 	step := iflags.String("step", "", "show step definition for identifier `step`")
@@ -44,7 +42,14 @@ func Run(client *sajari.Client, args []string) {
 	stepType := iflags.String("stepType", "pre", "type of step to list/get (pre|post)")
 	create := iflags.String("create", "", "YAML source path to create pipeline from")
 	name := iflags.String("name", "", "pipeline `name`, can be blank if requesting multiple")
-	version := iflags.String("version", "", "pipeline `version` to use in other options (-usage, -set-default, -list)")
+	version := iflags.String("version", "", "pipeline `version`")
+	inputs := iflags.String("inputs", "", "pipeline `inputs` object as a JSON string")
+
+	if len(args) == 0 {
+		fmt.Printf("\nusage: scloud pipeline <%v> [options...]\n\n", strings.Join(topLevelCommands, "|"))
+		iflags.Usage()
+		return
+	}
 	iflags.Parse(args[1:])
 
 	var ty pb.Type
@@ -65,6 +70,12 @@ func Run(client *sajari.Client, args []string) {
 		sty = pb.StepType_POST_STEP
 	default:
 		log.Fatalf("invalid -stepType value: %q", *stepType)
+	}
+
+	in := map[string]string{}
+	if err := json.Unmarshal([]byte(*inputs), &in); err != nil {
+		fmt.Printf("error unmarshalling JSON inputs: %v", err)
+		return
 	}
 
 	ctx := context.Background()
@@ -127,13 +138,26 @@ func Run(client *sajari.Client, args []string) {
 		getSteps(ctx, client, sf, ty, sty)
 		return
 
+	case "query":
+		if *name == "" {
+			fmt.Printf("-name is blank, you must specify a pipeline `name`")
+			return
+		}
+		if len(in) == 0 {
+			fmt.Printf("-inputs is blank, expecting a JSON object. e.g. {'q':'yogi'}")
+			return
+		}
+		Query(client, args[1:], *name, *version, in)
+
+	// case "record":
+	// 	Record(client, args[1:])
+
 	default:
 		fmt.Printf("usage: scloud pipeline <%v> [options...]\n", strings.Join(topLevelCommands, "|"))
 		return
 	}
 }
 
-// TODO ---- Should this be here? It is used in api and pipctl
 const (
 	projectKey    = "project"
 	collectionKey = "collection"
@@ -149,8 +173,6 @@ func newContext(ctx context.Context, client *sajari.Client) context.Context {
 	}
 	return metadata.NewOutgoingContext(ctx, md)
 }
-
-// -------------------------------------
 
 type tabWriter struct {
 	*tabwriter.Writer

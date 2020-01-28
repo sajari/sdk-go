@@ -15,15 +15,16 @@ var (
 )
 
 func Run(client *sajari.Client, args []string) {
-	if len(args) == 0 {
-		fmt.Printf("usage: scloud record <%v> [options...]\n", strings.Join(topLevelCommands, "|"))
-		return
-	}
-
 	iflags := flag.NewFlagSet("record", flag.ExitOnError)
 	field := iflags.String("field", "", "`field` to count unique keys")
 	value := iflags.String("value", "", "`value` of a record field")
 	data := iflags.String("data", "", "`json` encoded map of keys to values")
+
+	if len(args) == 0 {
+		fmt.Printf("\nusage: scloud record <%v> [options...]\n\n", strings.Join(topLevelCommands, "|"))
+		iflags.Usage()
+		return
+	}
 	iflags.Parse(args[1:])
 
 	switch args[0] {

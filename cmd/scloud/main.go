@@ -6,20 +6,21 @@ import (
 	"strings"
 
 	"code.sajari.com/sdk-go/cmd/scloud/config"
+	"code.sajari.com/sdk-go/cmd/scloud/interaction"
 	"code.sajari.com/sdk-go/cmd/scloud/pipeline"
 	"code.sajari.com/sdk-go/cmd/scloud/record"
 	"code.sajari.com/sdk-go/cmd/scloud/schema"
 )
 
 var (
-	topLevelCommands = []string{"init", "config", "schema", "record", "pipeline"}
+	topLevelCommands = []string{"init", "auth", "config", "schema", "record", "pipeline", "interaction"}
 )
 
 // TODO
-// init cmd
-// config set
 // auth login
-// run actual cmd line tools
+// querying
+// autocomplete -> not in SDK
+// csv
 
 func exit(str string, args ...interface{}) {
 	fmt.Printf(str+"\n\n", args...)
@@ -27,9 +28,6 @@ func exit(str string, args ...interface{}) {
 }
 
 func main() {
-	// Try to open config and use the current active profile
-	// if it doesn't exist, bail and suggest init or auth
-
 	if len(os.Args) == 1 {
 		exit("usage: scloud <%v> [options...]", strings.Join(topLevelCommands, "|"))
 	}
@@ -66,6 +64,9 @@ func main() {
 	case "config":
 		c.Settings(params)
 
+	case "auth":
+		fmt.Printf("to be implemented") // TODO
+
 	case "schema":
 		schema.Run(client, params)
 
@@ -74,6 +75,9 @@ func main() {
 
 	case "pipeline":
 		pipeline.Run(client, params)
+
+	case "interaction":
+		interaction.Run(client, params)
 
 	default:
 		exit("invalid command %q\nusage: engctl <%v> [options...]", cmd, strings.Join(topLevelCommands, "|"))

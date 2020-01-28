@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"os"
 	"strings"
 
@@ -36,13 +35,17 @@ type Schema struct {
 }
 
 func Run(client *sajari.Client, args []string) {
-	if len(args) == 0 {
-		log.Fatalf("usage: scloud schema <cmd> [options...]")
-	}
 
 	iflags := flag.NewFlagSet("stats", flag.ExitOnError)
-	ignoreFields := iflags.String("ignore-fields", "", "list of comma seperated fields `field1,field2,...` to ignore")
+	ignoreFields := iflags.String("ignore-fields", "", "list of comma separated fields `field1,field2,...` to ignore")
+
+	if len(args) == 0 {
+		fmt.Printf("\nusage: scloud schema <cmd> [options...]\n\n")
+		iflags.Usage()
+		return
+	}
 	iflags.Parse(args[1:])
+
 	ignoreFieldsMap := map[string]bool{}
 	if *ignoreFields != "" {
 		for _, field := range strings.Split(*ignoreFields, ",") {
@@ -83,7 +86,8 @@ func Run(client *sajari.Client, args []string) {
 		fs := getFields(args[1], ignoreFieldsMap)
 		for _, f := range fs {
 			if err := schema.CreateField(context.Background(), f); err != nil {
-				log.Fatalf("error adding field: %v", err)
+				fmt.Printf("error adding field: %v", err)
+				return
 			}
 		}
 
@@ -123,14 +127,16 @@ func Run(client *sajari.Client, args []string) {
 
 		b, err := json.MarshalIndent(sch, "", "  ")
 		if err != nil {
-			log.Fatalf("error marshalling JSON: %v", err)
+			fmt.Printf("error marshalling JSON: %v", err)
+			return
 		}
 
 		var out io.Writer = os.Stdout
 		if path != "" {
 			f, err := os.Create(path)
 			if err != nil {
-				log.Fatalf("error creating file for schema: %v", err)
+				fmt.Printf("error creating file for schema: %v", err)
+				return
 			}
 			out = f
 			defer f.Close()
@@ -148,12 +154,14 @@ func Run(client *sajari.Client, args []string) {
 func getFields(path string, ignoreFieldsMap map[string]bool) []sajari.Field {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
-		log.Fatalf("error reading JSON schema file: %v", err)
+		fmt.Printf("error reading JSON schema file: %v", err)
+		return []sajari.Field{}
 	}
 
 	s := Schema{}
 	if err := json.Unmarshal(b, &s); err != nil {
-		log.Fatalf("error unmarshalling JSON schema file: %v", err)
+		fmt.Printf("error unmarshalling JSON schema file: %v", err)
+		return []sajari.Field{}
 	}
 
 	var fields []sajari.Field
