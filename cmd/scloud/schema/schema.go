@@ -34,15 +34,15 @@ type Schema struct {
 	Fields []Field `json:"fields"`
 }
 
-func Run(client *sajari.Client, args []string) {
+// Run executes various operations on a collection schema
+func Run(client *sajari.Client, args []string) error {
 
 	iflags := flag.NewFlagSet("stats", flag.ExitOnError)
 	ignoreFields := iflags.String("ignore-fields", "", "list of comma separated fields `field1,field2,...` to ignore")
 
 	if len(args) == 0 {
-		fmt.Printf("\nusage: scloud schema <cmd> [options...]\n\n")
-		iflags.Usage()
-		return
+		defer iflags.Usage()
+		return fmt.Errorf("\nusage: scloud schema <cmd> [options...]\n\n")
 	}
 	iflags.Parse(args[1:])
 
@@ -56,8 +56,7 @@ func Run(client *sajari.Client, args []string) {
 	switch args[0] {
 	case "stats":
 		if len(args) <= 1 {
-			fmt.Printf("usage: scloud schema stats <path> [options...]\n\npath: to file to read JSON schema from")
-			return
+			return fmt.Errorf("usage: scloud schema stats <path> [options...]\n\npath: to file to read JSON schema from")
 		}
 		fs := getFields(args[1], ignoreFieldsMap)
 		fmt.Printf("Stats for schema: %v\n", args[1])
@@ -79,15 +78,13 @@ func Run(client *sajari.Client, args []string) {
 
 	case "add":
 		if len(args) <= 1 {
-			fmt.Printf("usage: scloud schema add <path> [options...]\n\npath: `path` to file to read JSON schema from\n")
-			return
+			return fmt.Errorf("usage: scloud schema add <path> [options...]\n\npath: `path` to file to read JSON schema from\n")
 		}
 		schema := client.Schema()
 		fs := getFields(args[1], ignoreFieldsMap)
 		for _, f := range fs {
 			if err := schema.CreateField(context.Background(), f); err != nil {
-				fmt.Printf("error adding field: %v", err)
-				return
+				return fmt.Errorf("error adding field: %v", err)
 			}
 		}
 
@@ -118,7 +115,7 @@ func Run(client *sajari.Client, args []string) {
 			}
 		}
 		if count == 0 {
-			fmt.Printf("No fields for collection: %v/%v\n", client.Project, client.Collection)
+			return fmt.Errorf("No fields for collection: %v/%v\n", client.Project, client.Collection)
 		}
 
 		sch := Schema{
@@ -127,28 +124,25 @@ func Run(client *sajari.Client, args []string) {
 
 		b, err := json.MarshalIndent(sch, "", "  ")
 		if err != nil {
-			fmt.Printf("error marshalling JSON: %v", err)
-			return
+			return fmt.Errorf("error marshalling JSON: %v", err)
 		}
 
 		var out io.Writer = os.Stdout
 		if path != "" {
 			f, err := os.Create(path)
 			if err != nil {
-				fmt.Printf("error creating file for schema: %v", err)
-				return
+				return fmt.Errorf("error creating file for schema: %v", err)
 			}
 			out = f
 			defer f.Close()
 		}
 		fmt.Fprintf(out, "%s\n", b)
-		return
 
 	default:
-		fmt.Printf("usage: scloud schema <%v> [options...]\n", strings.Join(topLevelCommands, "|"))
-		return
+		return fmt.Errorf("usage: scloud schema <%v> [options...]\n", strings.Join(topLevelCommands, "|"))
 	}
 
+	return nil
 }
 
 func getFields(path string, ignoreFieldsMap map[string]bool) []sajari.Field {

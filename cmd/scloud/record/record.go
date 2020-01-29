@@ -14,76 +14,66 @@ var (
 	topLevelCommands = []string{"get", "mutate", "delete", "count"}
 )
 
-func Run(client *sajari.Client, args []string) {
+// Run executes several different record request options
+func Run(client *sajari.Client, args []string) error {
 	iflags := flag.NewFlagSet("record", flag.ExitOnError)
 	field := iflags.String("field", "", "`field` to count unique keys")
 	value := iflags.String("value", "", "`value` of a record field")
 	data := iflags.String("data", "", "`json` encoded map of keys to values")
 
 	if len(args) == 0 {
-		fmt.Printf("\nusage: scloud record <%v> [options...]\n\n", strings.Join(topLevelCommands, "|"))
-		iflags.Usage()
-		return
+		defer iflags.Usage()
+		return fmt.Errorf("\nusage: scloud record <%v> [options...]\n\n", strings.Join(topLevelCommands, "|"))
 	}
 	iflags.Parse(args[1:])
 
 	switch args[0] {
 	case "get":
 		if *field == "" || *value == "" {
-			fmt.Printf("mutate must specify both `field` and `value` flags")
-			return
+			return fmt.Errorf("mutate must specify both `field` and `value` flags")
 		}
 
 		k := sajari.NewKey(*field, *value)
 		d, err := client.GetRecord(context.Background(), k)
 		if err != nil {
-			fmt.Printf("error from Get(%v): %v\n", k, err)
-			return
+			return fmt.Errorf("error from Get(%v): %v\n", k, err)
 		}
 
 		b, err := json.MarshalIndent(d, "", "  ")
 		if err != nil {
-			fmt.Printf("error marshaling JSON output: %v\n", err)
-			return
+			return fmt.Errorf("error marshaling JSON output: %v\n", err)
 		}
 
 		fmt.Println(string(b))
-		return
+		return nil
 
 	case "mutate":
 		if *data == "" {
-			fmt.Println("no data found, supply json input using the `data` flag")
-			return
+			return fmt.Errorf("no data found, supply json input using the `data` flag")
 		}
 		if *field == "" || *value == "" {
-			fmt.Printf("mutate must specify both `field` and `value` flags")
-			return
+			return fmt.Errorf("mutate must specify both `field` and `value` flags")
 		}
 		d := map[string]interface{}{}
 		if err := json.Unmarshal([]byte(*data), &d); err != nil {
-			fmt.Printf("got error unmarshalling json from `data`: %v\n", err)
-			return
+			return fmt.Errorf("got error unmarshalling json from `data`: %v\n", err)
 		}
 
 		ctx := context.Background()
 		k := sajari.NewKey(*field, *value)
 		if err := client.MutateRecord(ctx, k, sajari.SetFields(d)...); err != nil {
-			fmt.Printf("error mutating record: %v\n", err)
-			return
+			return fmt.Errorf("error mutating record: %v\n", err)
 		}
-		return
 
 	case "delete":
 		if *field == "" || *value == "" {
-			fmt.Printf("delete must specify both `field` and `value` flags")
-			return
+			return fmt.Errorf("delete must specify both `field` and `value` flags")
 		}
 
 		k := sajari.NewKey(*field, *value)
 		if err := client.DeleteRecord(context.Background(), k); err != nil {
-			fmt.Printf("error from Delete(%v): %v\n", k, err)
+			return fmt.Errorf("error from Delete(%v): %v\n", k, err)
 		}
-		return
 
 	case "count":
 		limit := 1000
@@ -95,15 +85,14 @@ func Run(client *sajari.Client, args []string) {
 				break
 			}
 			if err != nil {
-				fmt.Printf("Could not get key: %v", err)
-				return
+				return fmt.Errorf("Could not get key: %v", err)
 			}
 			total++
 		}
-		fmt.Printf("Total: %d keys", total)
-		return
+		return fmt.Errorf("Total: %d keys", total)
 
 	default:
-		fmt.Printf("usage: scloud schema <%v> [options...]\n", strings.Join(topLevelCommands, "|"))
+		return fmt.Errorf("usage: scloud schema <%v> [options...]\n", strings.Join(topLevelCommands, "|"))
 	}
+	return nil
 }

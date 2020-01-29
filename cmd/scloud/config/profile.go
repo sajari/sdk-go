@@ -16,6 +16,10 @@ type Profile struct {
 	Token      string `json:"token"`
 }
 
+func (p *Profile) String() string {
+	return fmt.Sprintf("project = %v\ncollection = %v\nendpoint = %v\n", p.Project, p.Collection, p.Endpoint)
+}
+
 func (p *Profile) Client() (*sajari.Client, func(), error) {
 	var opts []sajari.Opt
 	if p.Endpoint != "" {

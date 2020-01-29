@@ -15,7 +15,8 @@ var (
 	topLevelCommands = []string{"consume"}
 )
 
-func Run(client *sajari.Client, args []string) {
+// Run sends an interaction token to the API
+func Run(client *sajari.Client, args []string) error {
 	iflags := flag.NewFlagSet("interaction", flag.ExitOnError)
 	token := iflags.String("token", "", "`token` to send back")
 	weight := iflags.String("weight", "", "`weight` of the interaction")
@@ -23,9 +24,8 @@ func Run(client *sajari.Client, args []string) {
 	data := iflags.String("data", "", "`json` encoded map of keys to values")
 
 	if len(args) == 0 {
-		fmt.Printf("\nusage: scloud interaction <%v> [options...]\n\n", strings.Join(topLevelCommands, "|"))
-		iflags.Usage()
-		return
+		defer iflags.Usage()
+		return fmt.Errorf("\nusage: scloud interaction <%v> [options...]\n\n", strings.Join(topLevelCommands, "|"))
 	}
 	iflags.Parse(args[1:])
 
@@ -36,8 +36,7 @@ func Run(client *sajari.Client, args []string) {
 	if *data != "" {
 		d := map[string]string{}
 		if err := json.Unmarshal([]byte(*data), &d); err != nil {
-			fmt.Printf("got error unmarshalling json from `data`: %v\n", err)
-			return
+			return fmt.Errorf("got error unmarshalling json from `data`: %v\n", err)
 		}
 		opts.Data = d
 	}
@@ -45,15 +44,15 @@ func Run(client *sajari.Client, args []string) {
 	if *weight != "" {
 		w, err := strconv.Atoi(*weight)
 		if err != nil {
-			fmt.Printf("`weight must be an integer`")
-			return
+			return fmt.Errorf("`weight must be an integer`")
 		}
 		opts.Weight = int32(w)
 	}
 
 	if err := client.Interaction().ConsumeToken(context.Background(), *token, opts); err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
+
 	fmt.Printf("interaction token successfully sent")
+	return nil
 }

@@ -14,7 +14,7 @@ var (
 	configPath = ".config/sajari"
 	configName = "config"
 
-	topLevelCommands = []string{"list", "set", "delete"}
+	topLevelCommands = []string{"list", "get", "set", "delete"}
 )
 
 // config contains the credentials and onfig to use the scloud tool
@@ -34,6 +34,32 @@ func New() *config {
 func (c *config) Get(name string) (*Profile, bool) {
 	p, ok := c.Profiles[name]
 	return p, ok
+}
+
+// setDefault sets the default config profile
+func (c *config) setDefault(name string) error {
+	if _, ok := c.Profiles[name]; ok {
+		c.Active = name
+		return c.Save()
+	}
+	return fmt.Errorf("no profile named [%v]", name)
+}
+
+// delete removes a config profile by name
+func (c *config) delete(name string) error {
+	if _, ok := c.Profiles[name]; ok {
+		scanner := bufio.NewScanner(os.Stdin)
+		if confirmInput(scanner, "Delete profile. Are you sure? y/n") {
+			delete(c.Profiles, name)
+			if c.Active == name {
+				c.Active = ""
+			}
+			return c.Save()
+		}
+		fmt.Println("config deletion aborted")
+		return nil
+	}
+	return fmt.Errorf("no profile named [%v]", name)
 }
 
 // Load opens the existing config from local disk
@@ -99,7 +125,7 @@ func confirmInput(s *bufio.Scanner, q string) bool {
 }
 
 // Init creates a new config profile from cmd line input
-func (c *config) Init(args []string) {
+func (c *config) Init(args []string) error {
 	iflags := flag.NewFlagSet("init", flag.ExitOnError)
 	endpoint := iflags.String("endpoint", "", "endpoint `address`")
 	project := iflags.String("project", "", "project `id`")
@@ -135,8 +161,7 @@ func (c *config) Init(args []string) {
 	if *creds != "" {
 		credsSplit := strings.Split(*creds, ",")
 		if len(credsSplit) != 2 {
-			fmt.Printf("creds: expected 'id,secret', got '%v'", *creds)
-			return
+			return fmt.Errorf("creds: expected 'id,secret', got '%v'", *creds)
 		}
 		p.Key = credsSplit[0]
 		p.Secret = credsSplit[1]
@@ -164,18 +189,18 @@ func (c *config) Init(args []string) {
 	fmt.Println("profile has been set to default")
 
 	if err := c.Save(); err != nil {
-		fmt.Printf("could not save config: %v", err)
-		return
+		return fmt.Errorf("could not save config: %v", err)
 	}
-	fmt.Printf("profile saved: %v (and set to default)", *name)
+
+	fmt.Printf("profile [%v] saved (and set to default)", *name)
+	return nil
 }
 
 // Settings changes the active profile
-func (c *config) Settings(args []string) {
+func (c *config) Settings(args []string) error {
 	var name string
 	if len(args) < 1 {
-		fmt.Printf("usage: scloud config <%v> [options...]\n", strings.Join(topLevelCommands, "|"))
-		return
+		return fmt.Errorf("usage: scloud config <%v> [options...]\n", strings.Join(topLevelCommands, "|"))
 	}
 	if len(args) == 2 {
 		name = args[1]
@@ -183,34 +208,35 @@ func (c *config) Settings(args []string) {
 	switch args[0] {
 	case "list":
 		for name, p := range c.Profiles {
-			fmt.Printf("\nprofile: %v\ncid: %v/%v\nendpoint: %v\n\n", name, p.Project, p.Collection, p.Endpoint)
+			fmt.Printf("[%v]\n%v\n", name, p)
 		}
-		return
+		return nil
+
+	case "get":
+		if p, ok := c.Profiles[c.Active]; ok {
+			fmt.Printf("[%v]\n%v\n", c.Active, p)
+		}
+		return nil
+
 	case "set":
-		if _, ok := c.Get(name); !ok {
-			fmt.Println("profile does not exist")
-			return
+		err := c.setDefault(name)
+		if err != nil {
+			return err
 		}
-		c.Active = name
+		fmt.Printf("default profile now [%v]\n", name)
+		return nil
 
 	case "delete":
-		scanner := bufio.NewScanner(os.Stdin)
-		if confirmInput(scanner, "Delete profile. Are you sure? y/n") {
-			delete(c.Profiles, name)
-			if c.Active == name {
-				c.Active = ""
-			}
-		} else {
-			return
+		err := c.delete(name)
+		if err != nil {
+			return err
 		}
+		fmt.Printf("profile [%v] successfully deleted\n", name)
+		return nil
 
 	default:
-		fmt.Printf("usage: scloud config <%v> [options...]\n", strings.Join(topLevelCommands, "|"))
-		return
+		return fmt.Errorf("usage: scloud config <%v> [options...]\n", strings.Join(topLevelCommands, "|"))
 	}
-	if err := c.Save(); err != nil {
-		fmt.Printf("failed: %v\n\n", err)
-		return
-	}
-	fmt.Println("successfully updated")
+
+	return nil
 }

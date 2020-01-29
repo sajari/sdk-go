@@ -18,68 +18,77 @@ var (
 
 // TODO
 // auth login
-// querying
 // autocomplete -> not in SDK
 // csv
 
-func exit(str string, args ...interface{}) {
-	fmt.Printf(str+"\n\n", args...)
-	os.Exit(1)
-}
-
 func main() {
 	if len(os.Args) == 1 {
-		exit("usage: scloud <%v> [options...]", strings.Join(topLevelCommands, "|"))
+		fmt.Printf("usage: scloud <%v> [options...]", strings.Join(topLevelCommands, "|"))
+		return
 	}
 	cmd, params := os.Args[1], os.Args[2:]
 
-	// Load current config
 	c, err := config.Load()
 	if err != nil {
-		exit("error loading profile config: %v", err)
+		fmt.Printf("error loading profile config: %v", err)
+		return
 	}
 
-	// Special case we are initializing
 	if cmd == "init" {
-		c.Init(params)
+		if err := c.Init(params); err != nil {
+			fmt.Printf("%v", err)
+		}
 		return
 	}
 
 	p, ok := c.Get(c.Active)
 	if !ok {
-		// The active profile is gone. Should not happen
 		if cmd == "config" {
-			c.Settings(params)
+			if err := c.Settings(params); err != nil {
+				fmt.Printf("%v", err)
+				return
+			}
+			return
 		}
-		exit("No default profile set. Run `scloud init` to get started or use `scloud config set <profile>` to use an existing saved profile")
+		fmt.Printf("No default profile set. Run `scloud init` to get started or use `scloud config set <profile>` to use an existing saved profile")
+		return
 	}
 	client, fn, err := p.Client()
 	if err != nil {
-		exit("%v", err)
+		fmt.Printf("%v", err)
 	}
 	defer fn()
 
-	// Main functions
 	switch cmd {
 	case "config":
-		c.Settings(params)
+		if err := c.Settings(params); err != nil {
+			fmt.Printf("%v", err)
+		}
 
 	case "auth":
 		fmt.Printf("to be implemented") // TODO
 
 	case "schema":
-		schema.Run(client, params)
+		if err := schema.Run(client, params); err != nil {
+			fmt.Printf("%v", err)
+		}
 
 	case "record":
-		record.Run(client, params)
+		if err := record.Run(client, params); err != nil {
+			fmt.Printf("%v", err)
+		}
 
 	case "pipeline":
-		pipeline.Run(client, params)
+		if err := pipeline.Run(client, params); err != nil {
+			fmt.Printf("%v", err)
+		}
 
 	case "interaction":
-		interaction.Run(client, params)
+		if err := interaction.Run(client, params); err != nil {
+			fmt.Printf("%v", err)
+		}
 
 	default:
-		exit("invalid command %q\nusage: engctl <%v> [options...]", cmd, strings.Join(topLevelCommands, "|"))
+		fmt.Printf("usage: scloud <%v> [options...]", strings.Join(topLevelCommands, "|"))
 	}
 }

@@ -2,7 +2,6 @@ package pipeline
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -30,11 +29,23 @@ import (
 )
 
 var (
-	topLevelCommands = []string{"get", "create", "delete", "list", "usage", "step", "steps", "get-default", "set-default", "query", "record"}
+	topLevelCommands = []string{"get", "create", "delete", "list", "usage", "step", "steps", "get-default", "set-default", "query", "replace"}
 )
 
 // Run executes pipeline control based operations
-func Run(client *sajari.Client, args []string) {
+func Run(client *sajari.Client, args []string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("\nusage: scloud pipeline <%v> [options...]\n\n", strings.Join(topLevelCommands, "|"))
+	}
+
+	// Query and replace have different flag sets
+	switch args[0] {
+	case "query":
+		return Query(client, args[1:])
+
+	case "replace":
+		return Replace(client, args[1:])
+	}
 
 	iflags := flag.NewFlagSet("pipeline", flag.ExitOnError)
 	step := iflags.String("step", "", "show step definition for identifier `step`")
@@ -43,12 +54,10 @@ func Run(client *sajari.Client, args []string) {
 	create := iflags.String("create", "", "YAML source path to create pipeline from")
 	name := iflags.String("name", "", "pipeline `name`, can be blank if requesting multiple")
 	version := iflags.String("version", "", "pipeline `version`")
-	inputs := iflags.String("inputs", "", "pipeline `inputs` object as a JSON string")
 
 	if len(args) == 0 {
-		fmt.Printf("\nusage: scloud pipeline <%v> [options...]\n\n", strings.Join(topLevelCommands, "|"))
-		iflags.Usage()
-		return
+		defer iflags.Usage()
+		return fmt.Errorf("\nusage: scloud pipeline <%v> [options...]\n\n", strings.Join(topLevelCommands, "|"))
 	}
 	iflags.Parse(args[1:])
 
@@ -59,7 +68,7 @@ func Run(client *sajari.Client, args []string) {
 	case "record":
 		ty = pb.Type_RECORD_PIPELINE
 	default:
-		log.Fatalf("invalid -type value: %q", *pipelineType)
+		return fmt.Errorf("invalid -type value: %q", *pipelineType)
 	}
 
 	var sty pb.StepType
@@ -69,13 +78,7 @@ func Run(client *sajari.Client, args []string) {
 	case "post":
 		sty = pb.StepType_POST_STEP
 	default:
-		log.Fatalf("invalid -stepType value: %q", *stepType)
-	}
-
-	in := map[string]string{}
-	if err := json.Unmarshal([]byte(*inputs), &in); err != nil {
-		fmt.Printf("error unmarshalling JSON inputs: %v", err)
-		return
+		return fmt.Errorf("invalid -stepType value: %q", *stepType)
 	}
 
 	ctx := context.Background()
@@ -84,21 +87,18 @@ func Run(client *sajari.Client, args []string) {
 	switch args[0] {
 	case "get":
 		if err := getPipeline(ctx, client, ty, *name, *version); err != nil {
-			log.Fatalf("Could not get pipeline: %v", err)
+			return fmt.Errorf("Could not get pipeline: %v", err)
 		}
-		return
 
 	case "create":
 		if err := createPipeline(ctx, client, ty, *create); err != nil {
-			log.Fatalf("Could not create pipeline: %v", err)
+			return fmt.Errorf("Could not create pipeline: %v", err)
 		}
-		return
 
 	case "delete":
 		if err := deletePipeline(ctx, client, ty, *name, *version); err != nil {
-			log.Fatalf("Could not delete pipeline: %v", err)
+			return fmt.Errorf("Could not delete pipeline: %v", err)
 		}
-		return
 
 	case "list":
 		// Since we use non-empty *list to show that we want to run a list,
@@ -106,56 +106,36 @@ func Run(client *sajari.Client, args []string) {
 		// to indicate we want the list, but haven't specified a name.
 
 		if err := listPipelines(ctx, client, ty, *name, *version); err != nil {
-			log.Fatalf("Could not list pipelines: %v", err)
+			return fmt.Errorf("Could not list pipelines: %v", err)
 		}
-		return
 
 	case "usage":
 		if err := pipelineDocumentation(ctx, client, ty, *name, *version); err != nil {
-			log.Fatalf("Could not fetch documentation for pipeline: %v", err)
+			return fmt.Errorf("Could not fetch documentation for pipeline: %v", err)
 		}
-		return
 
 	case "get-default":
 		if err := getDefaultPipeline(ctx, client, ty, *name, *version); err != nil {
-			log.Fatalf("Could not get default version: %v", err)
+			return fmt.Errorf("Could not get default version: %v", err)
 		}
-		return
 
 	case "set-default":
 		if err := setDefaultPipeline(ctx, client, ty, *name, *version); err != nil {
-			log.Fatalf("Could not set default version: %v", err)
+			return fmt.Errorf("Could not set default version: %v", err)
 		}
-		return
 
 	case "step":
 		sf := pb.NewDocumentationClient(client.ClientConn)
 		getStep(ctx, client, sf, ty, *step)
-		return
 
 	case "steps":
 		sf := pb.NewDocumentationClient(client.ClientConn)
 		getSteps(ctx, client, sf, ty, sty)
-		return
-
-	case "query":
-		if *name == "" {
-			fmt.Printf("-name is blank, you must specify a pipeline `name`")
-			return
-		}
-		if len(in) == 0 {
-			fmt.Printf("-inputs is blank, expecting a JSON object. e.g. {'q':'yogi'}")
-			return
-		}
-		Query(client, args[1:], *name, *version, in)
-
-	// case "record":
-	// 	Record(client, args[1:])
 
 	default:
-		fmt.Printf("usage: scloud pipeline <%v> [options...]\n", strings.Join(topLevelCommands, "|"))
-		return
+		return fmt.Errorf("usage: scloud pipeline <%v> [options...]\n", strings.Join(topLevelCommands, "|"))
 	}
+	return nil
 }
 
 const (
