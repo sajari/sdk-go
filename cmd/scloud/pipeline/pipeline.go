@@ -51,7 +51,7 @@ func Run(client *sajari.Client, args []string) error {
 	step := iflags.String("step", "", "show step definition for identifier `step`")
 	pipelineType := iflags.String("type", "query", "type of pipeline to create (query|record)")
 	stepType := iflags.String("stepType", "pre", "type of step to list/get (pre|post)")
-	create := iflags.String("create", "", "YAML source path to create pipeline from")
+	path := iflags.String("path", "", "source path of YAML file to create pipeline from")
 	name := iflags.String("name", "", "pipeline `name`, can be blank if requesting multiple")
 	version := iflags.String("version", "", "pipeline `version`")
 
@@ -91,7 +91,7 @@ func Run(client *sajari.Client, args []string) error {
 		}
 
 	case "create":
-		if err := createPipeline(ctx, client, ty, *create); err != nil {
+		if err := createPipeline(ctx, client, ty, *path); err != nil {
 			return fmt.Errorf("Could not create pipeline: %v", err)
 		}
 

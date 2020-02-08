@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"os"
+	"sort"
+	"text/tabwriter"
 
 	"google.golang.org/grpc"
 
@@ -18,6 +21,7 @@ func Query(client *sajari.Client, args []string) error {
 	name := iflags.String("name", "", "pipeline `name` to run")
 	version := iflags.String("version", "", "pipeline `version` to run (optional, blank will use the default version)")
 	inputs := iflags.String("inputs", "", "pipeline `inputs` object as a JSON string")
+	format := iflags.String("format", "table", "output format. Supports `json`, `table` (default)") // csv
 
 	if len(args) == 0 {
 		defer iflags.Usage()
@@ -42,22 +46,59 @@ func Query(client *sajari.Client, args []string) error {
 
 	tracking := sajari.NewSession(sajari.TrackingNone, "", nil) // TODO: this is dumb. Fix the SDK
 
-	resp, _, err := client.Pipeline(*name, *version).Search(ctx, in, tracking)
+	resp, outputs, err := client.Pipeline(*name, *version).Search(ctx, in, tracking)
 	if err != nil {
 		return fmt.Errorf("Code: %v Message: %v", grpc.Code(err), grpc.ErrorDesc(err))
 	}
 
-	for _, result := range resp.Results {
-		b, err := json.MarshalIndent(result, "", "  ")
-		if err != nil {
-			return fmt.Errorf("could not write out result (%v): %v", result, err)
+	switch *format {
+
+	case "json":
+		for _, result := range resp.Results {
+			b, err := json.MarshalIndent(result, "", "  ")
+			if err != nil {
+				return fmt.Errorf("could not write out result (%v): %v", result, err)
+			}
+			fmt.Println(string(b))
 		}
-		fmt.Println(string(b))
+	case "table":
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.Debug)
+		fmt.Fprintf(w, "\n")
+		var headers []string
+		for i, result := range resp.Results {
+			if i == 0 {
+				for k := range result.Values {
+					headers = append(headers, k)
+				}
+				sort.Strings(headers)
+				fmt.Fprintf(w, "index score\tscore\t")
+				for _, k := range headers {
+					fmt.Fprintf(w, " %v\t", k)
+				}
+				fmt.Fprintf(w, "\n")
+			}
+			fmt.Fprintf(w, "%.4f\t %.4f\t", result.IndexScore, result.Score)
+			for _, k := range headers {
+				fmt.Fprintf(w, " %v\t", result.Values[k])
+			}
+			fmt.Fprintf(w, "\n")
+		}
+		fmt.Fprintf(w, "\n")
+		w.Flush()
 	}
 
-	fmt.Println("Total Results", len(resp.Results))
-	fmt.Println("Reads", resp.Reads)
-	fmt.Println("Time", resp.Latency)
+	if len(outputs) > 0 {
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.Debug)
+		fmt.Fprintf(w, "Outputs:\nkey\t value\n")
+		for k, v := range outputs {
+			fmt.Fprintf(w, "%v\t %v\n", k, v)
+		}
+		w.Flush()
+	}
+
+	fmt.Printf("\nTotal Results: %v", len(resp.Results))
+	fmt.Printf("\nReads: %v", resp.Reads)
+	fmt.Printf("\nTime: %v", resp.Latency)
 
 	return nil
 }
