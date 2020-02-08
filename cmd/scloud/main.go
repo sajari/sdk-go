@@ -13,7 +13,9 @@ import (
 )
 
 var (
-	topLevelCommands = []string{"init", "auth", "config", "schema", "record", "pipeline", "interaction"}
+	version = "0.1"
+
+	topLevelCommands = []string{"version", "init", "auth", "config", "schema", "record", "pipeline", "interaction"}
 )
 
 // TODO
@@ -60,6 +62,9 @@ func main() {
 	defer fn()
 
 	switch cmd {
+	case "version":
+		fmt.Printf("version: %v\n", version)
+
 	case "config":
 		if err := c.Settings(params); err != nil {
 			fmt.Printf("%v", err)
