@@ -96,9 +96,9 @@ func Query(client *sajari.Client, args []string) error {
 		w.Flush()
 	}
 
-	fmt.Printf("\nTotal Results: %v", len(resp.Results))
+	fmt.Printf("\nShowing %v of %v total results", len(resp.Results), resp.TotalResults)
 	fmt.Printf("\nReads: %v", resp.Reads)
-	fmt.Printf("\nTime: %v", resp.Latency)
+	fmt.Printf("\nTime: %v\n", resp.Latency)
 
 	return nil
 }
