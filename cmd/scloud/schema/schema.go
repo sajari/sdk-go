@@ -42,7 +42,7 @@ func Run(client *sajari.Client, args []string) error {
 
 	if len(args) == 0 {
 		defer iflags.Usage()
-		return fmt.Errorf("\nusage: scloud schema <cmd> [options...]\n\n")
+		return fmt.Errorf("\nusage: scloud schema <%v> [options...]\n\n", strings.Join(topLevelCommands, "|"))
 	}
 	iflags.Parse(args[1:])
 
