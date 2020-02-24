@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"code.sajari.com/sdk-go/cmd/scloud/config"
+	csvcmd "code.sajari.com/sdk-go/cmd/scloud/csv"
 	"code.sajari.com/sdk-go/cmd/scloud/interaction"
 	"code.sajari.com/sdk-go/cmd/scloud/pipeline"
 	"code.sajari.com/sdk-go/cmd/scloud/record"
@@ -90,6 +91,11 @@ func main() {
 
 	case "interaction":
 		if err := interaction.Run(client, params); err != nil {
+			fmt.Printf("%v", err)
+		}
+
+	case "csv":
+		if err := csvcmd.Run(client, params); err != nil {
 			fmt.Printf("%v", err)
 		}
 
