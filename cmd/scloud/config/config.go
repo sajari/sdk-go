@@ -96,7 +96,7 @@ func (c *config) Save() error {
 	}
 
 	dir := filepath.Join(home, configPath)
-	os.MkdirAll(dir, 0600)
+	os.MkdirAll(dir, 0700)
 	path := filepath.Join(dir, configName)
 	f, err := os.Create(path)
 	if err != nil {
