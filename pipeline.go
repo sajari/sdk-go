@@ -30,7 +30,7 @@ type Pipeline struct {
 	c *Client
 }
 
-// Search runs a search query defined by a pipline with the given params and
+// Search runs a search query defined by a pipeline with the given params and
 // session to run in.  Returns the query results and returned params (which could have
 // been modified in the pipeline).
 func (p *Pipeline) Search(ctx context.Context, params map[string]string, s Session) (*Results, map[string]string, error) {
@@ -241,9 +241,8 @@ func (p *Pipeline) proto() *pipelinepb.Identifier {
 	}
 }
 
-// CreateRecord adds multiple records to a collection using a pipeline, returning a list of Keys which
-// can be used to retrieve the respective record.  If any of the adds fail then a MultiError will
-// be returned with errors set in the respective indexes.
+// CreateRecord uses a pipeline to add a single record to a collection and
+// returns a Key which can be used to retrieve the newly created record.
 func (p *Pipeline) CreateRecord(ctx context.Context, values map[string]string, r Record) (*Key, map[string]string, error) {
 	pbr, err := r.proto()
 	if err != nil {
@@ -271,9 +270,8 @@ func (p *Pipeline) CreateRecord(ctx context.Context, values map[string]string, r
 	return k, m, nil
 }
 
-// ReplaceRecord adds a record to a collection using a pipeline, returning a list of Keys which
-// can be used to retrieve the respective record.  If any of the adds fail then a MultiError will
-// be returned with errors set in the respective indexes.
+// ReplaceRecord uses a pipeline to replace a single record in a collection
+// represented by the given Key.
 func (p *Pipeline) ReplaceRecord(ctx context.Context, values map[string]string, key *Key, r Record) (*Key, map[string]string, error) {
 	pbr, err := r.proto()
 	if err != nil {
