@@ -225,6 +225,10 @@ func (it *KeyIterator) Next() (*Key, error) {
 		if it.token == "" {
 			it.end = true
 		}
+
+		if len(it.keys) == 0 {
+			return nil, ErrDone
+		}
 	}
 
 	k := it.keys[0]
