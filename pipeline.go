@@ -3,7 +3,11 @@ package sajari
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/golang/protobuf/ptypes"
 
@@ -12,6 +16,23 @@ import (
 	enginepb "code.sajari.com/protogen-go/sajari/engine/v2"
 	pipelinepb "code.sajari.com/protogen-go/sajari/pipeline/v2"
 )
+
+// NoDefaultPipelineError is the error type returned when the collection does
+// not have a default version set for a given pipeline.
+// To resolve errors of this type, the caller should either pass an explicit
+// pipeline version along with their pipeline name, or they should set a default
+// pipeline version using the API or CLI tools.
+type NoDefaultPipelineError struct {
+	// Name is the name of the pipeline used in the attempted operation.
+	Name string
+}
+
+var _ error = (*NoDefaultPipelineError)(nil)
+
+// Error implements error.
+func (e *NoDefaultPipelineError) Error() string {
+	return fmt.Sprintf("no default version has been set for the pipeline named %q", e.Name)
+}
 
 // Pipeline returns a Pipeline for querying a collection.
 func (c *Client) Pipeline(name, version string) *Pipeline {
@@ -47,7 +68,13 @@ func (p *Pipeline) Search(ctx context.Context, params map[string]string, s Sessi
 
 	resp, err := pipelinepb.NewQueryClient(p.c.ClientConn).Search(p.c.newContext(ctx), r)
 	if err != nil {
-		return nil, nil, err
+		s, ok := status.FromError(err)
+		if ok {
+			if s.Code() == codes.NotFound && strings.HasPrefix(s.Message(), "no default pipeline") {
+				err = fmt.Errorf("%w", &NoDefaultPipelineError{Name: p.name})
+			}
+		}
+		return nil, nil, fmt.Errorf("could not run search: %w", err)
 	}
 
 	results, err := processResponse(resp.GetQueryResults(), resp.GetTokens()...)

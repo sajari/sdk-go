@@ -168,7 +168,7 @@ func ExamplePipeline_Search() {
 	}
 	defer client.Close()
 
-	pipeline := client.Pipeline("record", "v5")
+	pipeline := client.Pipeline("query", "v5")
 
 	values := map[string]string{
 		"q":              "your search terms",
@@ -184,5 +184,29 @@ func ExamplePipeline_Search() {
 	for _, r := range res.Results {
 		log.Printf("Values: %v", r.Values)
 		log.Printf("Tokens: %v", r.Tokens)
+	}
+}
+
+func ExamplePipeline_Search_noDefaultPipelineError() {
+	creds := sajari.KeyCredentials("key-id", "key-secret")
+	client, err := sajari.New("project", "collection", sajari.WithCredentials(creds))
+	if err != nil {
+		// handle
+	}
+	defer client.Close()
+
+	pipeline := client.Pipeline("query", "")
+
+	values := map[string]string{
+		"q": "your search terms",
+	}
+
+	_, _, err = pipeline.Search(context.Background(), values, sajari.NonTrackedSession())
+	if err != nil {
+		var e *sajari.NoDefaultPipelineError
+		if errors.As(err, &e) {
+			// handle case where there is no default pipeline version set
+		}
+		// handle other error cases
 	}
 }
