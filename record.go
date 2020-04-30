@@ -5,13 +5,17 @@ import (
 	"errors"
 	"fmt"
 
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+
 	"code.sajari.com/sdk-go/internal/protoutil"
 
 	enginepb "code.sajari.com/protogen-go/sajari/engine/v2"
 )
 
-// ErrNoSuchRecord is returned when a requested record cannot be found.
-var ErrNoSuchRecord = errors.New("sajari: no such record")
+// ErrNoSuchRecord is returned when a record was requested but there is no such
+// record.
+var ErrNoSuchRecord = errors.New("no such record")
 
 // Record is a set of field-value pairs representing a record in a collection.
 type Record map[string]interface{}
@@ -118,6 +122,11 @@ func recordFromProto(pbr *enginepb.Record) (Record, error) {
 	return d, nil
 }
 
+// MutateRecord mutates a record identified by the key k by applying the given
+// record mutation operations.
+//
+// If there is no such record matching the given key this method returns an
+// error wrapping ErrNoSuchRecord.
 func (c *Client) MutateRecord(ctx context.Context, k *Key, fms ...RecordMutation) error {
 	pbk, err := k.proto()
 	if err != nil {
@@ -133,7 +142,15 @@ func (c *Client) MutateRecord(ctx context.Context, k *Key, fms ...RecordMutation
 		Key:            pbk,
 		FieldMutations: pbfms,
 	})
-	return err
+	if err != nil {
+		switch code := grpc.Code(err); code {
+		case codes.NotFound:
+			return fmt.Errorf("%v: %w", k, ErrNoSuchRecord)
+		default:
+			return fmt.Errorf("could not mutate record: %w", err)
+		}
+	}
+	return nil
 }
 
 type recordMutations []RecordMutation
@@ -152,6 +169,9 @@ func (rms recordMutations) proto() ([]*enginepb.MutateRecordRequest_FieldMutatio
 
 // DeleteRecord removes a record identified by the key k.  Returns non-nil error if there was
 // a communication problem, but fails silently if any key doesn't have a corresponding record.
+//
+// If there is no such record matching the given key this method returns an
+// error wrapping ErrNoSuchRecord.
 func (c *Client) DeleteRecord(ctx context.Context, k *Key) error {
 	pbk, err := k.proto()
 	if err != nil {
@@ -161,10 +181,16 @@ func (c *Client) DeleteRecord(ctx context.Context, k *Key) error {
 	_, err = enginepb.NewStoreClient(c.ClientConn).DeleteRecord(c.newContext(ctx), &enginepb.DeleteRecordRequest{
 		Key: pbk,
 	})
-	return err
+	if err != nil {
+		return fmt.Errorf("could not delete record: %w", err)
+	}
+	return nil
 }
 
-// GetRecord retrives the record identified by the key k.
+// GetRecord retrieves the record identified by the key k.
+//
+// If there is no such record matching the given key this method returns an
+// error wrapping ErrNoSuchRecord.
 func (c *Client) GetRecord(ctx context.Context, k *Key) (Record, error) {
 	pbk, err := k.proto()
 	if err != nil {
@@ -175,7 +201,12 @@ func (c *Client) GetRecord(ctx context.Context, k *Key) (Record, error) {
 		Key: pbk,
 	})
 	if err != nil {
-		return nil, err
+		switch code := grpc.Code(err); code {
+		case codes.NotFound:
+			return nil, fmt.Errorf("%v: %w", k, ErrNoSuchRecord)
+		default:
+			return nil, fmt.Errorf("could not get record: %w", err)
+		}
 	}
 	return recordFromProto(resp.GetRecord())
 }

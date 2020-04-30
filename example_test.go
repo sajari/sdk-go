@@ -2,6 +2,7 @@ package sajari_test
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
 
@@ -32,6 +33,25 @@ func ExampleClient_GetRecord() {
 		// handle
 	}
 	_ = record // use record
+}
+
+func ExampleClient_GetRecord_errNoSuchRecord() {
+	creds := sajari.KeyCredentials("key-id", "key-secret")
+	client, err := sajari.New("project", "collection", sajari.WithCredentials(creds))
+	if err != nil {
+		// handle
+	}
+	defer client.Close()
+
+	key := sajari.NewKey("id", "12345") // or using your Key returned from another call
+
+	_, err = client.GetRecord(context.Background(), key)
+	if err != nil {
+		if errors.Is(err, sajari.ErrNoSuchRecord) {
+			// handle case where there is no such record
+		}
+		// handle other error cases
+	}
 }
 
 func ExampleClient_MutateRecord() {
