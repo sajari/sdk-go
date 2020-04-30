@@ -74,6 +74,8 @@ pipeline := client.Pipeline("record", "v5")
 
 Next, set up any values that you need to pass to the record pipeline, define your record and call `CreateRecord`.
 
+Values allow you to control the pipeline execution. For example, they can be used to dynamically turn pipeline steps on or off and control how the record is processed.
+
 ```go
 values := map[string]string{
 	// ...
@@ -123,6 +125,8 @@ pipeline := client.Pipeline("record", "v5")
 ```
 
 Next, set up any values that you need to pass to the record pipeline, define your record and call `ReplaceRecord`.
+
+Values allow you to control the pipeline execution. For example, they can be used to dynamically turn pipeline steps on or off and control how the record is processed.
 
 ```go
 values := map[string]string{
@@ -205,10 +209,15 @@ pipeline := client.Pipeline("search", "v5")
 
 Next, set up any values that you need to pass to the query pipeline, create a session and run your search.
 
+Values allow you to control the pipeline execution. For example, they can be used to dynamically turn pipeline steps on or off and control how the records are processed.
+
+> In the example below, passing the `resultsPerPage` and `page` values allows you to paginate through records for the search query provided in `q`. Note: this assumes that you have the `pagination` step in your query pipeline.
+
 ```go
 values := map[string]string{
 	"q":              "your search terms",
 	"resultsPerPage": "10",
+	"page":           "1",
 }
 
 session := sajari.NewSession(sajari.TrackingNone, "", nil)

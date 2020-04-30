@@ -153,6 +153,7 @@ func ExamplePipeline_Search() {
 	values := map[string]string{
 		"q":              "your search terms",
 		"resultsPerPage": "10",
+		"page":           "1",
 	}
 
 	session := sajari.NewSession(sajari.TrackingNone, "", nil)
