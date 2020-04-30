@@ -184,12 +184,11 @@ func (c *Client) GetRecord(ctx context.Context, k *Key) (Record, error) {
 // for each record in the collection. If changes to the collection are made
 // whilst iterating, the iterator may become invalid or return keys already
 // visited.
-func (c *Client) Keys(ctx context.Context, field string, limit int) *KeyIterator {
+func (c *Client) Keys(ctx context.Context, field string) *KeyIterator {
 	return &KeyIterator{
 		ctx:   ctx,
 		c:     c,
 		field: field,
-		limit: limit,
 	}
 }
 
@@ -201,7 +200,6 @@ type KeyIterator struct {
 	ctx     context.Context
 	c       *Client
 	field   string
-	limit   int
 	token   string
 	keys    []*Key
 	end     bool
@@ -239,7 +237,7 @@ func (it *KeyIterator) Next() (*Key, error) {
 func (it *KeyIterator) fetch(ctx context.Context) (ks []*Key, token string, err error) {
 	resp, err := enginepb.NewStoreClient(it.c.ClientConn).ListKeys(it.c.newContext(ctx), &enginepb.ListKeysRequest{
 		Field:     it.field,
-		PageSize:  int32(it.limit),
+		PageSize:  0,
 		PageToken: it.token,
 	})
 	if err != nil {
