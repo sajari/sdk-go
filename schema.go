@@ -38,14 +38,14 @@ type FieldIterator struct {
 	lastErr error
 }
 
-// Next returns the next field in the iteration, or Field{}, ErrDone if there
-// are no more fields remaining.
+// Next returns the next field in the iteration. If there are no more fields
+// remaining then an error wrapping ErrDone is returned.
 func (it *FieldIterator) Next() (Field, error) {
 	if it.lastErr != nil {
 		return Field{}, it.lastErr
 	}
 	if len(it.fields) == 0 && it.end {
-		return Field{}, ErrDone
+		return Field{}, fmt.Errorf("%w", ErrDone)
 	}
 
 	if len(it.fields) == 0 {

@@ -237,14 +237,14 @@ type KeyIterator struct {
 	lastErr error
 }
 
-// Next returns the next key in the iteration, or nil, ErrDone if there
-// are no more keys remaining.
+// Next returns the next key in the iteration. If there are no more keys
+// remaining then an error wrapping ErrDone is returned.
 func (it *KeyIterator) Next() (*Key, error) {
 	if it.lastErr != nil {
 		return nil, it.lastErr
 	}
 	if len(it.keys) == 0 && it.end {
-		return nil, ErrDone
+		return nil, fmt.Errorf("%w", ErrDone)
 	}
 
 	if len(it.keys) == 0 {
@@ -256,7 +256,7 @@ func (it *KeyIterator) Next() (*Key, error) {
 		}
 
 		if len(it.keys) == 0 {
-			return nil, ErrDone
+			return nil, fmt.Errorf("%w", ErrDone)
 		}
 	}
 
