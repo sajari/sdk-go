@@ -28,13 +28,34 @@ type Pipeline struct {
 	version string
 
 	c *Client
+
+	searchSession Session
 }
 
-// Search runs a search query defined by a pipeline with the given params and
-// session to run in.  Returns the query results and returned params (which could have
-// been modified in the pipeline).
-func (p *Pipeline) Search(ctx context.Context, params map[string]string, s Session) (*Results, map[string]string, error) {
-	pbTracking, err := s.next(params)
+// SearchOpt is a type which defines options for the Search method.
+type SearchOpt func(p *Pipeline)
+
+// WithSession configures the pipeline search to use the given session.
+func WithSession(session Session) SearchOpt {
+	return func(p *Pipeline) {
+		p.searchSession = session
+	}
+}
+
+// Search runs a search query defined by a pipeline with the given params.
+// Returns the query results and returned params (which could have been modified
+// in the pipeline).
+func (p *Pipeline) Search(ctx context.Context, params map[string]string, opts ...SearchOpt) (*Results, map[string]string, error) {
+	defaultOpts := []SearchOpt{
+		WithSession(NewSession(TrackingNone, "", nil)),
+	}
+
+	opts = append(defaultOpts, opts...)
+	for _, opt := range opts {
+		opt(p)
+	}
+
+	pbTracking, err := p.searchSession.next(params)
 	if err != nil {
 		return nil, nil, err
 	}
