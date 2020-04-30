@@ -153,6 +153,7 @@ func ExamplePipeline_Search() {
 	values := map[string]string{
 		"q":              "your search terms",
 		"resultsPerPage": "10",
+		"page":           "1",
 	}
 
 	res, _, err := pipeline.Search(context.Background(), values, sajari.NonTrackedSession())
