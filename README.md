@@ -211,9 +211,7 @@ values := map[string]string{
 	"resultsPerPage": "10",
 }
 
-session := sajari.NewSession(sajari.TrackingNone, "", nil)
-
-res, _, err := pipeline.Search(context.Background(), values, session)
+res, _, err := pipeline.Search(context.Background(), values, sajari.NonTrackedSession())
 if err != nil {
 	// handle
 }

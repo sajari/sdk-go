@@ -7,6 +7,11 @@ import (
 	pipelinepb "code.sajari.com/protogen-go/sajari/pipeline/v2"
 )
 
+// NonTrackedSession creates a session with no tracking enabled.
+func NonTrackedSession() Session {
+	return NewSession(TrackingNone, "", nil)
+}
+
 // WebSearchSession handles search sessions for website-style searching.
 //
 // It tracks the search text (pass to the query pipeline via queryLabel),
