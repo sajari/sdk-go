@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"code.sajari.com/sdk-go/internal/protoutil"
 
@@ -143,7 +143,7 @@ func (c *Client) MutateRecord(ctx context.Context, k *Key, fms ...RecordMutation
 		FieldMutations: pbfms,
 	})
 	if err != nil {
-		switch code := grpc.Code(err); code {
+		switch code := status.Code(err); code {
 		case codes.NotFound:
 			return fmt.Errorf("%v: %w", k, ErrNoSuchRecord)
 		default:
@@ -201,7 +201,7 @@ func (c *Client) GetRecord(ctx context.Context, k *Key) (Record, error) {
 		Key: pbk,
 	})
 	if err != nil {
-		switch code := grpc.Code(err); code {
+		switch code := status.Code(err); code {
 		case codes.NotFound:
 			return nil, fmt.Errorf("%v: %w", k, ErrNoSuchRecord)
 		default:
