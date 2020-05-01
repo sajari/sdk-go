@@ -249,4 +249,4 @@ go test ./...
 
 ## License
 
-We use the [MIT License](./LICENSE.md).
+We use the [MIT License](./LICENSE).
