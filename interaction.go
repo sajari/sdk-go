@@ -3,9 +3,11 @@ package sajari
 import (
 	"context"
 
-	"code.sajari.com/protogen-go/sajari/interaction/v2"
+	interactionpb "code.sajari.com/protogen-go/sajari/interaction/v2"
 )
 
+// Interaction creates a new Interaction which can be used to register
+// interactions.
 func (c *Client) Interaction() *Interaction {
 	return &Interaction{
 		c: c,

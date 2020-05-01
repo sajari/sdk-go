@@ -133,6 +133,8 @@ type Field struct {
 	Indexes []FieldIndex
 }
 
+// Index returns the index matching the given identifier/specification.
+// If no such index exists then it will return ({}, false).
 func (f Field) Index(spec string) (FieldIndex, bool) {
 	for _, idx := range f.Indexes {
 		if idx.Spec == spec {

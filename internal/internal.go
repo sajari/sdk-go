@@ -11,6 +11,7 @@ const (
 	collectionKey = "collection"
 )
 
+// NewContext creates a new context with project and collection attached.
 func NewContext(ctx context.Context, project, collection string) context.Context {
 	m := map[string]string{
 		projectKey:    project,
