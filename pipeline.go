@@ -23,7 +23,7 @@ import (
 // pipeline version along with their pipeline name, or they should set a default
 // pipeline version using the API or CLI tools.
 type NoDefaultPipelineError struct {
-	// Name is the name of the pipeline used in the attempted operation.
+	// Name of the pipeline used in the attempted operation.
 	Name string
 }
 

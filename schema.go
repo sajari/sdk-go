@@ -114,13 +114,13 @@ func fieldFromProto(f *pb.Field) (Field, error) {
 
 // Field represents a meta field which can be assigned in a collection record.
 type Field struct {
-	// Name is the name used to identify the field.
+	// Name used to identify the field.
 	Name string
 
-	// Description is a description of the field.
+	// Description of the field.
 	Description string
 
-	// Type defines the type of the field.
+	// Type of the field.
 	Type FieldType
 
 	// Mode of the field.
