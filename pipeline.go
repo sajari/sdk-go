@@ -128,9 +128,13 @@ func processResponse(pbResp *pipelinepb.QueryResults, tokens ...*pipelinepb.Toke
 		results = append(results, r)
 	}
 
-	d, err := ptypes.Duration(pbResp.GetLatency())
-	if err != nil {
-		return nil, err
+	var d time.Duration
+	var err error
+	if pbResp.GetLatency() != nil {
+		d, err = ptypes.Duration(pbResp.GetLatency())
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	resp := &Results{
