@@ -134,12 +134,12 @@ func processResponse(pbResp *pipelinepb.QueryResults, tokens ...*pipelinepb.Toke
 		Results:      results,
 	}
 
-	if pbResp.GetLatency() != nil {
-		d, err := ptypes.Duration(pbResp.GetLatency())
+	if pbL := pbResp.GetLatency(); pbL != nil {
+		l, err := ptypes.Duration(pbL)
 		if err != nil {
 			return nil, err
 		}
-		resp.Latency = d
+		resp.Latency = l
 	}
 
 	if pbA := pbResp.GetAggregates(); pbA != nil {
