@@ -50,7 +50,7 @@ func (k *Key) String() string {
 	if k == nil {
 		return ""
 	}
-	return fmt.Sprintf("Key{Field: %q, Value: %q}", k.field, k.value)
+	return fmt.Sprintf("Key{Field: %v, Value: %v}", k.field, k.value)
 }
 
 type keys []*Key
