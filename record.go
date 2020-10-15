@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"code.sajari.com/sdk-go/internal/openapi"
 	"code.sajari.com/sdk-go/internal/protoutil"
 
 	enginepb "code.sajari.com/protogen-go/sajari/engine/v2"
@@ -192,11 +193,43 @@ func (c *Client) DeleteRecord(ctx context.Context, k *Key) error {
 	return nil
 }
 
+func (c *Client) getRecordV4(ctx context.Context, k *Key) (Record, error) {
+	ctx = context.WithValue(ctx, openapi.ContextBasicAuth, c.openAPI.auth)
+
+	req := openapi.Sajariv4beta1GetRecordRequest{
+		Key: openapi.Sajariv4beta1Key{
+			Field: k.field,
+			Value: fmt.Sprintf("%v", k.value),
+		},
+	}
+	resp, _, err := c.openAPI.client.RecordsApi.GetRecord(ctx, c.Collection).Sajariv4beta1GetRecordRequest(req).Execute()
+	if err != nil {
+		switch x := err.(type) {
+		case openapi.GenericOpenAPIError:
+			m := x.Model()
+
+			if m, ok := m.(openapi.GatewayruntimeError3); ok {
+				switch codes.Code(m.GetCode()) {
+				case codes.NotFound:
+					return nil, fmt.Errorf("%v: %w", k, ErrNoSuchRecord)
+				}
+			}
+		}
+		return nil, fmt.Errorf("could not get record: %w", err)
+	}
+
+	return resp, nil
+}
+
 // GetRecord retrieves the record identified by the key k.
 //
 // If there is no such record matching the given key this method returns an
 // error wrapping ErrNoSuchRecord.
 func (c *Client) GetRecord(ctx context.Context, k *Key) (Record, error) {
+	if c.v4 {
+		return c.getRecordV4(ctx, k)
+	}
+
 	pbk, err := k.proto()
 	if err != nil {
 		return nil, err

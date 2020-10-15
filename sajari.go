@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/credentials"
 
 	"code.sajari.com/sdk-go/internal"
+	"code.sajari.com/sdk-go/internal/openapi"
 )
 
 const (
@@ -21,6 +22,12 @@ func New(project, collection string, opts ...Opt) (*Client, error) {
 	c := &Client{
 		Project:    project,
 		Collection: collection,
+	}
+
+	c.openAPI.config = openapi.NewConfiguration()
+	c.openAPI.config.UserAgent = userAgent
+	c.openAPI.config.DefaultHeader = map[string]string{
+		"Account-Id": project,
 	}
 
 	defaultOpts := []Opt{
@@ -56,6 +63,13 @@ type Client struct {
 
 	ClientConn *grpc.ClientConn
 	dialOpts   []grpc.DialOption
+
+	v4      bool
+	openAPI struct {
+		config *openapi.Configuration
+		client *openapi.APIClient
+		auth   openapi.BasicAuth
+	}
 }
 
 // Close releases all resources held by the Client.

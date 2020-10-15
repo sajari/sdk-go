@@ -1,0 +1,3184 @@
+openapi: 3.0.3
+info:
+  contact:
+    email: support@sajari.com
+    name: API Support
+    url: https://www.sajari.com/company/contact
+  description: Sajari is a smart, highly-configurable, real-time search service that
+    enables thousands of businesses worldwide to provide amazing search experiences
+    on their websites, stores, and applications.
+  termsOfService: https://www.sajari.com/terms
+  title: Sajari API
+  version: v4beta1
+  x-logo:
+    altText: Sajari
+    url: /docs/api-reference/logo-full.png
+externalDocs:
+  description: Read more about the Sajari API
+  url: https://www.sajari.com/docs
+servers:
+- url: https://api-gateway.sajari.com
+security:
+- BasicAuth: []
+tags:
+- description: |-
+    Collections store the records that you want to search through.
+
+    They also contain the configuration associated with your data including pipelines, rules, synonyms, authorized domains and analytics. Each collection has an associated schema that designates field names, field types, and whether a field's data is indexed for text search.
+
+    Create a collection for every new set of related records that you want to search through.
+  name: Collections
+- description: |-
+    In Sajari, you configure your search algorithm using pipelines.
+
+    Pipelines are easily configurable YAML-based scripts that define a series of steps that are executed sequentially when indexing a record, using a record pipeline, or performing a query, using a query pipeline.
+  name: Pipelines
+- description: |-
+    A schema describes the set of fields that records in a collection can have.
+
+    It is made up of a list of schema fields. Each schema field has a name, associated data type and mode.
+
+    For example, the following record:
+
+    ```json
+    {
+      "id": "54hdc7h2334h",
+      "name": "Smart TV",
+      "price": 1999,
+      "brand": "Acme",
+      "in_stock": true,
+      "tags": ["TV", "Smart TV"],
+      "create_time": "2006-01-02T15:04:05Z07:00"
+    }
+    ```
+
+    Requires the following schema fields:
+
+    - `id`, of type **STRING** and mode **UNIQUE**
+    - `name`, of type **STRING**
+    - `price`, of type **FLOAT**
+    - `brand`, of type **STRING**
+    - `in_stock`, of type **BOOLEAN**
+    - `tags`, of type list of **STRING**
+    - `create_time`, of type **TIMESTAMP**
+
+    Type can be one of the following:
+
+    - **STRING**
+    - **INTEGER**
+    - **BOOLEAN**
+    - **FLOAT**
+    - **DOUBLE**
+    - **TIMESTAMP**, in [RFC3339](https://tools.ietf.org/html/rfc3339) format
+    - List of **STRING**
+    - List of **INTEGER**
+    - List of **BOOLEAN**
+    - List of **FLOAT**
+    - List of **DOUBLE**
+    - List of **TIMESTAMP**
+
+    Mode can be one of the following:
+
+    - **NULLABLE**, indicates a record field-value pair can be null
+    - **REQUIRED**, indicates a record field-value pair is required
+    - **UNIQUE**, indicates a record field-value pair must be unique across all records in the collection
+  name: Schema
+- description: |-
+    A record is a single entry in a collection, made up of field-value pairs.
+
+    For example in the following record:
+
+    ```json
+    {
+      "name": "Kim Jones"
+    }
+    ```
+
+    There is one field-value pair. The field is `name` and the value is `"Kim Jones"`.
+
+    Records are analogous to rows in a database. Records can represent:
+
+    - Webpages
+    - Standard documents e.g. HTML, PDF, Microsoft Word Document
+    - Custom data objects, if your data is not webpages or documents
+
+    The set of fields a record can have is known as its schema. Webpages indexed via Sajari's web crawler have a predefined schema that can be extended with custom fields. For custom records, you can define your own schema.
+  name: Records
+paths:
+  /v4beta1/collections:
+    get:
+      description: Retrieve a list of collections in the account.
+      operationId: ListCollections
+      parameters:
+      - description: |-
+          The maximum number of collections to return. The service may return fewer
+          than this value.
+
+          If unspecified, at most 50 collections are returned.
+
+          The maximum value is 100; values above 100 are coerced to 100.
+        explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: |-
+          A page token, received from a previous
+          [ListCollections](/docs/api-reference#operation/ListCollections) call.
+
+          Provide this to retrieve the subsequent page.
+
+          When paginating, all other parameters provided to
+          [ListCollections](/docs/api-reference#operation/ListCollections) must match
+          the call that provided the page token.
+        explode: true
+        in: query
+        name: page_token
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v4beta1ListCollectionsResponse'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError1'
+          description: An unexpected error response
+      summary: List collections
+      tags:
+      - Collections
+    post:
+      description: |-
+        Create an empty collection.
+
+        Before records can be added to a collection, the schema and pipelines for
+        the collection have to be set up. Consider setting up new collections via
+        the Sajari Console, which handles the creation of the schema and pipelines
+        for you.
+      operationId: CreateCollection
+      parameters:
+      - description: |-
+          The ID to use for the collection.
+
+          This must start with an alphanumeric character followed by one or more
+          alphanumeric or `-` characters. Strictly speaking, it must match the
+          regular expression: `^[A-Za-z][A-Za-z0-9\-]*$`.
+        explode: true
+        in: query
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: form
+      requestBody:
+        $ref: '#/components/requestBodies/v4beta1Collection'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v4beta1Collection'
+          description: A successful response.
+        "400":
+          content:
+            application/json:
+              examples:
+                response:
+                  value:
+                    code: 6
+                    message: invalid request
+                    details:
+                    - '@type': type.googleapis.com/google.rpc.BadRequest
+                      field_violations:
+                      - field: collection_id
+                        description: collection_id cannot be empty
+              schema:
+                $ref: '#/components/schemas/rpcStatus'
+          description: Returned when the request contains violations for one or more
+            fields.
+        "409":
+          content:
+            application/json:
+              examples:
+                response:
+                  value:
+                    code: 6
+                    message: resource already exists
+              schema:
+                $ref: '#/components/schemas/rpcStatus'
+          description: Returned when the collection already exists.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError1'
+          description: An unexpected error response
+      summary: Create collection
+      tags:
+      - Collections
+  /v4beta1/collections/{collection_id}:
+    delete:
+      description: |-
+        Delete a collection and all of its associated data.
+
+        > Note: this operation cannot be reversed.
+      operationId: DeleteCollection
+      parameters:
+      - description: The collection to delete, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                properties: {}
+          description: A successful response.
+        "404":
+          content:
+            application/json:
+              examples:
+                response:
+                  value:
+                    code: 5
+                    message: resource not found
+              schema:
+                $ref: '#/components/schemas/rpcStatus'
+          description: Returned when the collection was not found.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError1'
+          description: An unexpected error response
+      summary: Delete collection
+      tags:
+      - Collections
+    get:
+      description: Retrieve the details of a collection.
+      operationId: GetCollection
+      parameters:
+      - description: The collection to retrieve, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v4beta1Collection'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError1'
+          description: An unexpected error response
+      summary: Get collection
+      tags:
+      - Collections
+  /v4beta1/collections/{collection_id}:generatePipelines:
+    post:
+      description: |-
+        Generate basic record, query and autocomplete pipeline templates.
+        Use these templates as a starting point for your collection's pipelines.
+
+        This call returns a set of pipelines that you can pass directly to the
+        create pipeline call.
+
+        The generated templates can be returned in JSON, the default, or YAML. To
+        return the generated pipelines in YAML, set the request's `Accept` header
+        to `application/yaml`. The three pipelines in the YAML response are
+        separated by three dashes (`---`).
+      operationId: GeneratePipelines
+      parameters:
+      - description: The collection, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/v4beta1GeneratePipelinesRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v4beta1GeneratePipelinesResponse'
+            application/yaml:
+              examples:
+                response:
+                  value: |-
+                    type: record
+                    preSteps:
+                    - id: step-id
+                    postSteps:
+                    - id: step-id
+                    ---
+                    type: query
+                    preSteps:
+                    - id: step-id
+                    postSteps:
+                    - id: step-id
+                    ---
+                    type: autocomplete
+                    preSteps:
+                    - id: step-id
+                    postSteps:
+                    - id: step-id
+              schema:
+                $ref: '#/components/schemas/v4beta1GeneratePipelinesResponse'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError1'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError1'
+          description: An unexpected error response
+      summary: Generate pipelines
+      tags:
+      - Pipelines
+  /v4beta1/collections/{collection_id}:queryCollection:
+    post:
+      description: |-
+        Query the collection to search for records.
+
+        The following example demonstrates how to run a simple search for a
+        particular string:
+
+        ```json
+        {
+          "variables": { "q": "search terms" }
+        }
+        ```
+
+        For more information:
+
+        - See [filtering
+        content](https://www.sajari.com/docs/user-guide/integrating-search/filters/)
+        - See [tracking in the Go
+        SDK](https://github.com/sajari/sdk-go/blob/v2/session.go)
+        - See [tracking in the JS
+        SDK](https://github.com/sajari/sajari-sdk-js/blob/master/src/session.ts)
+      operationId: QueryCollection
+      parameters:
+      - description: The collection to query, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/v4beta1QueryCollectionRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v4beta1QueryCollectionResponse'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError1'
+          description: An unexpected error response
+      summary: Query collection
+      tags:
+      - Collections
+  /v4beta1/collections/{collection_id}:setDefaultPipeline:
+    post:
+      description: |-
+        Set the default pipeline for a collection.
+
+        Every collection has a default `record` pipeline and a default `query`
+        pipeline.
+
+        When a pipeline is required to complete an operation, it can be omitted
+        from the request if a default pipeline has been set. When adding a record
+        to a collection, the default `record` pipeline is used if none is provided.
+        When querying a collection, the default `query` pipeline is used if none is
+        provided.
+
+        Once a default pipeline has been set it cannot be cleared, only set to
+        another pipeline.
+      operationId: SetDefaultPipeline
+      parameters:
+      - description: The collection to set the default query pipeline of, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/v4beta1SetDefaultPipelineRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v4beta1SetDefaultPipelineResponse'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError1'
+          description: An unexpected error response
+      summary: Set default pipeline
+      tags:
+      - Pipelines
+  /v4beta1/collections/{collection_id}/records:batchPut:
+    post:
+      description: |-
+        The batch version of the
+        [PutRecord](/docs/api-reference#operation/PutRecord) call.
+      operationId: BatchPutRecords
+      parameters:
+      - description: The collection to put the records in, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/v4beta1BatchPutRecordsRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v4beta1BatchPutRecordsResponse'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError2'
+          description: An unexpected error response
+      summary: Batch put records
+      tags:
+      - Records
+  /v4beta1/collections/{collection_id}/records:delete:
+    post:
+      description: Delete a record with the given key.
+      operationId: DeleteRecord
+      parameters:
+      - description: The collection that contains the record to delete, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/sajariv4beta1DeleteRecordRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                properties: {}
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError2'
+          description: An unexpected error response
+      summary: Delete record
+      tags:
+      - Records
+  /v4beta1/collections/{collection_id}/records:get:
+    post:
+      description: Retrieve a record with the given key.
+      operationId: GetRecord
+      parameters:
+      - description: The collection that contains the record to retrieve, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/sajariv4beta1GetRecordRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError2'
+          description: An unexpected error response
+      summary: Get record
+      tags:
+      - Records
+  /v4beta1/collections/{collection_id}/records:put:
+    post:
+      description: |-
+        Upsert a record. If the record does not exist in your collection it is
+        inserted. If it does exist it is updated.
+
+        If no pipeline is specified, the default record pipeline is used to process
+        the record.
+
+        For example, to add a single product from your ecommerce store to a
+        collection, use the following call:
+
+        ```json
+        {
+          "pipeline": {
+            "name": "my-pipeline",
+            "version": "1"
+          },
+          "record": {
+            "id": "54hdc7h2334h",
+            "name": "Smart TV",
+            "price": 1999,
+            "brand": "Acme",
+            "description": "...",
+            "in_stock": true
+          }
+        }
+        ```
+      operationId: PutRecord
+      parameters:
+      - description: The collection to put the record in, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/v4beta1PutRecordRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v4beta1PutRecordResponse'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError2'
+          description: An unexpected error response
+      summary: Put record
+      tags:
+      - Records
+  /v4beta1/collections/{collection_id}/pipelines:
+    get:
+      description: Retrieve a list of pipelines.
+      operationId: ListPipelines
+      parameters:
+      - description: The collection that owns this set of pipelines, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: |-
+          The maximum number of pipelines to return. The service may return fewer
+          than this value.
+
+          If unspecified, at most 50 pipelines are returned.
+
+          The maximum value is 1000; values above 1000 are coerced to 1000.
+        explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: |-
+          A page token, received from a previous
+          [ListPipelines](/docs/api-reference#operation/ListPipelines) call.
+
+          Provide this to retrieve the subsequent page.
+
+          When paginating, all other parameters provided to
+          [ListPipelines](/docs/api-reference#operation/ListPipelines) must match the
+          call that provided the page token.
+        explode: true
+        in: query
+        name: page_token
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: |-
+          The amount of information to include in each retrieved pipeline.
+
+           - VIEW_UNSPECIFIED: The default / unset value.
+          The API defaults to the `BASIC` view.
+           - BASIC: Include basic information including type, name, version and description
+          but not the full step configuration. This is the default value (for both
+          [ListPipelines](/docs/api-reference#operation/ListPipelines) and
+          [GetPipeline](/docs/api-reference#operation/GetPipeline)).
+           - FULL: Include the information from `BASIC`, plus full step
+          configuration.
+        explode: true
+        in: query
+        name: view
+        required: false
+        schema:
+          default: VIEW_UNSPECIFIED
+          enum:
+          - VIEW_UNSPECIFIED
+          - BASIC
+          - FULL
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v4beta1ListPipelinesResponse'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError3'
+          description: An unexpected error response
+      summary: List pipelines
+      tags:
+      - Pipelines
+    post:
+      description: |-
+        Create a new pipeline.
+
+        Pipelines are immutable once created. If you want to change a pipeline e.g.
+        to add or change some steps, you need to create a new version of that
+        pipeline.
+
+        To start using a new pipeline you need to update your record ingestion
+        calls and/or your query calls to specify the new pipeline.
+
+        To create the pipeline from YAML, set the request's `Content-Type` header
+        to `application/yaml` and submit the pipeline's YAML in the request body.
+      operationId: CreatePipeline
+      parameters:
+      - description: The collection to create the pipeline in, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/sajariv4beta1Pipeline'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sajariv4beta1Pipeline1'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/sajariv4beta1Pipeline1'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError3'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError3'
+          description: An unexpected error response
+      summary: Create pipeline
+      tags:
+      - Pipelines
+  /v4beta1/collections/{collection_id}/pipelines/{type}/{name}/{version}:
+    get:
+      description: |-
+        Retrieve the details of a pipeline. Supply the type, name and version.
+
+        To retrieve the pipeline in YAML, set the request's `Accept` header to
+        `application/yaml`.
+      operationId: GetPipeline
+      parameters:
+      - description: The collection that owns the pipeline, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The type of the pipeline to retrieve, either `record` or `query`.
+        explode: false
+        in: path
+        name: type
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The name of the pipeline to retrieve, e.g. `my-pipeline`.
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The version of the pipeline to retrieve, e.g. `42`.
+        explode: false
+        in: path
+        name: version
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: |-
+          The amount of information to include in the retrieved pipeline.
+
+           - VIEW_UNSPECIFIED: The default / unset value.
+          The API defaults to the `BASIC` view.
+           - BASIC: Include basic information including type, name, version and description
+          but not the full step configuration. This is the default value (for both
+          [ListPipelines](/docs/api-reference#operation/ListPipelines) and
+          [GetPipeline](/docs/api-reference#operation/GetPipeline)).
+           - FULL: Include the information from `BASIC`, plus full step configuration.
+        explode: true
+        in: query
+        name: view
+        required: false
+        schema:
+          default: VIEW_UNSPECIFIED
+          enum:
+          - VIEW_UNSPECIFIED
+          - BASIC
+          - FULL
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sajariv4beta1Pipeline1'
+            application/yaml:
+              examples:
+                response:
+                  value: |-
+                    type: record
+                    name: my-pipeline
+                    version: "1"
+                    description: version 1 of my-pipeline (record)
+                    createTime: 2020-08-11T07:52:54.287Z
+                    preSteps:
+                    - id: step-id
+                    postSteps:
+                    - id: step-id
+              schema:
+                $ref: '#/components/schemas/sajariv4beta1Pipeline1'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError3'
+            application/yaml:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError3'
+          description: An unexpected error response
+      summary: Get pipeline
+      tags:
+      - Pipelines
+  /v4beta1/collections/{collection_id}/pipelines/{type}/{name}:setDefaultVersion:
+    post:
+      description: |-
+        Set the default version for a given pipeline.
+
+        The default version of a pipeline allows you to refer to a pipeline without
+        having to specify a version. This means you can change the pipeline version
+        used for requests without having to change your code.
+      operationId: SetDefaultVersion
+      parameters:
+      - description: |-
+          The collection that owns the pipeline to set the default version of, e.g.
+          `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: |-
+          The type of the pipeline to set the default version of, either `record` or
+          `query`.
+        explode: false
+        in: path
+        name: type
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The name of the pipeline to set the default version of, e.g.
+          `my-pipeline`.
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/v4beta1SetDefaultVersionRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v4beta1SetDefaultVersionResponse'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError3'
+          description: An unexpected error response
+      summary: Set default pipeline version
+      tags:
+      - Pipelines
+  /v4beta1/collections/{collection_id}/schemaFields:
+    get:
+      description: Retrieve a list of schema fields in the collection.
+      operationId: ListSchemaFields
+      parameters:
+      - description: The collection that owns this set of schema fields, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: |-
+          The maximum number of schema fields to return. The service may return
+          fewer than this value.
+
+          If unspecified, at most 50 schema fields are returned.
+
+          The maximum value is 1000; values above 1000 are coerced to 1000.
+        explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: |-
+          A page token, received from a previous
+          [ListSchemaFields](/docs/api-reference#operation/ListSchemaFields) call.
+
+          Provide this to retrieve the subsequent page.
+
+          When paginating, all other parameters provided to
+          [ListSchemaFields](/docs/api-reference#operation/ListSchemaFields) must
+          match the call that provided the page token.
+        explode: true
+        in: query
+        name: page_token
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v4beta1ListSchemaFieldsResponse'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError4'
+          description: An unexpected error response
+      summary: List schema fields
+      tags:
+      - Schema
+    post:
+      description: Create a new field in your collection's schema.
+      operationId: CreateSchemaField
+      parameters:
+      - description: The collection to create a schema field in, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/v4beta1SchemaField'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v4beta1SchemaField1'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError4'
+          description: An unexpected error response
+      summary: Create schema field
+      tags:
+      - Schema
+  /v4beta1/collections/{collection_id}/schemaFields:batchCreate:
+    post:
+      description: |-
+        The batch version of the
+        [CreateSchemaField](/docs/api-reference#operation/CreateSchemaField) call.
+      operationId: BatchCreateSchemaFields
+      parameters:
+      - description: The collection to create the schema fields in, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/v4beta1BatchCreateSchemaFieldsRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v4beta1BatchCreateSchemaFieldsResponse'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError4'
+          description: An unexpected error response
+      summary: Batch create schema fields
+      tags:
+      - Schema
+components:
+  requestBodies:
+    v4beta1Collection:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/v4beta1Collection'
+      description: Details of the collection to create.
+      required: true
+    v4beta1GeneratePipelinesRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/v4beta1GeneratePipelinesRequest'
+      required: true
+    v4beta1QueryCollectionRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/v4beta1QueryCollectionRequest'
+      required: true
+    v4beta1SetDefaultPipelineRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/v4beta1SetDefaultPipelineRequest'
+      required: true
+    v4beta1BatchPutRecordsRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/v4beta1BatchPutRecordsRequest'
+      required: true
+    sajariv4beta1DeleteRecordRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/sajariv4beta1DeleteRecordRequest'
+      required: true
+    sajariv4beta1GetRecordRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/sajariv4beta1GetRecordRequest'
+      required: true
+    v4beta1PutRecordRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/v4beta1PutRecordRequest'
+      required: true
+    sajariv4beta1Pipeline:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/sajariv4beta1Pipeline1'
+      description: The pipeline to create.
+      required: true
+    v4beta1SetDefaultVersionRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/v4beta1SetDefaultVersionRequest'
+      required: true
+    v4beta1SchemaField:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/v4beta1SchemaField1'
+      description: The schema field to create.
+      required: true
+    v4beta1BatchCreateSchemaFieldsRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/v4beta1BatchCreateSchemaFieldsRequest'
+      required: true
+  schemas:
+    gatewayruntimeError:
+      properties:
+        error:
+          type: string
+        code:
+          format: int32
+          type: integer
+        message:
+          type: string
+        details:
+          items:
+            $ref: '#/components/schemas/protobufAny'
+          type: array
+      type: object
+    protobufAny:
+      description: |-
+        `Any` contains an arbitrary serialized protocol buffer message along with a
+        URL that describes the type of the serialized message.
+
+        Protobuf library provides support to pack/unpack Any values in the form
+        of utility functions or additional generated methods of the Any type.
+
+        Example 1: Pack and unpack a message in C++.
+
+            Foo foo = ...;
+            Any any;
+            any.PackFrom(foo);
+            ...
+            if (any.UnpackTo(&foo)) {
+              ...
+            }
+
+        Example 2: Pack and unpack a message in Java.
+
+            Foo foo = ...;
+            Any any = Any.pack(foo);
+            ...
+            if (any.is(Foo.class)) {
+              foo = any.unpack(Foo.class);
+            }
+
+         Example 3: Pack and unpack a message in Python.
+
+            foo = Foo(...)
+            any = Any()
+            any.Pack(foo)
+            ...
+            if any.Is(Foo.DESCRIPTOR):
+              any.Unpack(foo)
+              ...
+
+         Example 4: Pack and unpack a message in Go
+
+             foo := &pb.Foo{...}
+             any, err := ptypes.MarshalAny(foo)
+             ...
+             foo := &pb.Foo{}
+             if err := ptypes.UnmarshalAny(any, foo); err != nil {
+               ...
+             }
+
+        The pack methods provided by protobuf library will by default use
+        'type.googleapis.com/full.type.name' as the type URL and the unpack
+        methods only use the fully qualified type name after the last '/'
+        in the type URL, for example "foo.bar.com/x/y.z" will yield type
+        name "y.z".
+
+
+        JSON
+        ====
+        The JSON representation of an `Any` value uses the regular
+        representation of the deserialized, embedded message, with an
+        additional field `@type` which contains the type URL. Example:
+
+            package google.profile;
+            message Person {
+              string first_name = 1;
+              string last_name = 2;
+            }
+
+            {
+              "@type": "type.googleapis.com/google.profile.Person",
+              "firstName": <string>,
+              "lastName": <string>
+            }
+
+        If the embedded message type is well-known and has a custom JSON
+        representation, that representation will be embedded adding a field
+        `value` which holds the custom JSON in addition to the `@type`
+        field. Example (for message [google.protobuf.Duration][]):
+
+            {
+              "@type": "type.googleapis.com/google.protobuf.Duration",
+              "value": "1.212s"
+            }
+      example:
+        value: value
+        type_url: type_url
+      properties:
+        type_url:
+          description: |-
+            A URL/resource name that uniquely identifies the type of the serialized
+            protocol buffer message. This string must contain at least
+            one "/" character. The last segment of the URL's path must represent
+            the fully qualified name of the type (as in
+            `path/google.protobuf.Duration`). The name should be in a canonical form
+            (e.g., leading "." is not accepted).
+
+            In practice, teams usually precompile into the binary all types that they
+            expect it to use in the context of Any. However, for URLs which use the
+            scheme `http`, `https`, or no scheme, one can optionally set up a type
+            server that maps type URLs to message definitions as follows:
+
+            * If no scheme is provided, `https` is assumed.
+            * An HTTP GET on the URL must yield a [google.protobuf.Type][]
+              value in binary format, or produce an error.
+            * Applications are allowed to cache lookup results based on the
+              URL, or have them precompiled into a binary to avoid any
+              lookup. Therefore, binary compatibility needs to be preserved
+              on changes to types. (Use versioned type names to manage
+              breaking changes.)
+
+            Note: this functionality is not currently available in the official
+            protobuf release, and it is not used for type URLs beginning with
+            type.googleapis.com.
+
+            Schemes other than `http`, `https` (or the empty scheme) might be
+            used with implementation specific semantics.
+          type: string
+        value:
+          description: Must be a valid serialized protocol buffer of the above specified
+            type.
+          format: byte
+          type: string
+      type: object
+    BucketsBucket:
+      description: Bucket is the result of a bucket aggregate.
+      example:
+        name: name
+        count: 1
+      properties:
+        name:
+          description: Name of bucket.
+          type: string
+        count:
+          description: Number of records in the bucket.
+          format: int32
+          type: integer
+      type: object
+    QueryAggregateResultAnalysis:
+      example:
+        coverage: 5
+        min_len: 7
+        avg_len: 3.6160767
+        cardinality: 2
+        max_len: 9
+      properties:
+        coverage:
+          description: |-
+            Coverage is the number of records which have a value
+            set.
+          format: int32
+          type: integer
+        cardinality:
+          description: Cardinality is the number of different values in a field.
+          format: int32
+          type: integer
+        min_len:
+          description: Min length of a repeated field.
+          format: int32
+          type: integer
+        max_len:
+          description: Max number of values in a repeated field.
+          format: int32
+          type: integer
+        avg_len:
+          description: Avg number of items in repeated field.
+          format: float
+          type: number
+      type: object
+    QueryAggregateResultBuckets:
+      description: Buckets is a full set of buckets computed in an aggregation.
+      example:
+        buckets:
+          key:
+            name: name
+            count: 1
+      properties:
+        buckets:
+          additionalProperties:
+            $ref: '#/components/schemas/BucketsBucket'
+          type: object
+      type: object
+    QueryAggregateResultCount:
+      example:
+        counts:
+          key: 6
+      properties:
+        counts:
+          additionalProperties:
+            format: int32
+            type: integer
+          type: object
+      title: Count contains the counts for the set of values returned
+      type: object
+    QueryAggregateResultDate:
+      example:
+        dates:
+          key: 5
+      properties:
+        dates:
+          additionalProperties:
+            format: int32
+            type: integer
+          type: object
+      type: object
+    QueryAggregateResultMetric:
+      description: Metric represents the metric type requested, represented by an
+        Enumeration Type.
+      example:
+        value: 0.8008281904610115
+      properties:
+        value:
+          format: double
+          type: number
+      type: object
+    SchemaFieldMode:
+      default: MODE_UNSPECIFIED
+      description: |-
+        Mode is an enumeration of modes for a field.
+
+         - MODE_UNSPECIFIED: Mode not specified.
+         - NULLABLE: Nullable fields do not need to be specified.
+         - REQUIRED: Required fields must be specified and cannot be null.
+         - UNIQUE: Unique fields must be specified and must be unique.
+      enum:
+      - MODE_UNSPECIFIED
+      - NULLABLE
+      - REQUIRED
+      - UNIQUE
+      type: string
+    StepParamBinding:
+      example:
+        bind: bind
+        const: const
+        description: description
+        default_value: default_value
+      properties:
+        bind:
+          description: Bind the step parameter to a pipeline variable.
+          type: string
+        description:
+          description: Set the description of the step parameter.
+          type: string
+        default_value:
+          description: |-
+            Set a default value for the step parameter.
+
+            This allows you to set a default value for the step parameter when it is
+            not bound to a pipeline variable.
+          type: string
+        const:
+          description: Bind the step parameter to a constant value.
+          type: string
+      type: object
+    TokenClick:
+      description: |-
+        Click is a token that corresponds to selecting a record from a result set.
+        It is taken as an indication that this record is a good match for the
+        corresponding SearchRequest.
+      example:
+        token: token
+      properties:
+        token:
+          type: string
+      type: object
+    TokenPosNeg:
+      description: |-
+        PosNeg is a pair of tokens which are used to mark a record as a good/bad
+        result for a SearchRequest.
+      example:
+        neg: neg
+        pos: pos
+      properties:
+        pos:
+          type: string
+        neg:
+          type: string
+      type: object
+    ValueRepeated:
+      example:
+        values:
+        - values
+        - values
+      properties:
+        values:
+          items:
+            type: string
+          type: array
+      title: Repeated values
+      type: object
+    enginev2Value:
+      description: Value is the representation for record field values.
+      example:
+        single: single
+        null: true
+        repeated:
+          values:
+          - values
+          - values
+      properties:
+        null:
+          format: boolean
+          title: Null value
+          type: boolean
+        single:
+          title: Single value
+          type: string
+        repeated:
+          $ref: '#/components/schemas/ValueRepeated'
+      type: object
+    gatewayruntimeError1:
+      properties:
+        error:
+          type: string
+        code:
+          format: int32
+          type: integer
+        message:
+          type: string
+        details:
+          items:
+            $ref: '#/components/schemas/protobufAny'
+          type: array
+      type: object
+    protobufNullValue:
+      default: NULL_VALUE
+      description: |-
+        `NullValue` is a singleton enumeration to represent the null value for the
+        `Value` type union.
+
+         The JSON representation for `NullValue` is JSON `null`.
+
+         - NULL_VALUE: Null value.
+      enum:
+      - NULL_VALUE
+      type: string
+    rpcStatus:
+      description: |-
+        The `Status` type defines a logical error model that is suitable for
+        different programming environments, including REST APIs and RPC APIs. It is
+        used by [gRPC](https://github.com/grpc). Each `Status` message contains
+        three pieces of data: error code, error message, and error details.
+
+        You can find out more about this error model and how to work with it in the
+        [API Design Guide](https://cloud.google.com/apis/design/errors).
+      properties:
+        code:
+          description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+          format: int32
+          type: integer
+        message:
+          description: |-
+            A developer-facing error message, which should be in English. Any
+            user-facing error message should be localized and sent in the
+            [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+          type: string
+        details:
+          description: |-
+            A list of messages that carry the error details.  There is a common set of
+            message types for APIs to use.
+          items:
+            $ref: '#/components/schemas/protobufAny'
+          type: array
+      type: object
+    sajariv4beta1Pipeline:
+      example:
+        create_time: 2000-01-23T04:56:07.000+00:00
+        post_steps:
+        - condition: condition
+          description: description
+          annotations:
+          - annotations
+          - annotations
+          id: id
+          title: title
+          params:
+            key:
+              bind: bind
+              const: const
+              description: description
+              default_value: default_value
+        - condition: condition
+          description: description
+          annotations:
+          - annotations
+          - annotations
+          id: id
+          title: title
+          params:
+            key:
+              bind: bind
+              const: const
+              description: description
+              default_value: default_value
+        name: name
+        pre_steps:
+        - condition: condition
+          description: description
+          annotations:
+          - annotations
+          - annotations
+          id: id
+          title: title
+          params:
+            key:
+              bind: bind
+              const: const
+              description: description
+              default_value: default_value
+        - condition: condition
+          description: description
+          annotations:
+          - annotations
+          - annotations
+          id: id
+          title: title
+          params:
+            key:
+              bind: bind
+              const: const
+              description: description
+              default_value: default_value
+        description: description
+        version: version
+      properties:
+        create_time:
+          description: Output only. Creation time of the pipeline.
+          format: date-time
+          readOnly: true
+          type: string
+        type:
+          $ref: '#/components/schemas/v4beta1PipelineType'
+        name:
+          description: |-
+            The pipeline's name.
+
+            Must start with an alphanumeric character followed by one or more
+            alphanumeric, `_`, `-` or `.` characters. Strictly speaking, it must match
+            the regular expression: `^[a-zA-Z0-9][a-zA-Z0-9_\-\.]+$`.
+          type: string
+        version:
+          description: |-
+            The pipeline's version.
+
+            Must start with an alphanumeric character followed by one or more
+            alphanumeric, `_`, `-` or `.` characters. Strictly speaking, it must match
+            the regular expression: `^[a-zA-Z0-9][a-zA-Z0-9_\-\.]+$`.
+          type: string
+        description:
+          description: Description of the pipeline.
+          type: string
+        pre_steps:
+          description: |-
+            Pre-steps are run before an indexing operation or query request is sent to
+            the search index.
+          items:
+            $ref: '#/components/schemas/v4beta1Step'
+          type: array
+        post_steps:
+          description: |-
+            Post-steps are run after an indexing operation or query request has been
+            sent to the search index.
+
+            For indexing operations, the post-steps only run when creating new records.
+            They do not run when updating records.
+
+            For querying, the post-steps have access to the result-set. This makes it
+            possible to act on the results before sending them back to the caller.
+          items:
+            $ref: '#/components/schemas/v4beta1Step'
+          type: array
+      required:
+      - name
+      - type
+      - version
+      type: object
+    v2QueryAggregateResult:
+      description: QueryAggregateResult contains results of aggregations.
+      example:
+        date:
+          dates:
+            key: 5
+        metric:
+          value: 0.8008281904610115
+        buckets:
+          buckets:
+            key:
+              name: name
+              count: 1
+        count:
+          counts:
+            key: 6
+        analysis:
+          coverage: 5
+          min_len: 7
+          avg_len: 3.6160767
+          cardinality: 2
+          max_len: 9
+      properties:
+        metric:
+          $ref: '#/components/schemas/QueryAggregateResultMetric'
+        count:
+          $ref: '#/components/schemas/QueryAggregateResultCount'
+        buckets:
+          $ref: '#/components/schemas/QueryAggregateResultBuckets'
+        date:
+          $ref: '#/components/schemas/QueryAggregateResultDate'
+        analysis:
+          $ref: '#/components/schemas/QueryAggregateResultAnalysis'
+      type: object
+    v2QueryResult:
+      description: QueryResult is a record as represented in a search result.
+      example:
+        score: 2.027123023002322
+        values:
+          key:
+            single: single
+            null: true
+            repeated:
+              values:
+              - values
+              - values
+        index_score: 4.145608029883936
+      properties:
+        values:
+          additionalProperties:
+            $ref: '#/components/schemas/enginev2Value'
+          description: Meta data in field-value pairs.
+          type: object
+        score:
+          description: |-
+            Score (normalised) attributed to this record.
+            Combines the index score and feature score.
+          format: double
+          type: number
+        index_score:
+          description: Index score.
+          format: double
+          type: number
+      type: object
+    v2QueryResults:
+      description: QueryResults contains all data in response to a search request.
+      example:
+        latency: latency
+        reads: reads
+        aggregate_filters:
+          key:
+            date:
+              dates:
+                key: 5
+            metric:
+              value: 0.8008281904610115
+            buckets:
+              buckets:
+                key:
+                  name: name
+                  count: 1
+            count:
+              counts:
+                key: 6
+            analysis:
+              coverage: 5
+              min_len: 7
+              avg_len: 3.6160767
+              cardinality: 2
+              max_len: 9
+        aggregates:
+          key:
+            date:
+              dates:
+                key: 5
+            metric:
+              value: 0.8008281904610115
+            buckets:
+              buckets:
+                key:
+                  name: name
+                  count: 1
+            count:
+              counts:
+                key: 6
+            analysis:
+              coverage: 5
+              min_len: 7
+              avg_len: 3.6160767
+              cardinality: 2
+              max_len: 9
+        results:
+        - score: 2.027123023002322
+          values:
+            key:
+              single: single
+              null: true
+              repeated:
+                values:
+                - values
+                - values
+          index_score: 4.145608029883936
+        - score: 2.027123023002322
+          values:
+            key:
+              single: single
+              null: true
+              repeated:
+                values:
+                - values
+                - values
+          index_score: 4.145608029883936
+        total_results: total_results
+      properties:
+        reads:
+          description: Number of reverse indexes read during the search request.
+          format: int64
+          type: string
+        total_results:
+          description: Total number of results.
+          format: int64
+          type: string
+        latency:
+          description: Time taken to perform query.
+          type: string
+        aggregates:
+          additionalProperties:
+            $ref: '#/components/schemas/v2QueryAggregateResult'
+          description: Aggregates returned by query.
+          type: object
+        aggregate_filters:
+          additionalProperties:
+            $ref: '#/components/schemas/v2QueryAggregateResult'
+          description: Aggregates run with filters.
+          type: object
+        results:
+          description: Results returned by query.
+          items:
+            $ref: '#/components/schemas/v2QueryResult'
+          type: array
+      type: object
+    v2Token:
+      description: Tokens are used to carry ranking information for query results.
+      example:
+        pos_neg:
+          neg: neg
+          pos: pos
+        click:
+          token: token
+      properties:
+        click:
+          $ref: '#/components/schemas/TokenClick'
+        pos_neg:
+          $ref: '#/components/schemas/TokenPosNeg'
+      type: object
+    v2Tracking:
+      properties:
+        type:
+          $ref: '#/components/schemas/v2TrackingType'
+        query_id:
+          description: Query ID of the query.  If this is empty, then one is generated.
+          type: string
+        sequence:
+          description: Sequence number of query.
+          format: int32
+          type: integer
+        field:
+          description: Tracking field (must be unique in the collection) used to identify
+            records in the collection.
+          type: string
+        data:
+          additionalProperties:
+            type: string
+          description: Custom values to be included in tracking data.
+          type: object
+      type: object
+    v2TrackingType:
+      default: NONE
+      description: |2-
+         - NONE: No tracking.
+         - CLICK: Click tracking.
+
+        A click token will be generated for each result.  Results which do not receive clicks
+        will fall down rankings, and similarly low-ranked records which receive clicks will be
+        moved up the rankings.
+         - POS_NEG: Pos/neg tracking.
+
+        Pos/neg tokens will be generated for each result.  Each record in the result set can be
+        marked with pos/neg value for the search.  This is then fed back into the ranking algorithm
+        to improve future results.  Unlike CLICK, if no tokens are reported for records then
+        no action is taken.
+      enum:
+      - NONE
+      - CLICK
+      - POS_NEG
+      type: string
+    v4beta1Collection:
+      example:
+        account_id: account_id
+        create_time: 2000-01-23T04:56:07.000+00:00
+        id: id
+        display_name: display_name
+      properties:
+        id:
+          description: Output only. The collection's ID.
+          readOnly: true
+          type: string
+        account_id:
+          description: Output only. The ID of the account that owns this collection.
+          readOnly: true
+          type: string
+        create_time:
+          description: Output only. Creation time of the collection.
+          format: date-time
+          readOnly: true
+          type: string
+        display_name:
+          description: The collection's display name. You can change this at any time.
+          type: string
+      required:
+      - display_name
+      type: object
+    v4beta1GeneratePipelinesRequest:
+      properties:
+        searchable_fields:
+          description: Prioritized list of fields to search.
+          items:
+            type: string
+          type: array
+        query_training_fields:
+          description: List of fields to train query suggestions from.
+          items:
+            type: string
+          type: array
+      required:
+      - searchable_fields
+      type: object
+    v4beta1GeneratePipelinesResponse:
+      example:
+        record_pipeline:
+          create_time: 2000-01-23T04:56:07.000+00:00
+          post_steps:
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          name: name
+          pre_steps:
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          description: description
+          version: version
+        autocomplete_pipeline:
+          create_time: 2000-01-23T04:56:07.000+00:00
+          post_steps:
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          name: name
+          pre_steps:
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          description: description
+          version: version
+        query_pipeline:
+          create_time: 2000-01-23T04:56:07.000+00:00
+          post_steps:
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          name: name
+          pre_steps:
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          description: description
+          version: version
+      properties:
+        record_pipeline:
+          $ref: '#/components/schemas/sajariv4beta1Pipeline'
+        query_pipeline:
+          $ref: '#/components/schemas/sajariv4beta1Pipeline'
+        autocomplete_pipeline:
+          $ref: '#/components/schemas/sajariv4beta1Pipeline'
+      type: object
+    v4beta1ListCollectionsResponse:
+      example:
+        next_page_token: next_page_token
+        collections:
+        - account_id: account_id
+          create_time: 2000-01-23T04:56:07.000+00:00
+          id: id
+          display_name: display_name
+        - account_id: account_id
+          create_time: 2000-01-23T04:56:07.000+00:00
+          id: id
+          display_name: display_name
+      properties:
+        collections:
+          description: The collections from the specified account.
+          items:
+            $ref: '#/components/schemas/v4beta1Collection'
+          type: array
+        next_page_token:
+          description: |-
+            A token, which can be sent as `page_token` to retrieve the next page.
+
+            If this field is omitted, there are no subsequent pages.
+          type: string
+      type: object
+    v4beta1PipelineType:
+      default: TYPE_UNSPECIFIED
+      description: |2-
+         - TYPE_UNSPECIFIED: Pipeline type not specified.
+         - RECORD: Record pipeline.
+         - QUERY: Query pipeline.
+         - RECORD_PIPELINE: Record pipeline. Deprecated: Use RECORD.
+         - QUERY_PIPELINE: Query pipeline. Deprecated: Use QUERY.
+      enum:
+      - TYPE_UNSPECIFIED
+      - RECORD
+      - QUERY
+      - RECORD_PIPELINE
+      - QUERY_PIPELINE
+      type: string
+    v4beta1QueryCollectionRequest:
+      description: QueryCollectionRequest is a request to perform a search using a
+        pipeline.
+      properties:
+        pipeline:
+          $ref: '#/components/schemas/v4beta1QueryCollectionRequestPipeline'
+        variables:
+          description: |-
+            The initial values for the variables the pipeline operates on and
+            transforms throughout its steps.
+
+            A typical variable is `q` which is the query the user entered, for example:
+
+            ```json
+            { "q": "search terms" }
+            ```
+          type: object
+        tracking:
+          $ref: '#/components/schemas/v2Tracking'
+      required:
+      - variables
+      type: object
+    v4beta1QueryCollectionRequestPipeline:
+      description: |-
+        The pipeline to use when querying the collection.
+
+        If not provided the default query pipeline is used.
+      properties:
+        name:
+          description: The query pipeline's name, e.g. `my-pipeline`.
+          type: string
+        version:
+          description: |-
+            The query pipeline's version, e.g. `42`.
+
+            If not provided the default version is used.
+          type: string
+      required:
+      - name
+      type: object
+    v4beta1QueryCollectionResponse:
+      example:
+        pipeline:
+          name: name
+          version: version
+        variables: '{}'
+        query_results:
+          latency: latency
+          reads: reads
+          aggregate_filters:
+            key:
+              date:
+                dates:
+                  key: 5
+              metric:
+                value: 0.8008281904610115
+              buckets:
+                buckets:
+                  key:
+                    name: name
+                    count: 1
+              count:
+                counts:
+                  key: 6
+              analysis:
+                coverage: 5
+                min_len: 7
+                avg_len: 3.6160767
+                cardinality: 2
+                max_len: 9
+          aggregates:
+            key:
+              date:
+                dates:
+                  key: 5
+              metric:
+                value: 0.8008281904610115
+              buckets:
+                buckets:
+                  key:
+                    name: name
+                    count: 1
+              count:
+                counts:
+                  key: 6
+              analysis:
+                coverage: 5
+                min_len: 7
+                avg_len: 3.6160767
+                cardinality: 2
+                max_len: 9
+          results:
+          - score: 2.027123023002322
+            values:
+              key:
+                single: single
+                null: true
+                repeated:
+                  values:
+                  - values
+                  - values
+            index_score: 4.145608029883936
+          - score: 2.027123023002322
+            values:
+              key:
+                single: single
+                null: true
+                repeated:
+                  values:
+                  - values
+                  - values
+            index_score: 4.145608029883936
+          total_results: total_results
+        tokens:
+        - pos_neg:
+            neg: neg
+            pos: pos
+          click:
+            token: token
+        - pos_neg:
+            neg: neg
+            pos: pos
+          click:
+            token: token
+      properties:
+        pipeline:
+          $ref: '#/components/schemas/v4beta1QueryCollectionResponsePipeline'
+        variables:
+          description: |-
+            The modified variables returned by the pipeline after it has finished
+            processing.
+          type: object
+        query_results:
+          $ref: '#/components/schemas/v2QueryResults'
+        tokens:
+          description: Tokens which correspond to the result records.
+          items:
+            $ref: '#/components/schemas/v2Token'
+          type: array
+      type: object
+    v4beta1QueryCollectionResponsePipeline:
+      description: The resolved query pipeline that was used to run the query.
+      example:
+        name: name
+        version: version
+      properties:
+        name:
+          description: The pipeline's name, e.g. `my-pipeline`.
+          type: string
+        version:
+          description: The pipeline's version, e.g. `42`.
+          type: string
+      type: object
+    v4beta1SchemaField:
+      description: SchemaField defines the properties of a field in the schema.
+      properties:
+        name:
+          description: The name of the field.
+          type: string
+        description:
+          description: The description of the field.
+          type: string
+        type:
+          $ref: '#/components/schemas/v4beta1SchemaFieldType'
+        mode:
+          $ref: '#/components/schemas/SchemaFieldMode'
+        list:
+          description: |-
+            List indicates if the field is a list of values.
+
+            A list is also known as an array.
+
+            For example, if `type` is string and `list` is `true`, then the field is a
+            list of strings.
+          format: boolean
+          type: boolean
+        list_length:
+          description: |-
+            The required length of the list, if `list` is `true`.
+
+            This allows you to enforce that a list contains an exact number of items.
+
+            For example, to store a 2x2 vector, you could set `type` to float, `list`
+            to `true` and `list_length` to `4`.
+          format: int32
+          type: integer
+      required:
+      - mode
+      - name
+      - type
+      type: object
+    v4beta1SchemaFieldType:
+      default: TYPE_UNSPECIFIED
+      description: |-
+        Type represents the underlying data type of the field.
+
+         - TYPE_UNSPECIFIED: Type not specified.
+         - STRING: String values.
+         - INTEGER: Integer values (64-bit).
+         - FLOAT: Floating point values (32-bit).
+         - DOUBLE: Double floating point values (64-bit).
+         - BOOLEAN: Boolean values.
+         - TIMESTAMP: Timestamp values.
+      enum:
+      - TYPE_UNSPECIFIED
+      - STRING
+      - INTEGER
+      - FLOAT
+      - DOUBLE
+      - BOOLEAN
+      - TIMESTAMP
+      type: string
+    v4beta1SetDefaultPipelineRequest:
+      properties:
+        type:
+          $ref: '#/components/schemas/v4beta1PipelineType'
+        pipeline:
+          description: The name of the pipeline to use when not otherwise specified.
+          type: string
+      required:
+      - pipeline
+      - type
+      type: object
+    v4beta1SetDefaultPipelineResponse:
+      type: object
+    v4beta1Step:
+      description: Step creates a pipeline step.
+      example:
+        condition: condition
+        description: description
+        annotations:
+        - annotations
+        - annotations
+        id: id
+        title: title
+        params:
+          key:
+            bind: bind
+            const: const
+            description: description
+            default_value: default_value
+      properties:
+        id:
+          description: ID of the step template.
+          type: string
+        title:
+          description: Title for the step. Overrides the default title.
+          type: string
+        description:
+          description: Description for the step. Overrides the default description.
+          type: string
+        params:
+          additionalProperties:
+            $ref: '#/components/schemas/StepParamBinding'
+          description: Bindings for the step parameters.
+          type: object
+        condition:
+          description: |-
+            Condition expression to determine if the step should be run.
+
+            This is a filter expression much like the query filter expression, but it
+            acts upon the pipeline variables.
+
+            For example, to only run the step if the pipeline `q` variable is not
+            empty, set this to `q != ''`.
+          type: string
+        annotations:
+          description: Annotations added to the request when the step is run.
+          items:
+            type: string
+          type: array
+      required:
+      - id
+      type: object
+    BatchPutRecordsResponseVariables:
+      example:
+        variables: '{}'
+        index: 6
+      properties:
+        index:
+          description: Index of the record in `records` that these variables correspond
+            to.
+          format: int32
+          type: integer
+        variables:
+          description: The variables.
+          type: object
+      type: object
+    gatewayruntimeError2:
+      properties:
+        error:
+          type: string
+        code:
+          format: int32
+          type: integer
+        message:
+          type: string
+        details:
+          items:
+            $ref: '#/components/schemas/protobufAny'
+          type: array
+      type: object
+    rpcStatus1:
+      description: |-
+        The `Status` type defines a logical error model that is suitable for
+        different programming environments, including REST APIs and RPC APIs. It is
+        used by [gRPC](https://github.com/grpc). Each `Status` message contains
+        three pieces of data: error code, error message, and error details.
+
+        You can find out more about this error model and how to work with it in the
+        [API Design Guide](https://cloud.google.com/apis/design/errors).
+      example:
+        code: 5
+        details:
+        - value: value
+          type_url: type_url
+        - value: value
+          type_url: type_url
+        message: message
+      properties:
+        code:
+          description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+          format: int32
+          type: integer
+        message:
+          description: |-
+            A developer-facing error message, which should be in English. Any
+            user-facing error message should be localized and sent in the
+            [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+          type: string
+        details:
+          description: |-
+            A list of messages that carry the error details.  There is a common set of
+            message types for APIs to use.
+          items:
+            $ref: '#/components/schemas/protobufAny'
+          type: array
+      type: object
+    sajariv4beta1DeleteRecordRequest:
+      properties:
+        key:
+          $ref: '#/components/schemas/sajariv4beta1Key'
+      required:
+      - key
+      type: object
+    sajariv4beta1GetRecordRequest:
+      properties:
+        key:
+          $ref: '#/components/schemas/sajariv4beta1Key'
+      required:
+      - key
+      type: object
+    sajariv4beta1Key:
+      example:
+        field: field
+        value: value
+      properties:
+        field:
+          description: A field in your record that uniquely identifies it, e.g. `id`.
+          type: string
+        value:
+          description: |-
+            The value of `field` in your record, e.g.
+            `b217a995-597c-410f-bef2-60e9f8c0aadd`.
+          type: string
+      required:
+      - field
+      - value
+      type: object
+    v4beta1BatchPutRecordsRequest:
+      properties:
+        pipeline:
+          $ref: '#/components/schemas/v4beta1BatchPutRecordsRequestPipeline'
+        records:
+          description: A list of records to put.
+          items:
+            type: object
+          type: array
+        variables:
+          description: |-
+            The initial values for the variables the pipeline operates on and
+            transforms throughout its steps.
+          type: object
+      required:
+      - records
+      type: object
+    v4beta1BatchPutRecordsRequestPipeline:
+      description: |-
+        The pipeline to use when putting the records.
+
+        If not provided the default record pipeline is used.
+      properties:
+        name:
+          description: The record pipeline's name, e.g. `my-pipeline`.
+          type: string
+        version:
+          description: |-
+            The record pipeline's version, e.g. `42`.
+
+            If not provided the default version is used.
+          type: string
+      required:
+      - name
+      type: object
+    v4beta1BatchPutRecordsResponse:
+      example:
+        variables:
+        - variables: '{}'
+          index: 6
+        - variables: '{}'
+          index: 6
+        keys:
+        - index: 0
+          key:
+            field: field
+            value: value
+        - index: 0
+          key:
+            field: field
+            value: value
+        errors:
+        - index: 1
+          status:
+            code: 5
+            details:
+            - value: value
+              type_url: type_url
+            - value: value
+              type_url: type_url
+            message: message
+        - index: 1
+          status:
+            code: 5
+            details:
+            - value: value
+              type_url: type_url
+            - value: value
+              type_url: type_url
+            message: message
+      properties:
+        keys:
+          description: |-
+            A list of keys of the records that were inserted.
+
+            If a record was inserted, keys contains an entry containing the index of
+            the inserted record from `records` and the key. You can use the key if you
+            need to retrieve or delete the record.
+
+            If a record was updated, keys contains no such entry for the updated
+            record.
+          items:
+            $ref: '#/components/schemas/v4beta1BatchPutRecordsResponseKey'
+          type: array
+        variables:
+          description: |-
+            A list of modified variables returned by the pipeline after it has finished
+            processing each record.
+          items:
+            $ref: '#/components/schemas/BatchPutRecordsResponseVariables'
+          type: array
+        errors:
+          description: Errors that occurred.
+          items:
+            $ref: '#/components/schemas/v4beta1BatchPutRecordsResponseError'
+          type: array
+      type: object
+    v4beta1BatchPutRecordsResponseError:
+      example:
+        index: 1
+        status:
+          code: 5
+          details:
+          - value: value
+            type_url: type_url
+          - value: value
+            type_url: type_url
+          message: message
+      properties:
+        index:
+          description: Index of the record in `records` that this error corresponds
+            to.
+          format: int32
+          type: integer
+        status:
+          $ref: '#/components/schemas/rpcStatus1'
+      type: object
+    v4beta1BatchPutRecordsResponseKey:
+      example:
+        index: 0
+        key:
+          field: field
+          value: value
+      properties:
+        index:
+          description: Index of the record in `records` that this key corresponds
+            to.
+          format: int32
+          type: integer
+        key:
+          $ref: '#/components/schemas/sajariv4beta1Key'
+      type: object
+    v4beta1PutRecordRequest:
+      properties:
+        pipeline:
+          $ref: '#/components/schemas/v4beta1PutRecordRequestPipeline'
+        record:
+          description: An object made up of field-value pairs that contains the record
+            data.
+          type: object
+        variables:
+          description: |-
+            The initial values for the variables the pipeline operates on and
+            transforms throughout its steps.
+          type: object
+      required:
+      - record
+      type: object
+    v4beta1PutRecordRequestPipeline:
+      description: |-
+        The pipeline to use when putting the record.
+
+        If not provided the default record pipeline is used.
+      properties:
+        name:
+          description: The record pipeline's name, e.g. `my-pipeline`.
+          type: string
+        version:
+          description: |-
+            The record pipeline's version, e.g. `42`.
+
+            If not provided the default version is used.
+          type: string
+      required:
+      - name
+      type: object
+    v4beta1PutRecordResponse:
+      example:
+        variables: '{}'
+        key:
+          field: field
+          value: value
+      properties:
+        key:
+          $ref: '#/components/schemas/sajariv4beta1Key'
+        variables:
+          description: |-
+            The modified variables returned by the pipeline after it has finished
+            processing.
+          type: object
+      type: object
+    v4beta1PatchRecordRequest: {}
+    gatewayruntimeError3:
+      properties:
+        error:
+          type: string
+        code:
+          format: int32
+          type: integer
+        message:
+          type: string
+        details:
+          items:
+            $ref: '#/components/schemas/protobufAny'
+          type: array
+      type: object
+    sajariv4beta1Pipeline1:
+      example:
+        create_time: 2000-01-23T04:56:07.000+00:00
+        post_steps:
+        - condition: condition
+          description: description
+          annotations:
+          - annotations
+          - annotations
+          id: id
+          title: title
+          params:
+            key:
+              bind: bind
+              const: const
+              description: description
+              default_value: default_value
+        - condition: condition
+          description: description
+          annotations:
+          - annotations
+          - annotations
+          id: id
+          title: title
+          params:
+            key:
+              bind: bind
+              const: const
+              description: description
+              default_value: default_value
+        name: name
+        pre_steps:
+        - condition: condition
+          description: description
+          annotations:
+          - annotations
+          - annotations
+          id: id
+          title: title
+          params:
+            key:
+              bind: bind
+              const: const
+              description: description
+              default_value: default_value
+        - condition: condition
+          description: description
+          annotations:
+          - annotations
+          - annotations
+          id: id
+          title: title
+          params:
+            key:
+              bind: bind
+              const: const
+              description: description
+              default_value: default_value
+        description: description
+        version: version
+      properties:
+        create_time:
+          description: Output only. Creation time of the pipeline.
+          format: date-time
+          readOnly: true
+          type: string
+        type:
+          $ref: '#/components/schemas/v4beta1PipelineType'
+        name:
+          description: |-
+            The pipeline's name.
+
+            Must start with an alphanumeric character followed by one or more
+            alphanumeric, `_`, `-` or `.` characters. Strictly speaking, it must match
+            the regular expression: `^[a-zA-Z0-9][a-zA-Z0-9_\-\.]+$`.
+          type: string
+        version:
+          description: |-
+            The pipeline's version.
+
+            Must start with an alphanumeric character followed by one or more
+            alphanumeric, `_`, `-` or `.` characters. Strictly speaking, it must match
+            the regular expression: `^[a-zA-Z0-9][a-zA-Z0-9_\-\.]+$`.
+          type: string
+        description:
+          description: Description of the pipeline.
+          type: string
+        pre_steps:
+          description: |-
+            Pre-steps are run before an indexing operation or query request is sent to
+            the search index.
+          items:
+            $ref: '#/components/schemas/v4beta1Step1'
+          type: array
+        post_steps:
+          description: |-
+            Post-steps are run after an indexing operation or query request has been
+            sent to the search index.
+
+            For indexing operations, the post-steps only run when creating new records.
+            They do not run when updating records.
+
+            For querying, the post-steps have access to the result-set. This makes it
+            possible to act on the results before sending them back to the caller.
+          items:
+            $ref: '#/components/schemas/v4beta1Step1'
+          type: array
+      required:
+      - name
+      - type
+      - version
+      type: object
+    v4beta1GetPipelineRequestView:
+      default: VIEW_UNSPECIFIED
+      description: |2-
+         - VIEW_UNSPECIFIED: The default / unset value.
+        The API defaults to the `BASIC` view.
+         - BASIC: Include basic information including type, name, version and description
+        but not the full step configuration. This is the default value (for both
+        [ListPipelines](/docs/api-reference#operation/ListPipelines) and
+        [GetPipeline](/docs/api-reference#operation/GetPipeline)).
+         - FULL: Include the information from `BASIC`, plus full step configuration.
+      enum:
+      - VIEW_UNSPECIFIED
+      - BASIC
+      - FULL
+      type: string
+    v4beta1ListPipelinesRequestView:
+      default: VIEW_UNSPECIFIED
+      description: |2-
+         - VIEW_UNSPECIFIED: The default / unset value.
+        The API defaults to the `BASIC` view.
+         - BASIC: Include basic information including type, name, version and description
+        but not the full step configuration. This is the default value (for both
+        [ListPipelines](/docs/api-reference#operation/ListPipelines) and
+        [GetPipeline](/docs/api-reference#operation/GetPipeline)).
+         - FULL: Include the information from `BASIC`, plus full step
+        configuration.
+      enum:
+      - VIEW_UNSPECIFIED
+      - BASIC
+      - FULL
+      type: string
+    v4beta1ListPipelinesResponse:
+      example:
+        pipelines:
+        - create_time: 2000-01-23T04:56:07.000+00:00
+          post_steps:
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          name: name
+          pre_steps:
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          description: description
+          version: version
+        - create_time: 2000-01-23T04:56:07.000+00:00
+          post_steps:
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          name: name
+          pre_steps:
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          - condition: condition
+            description: description
+            annotations:
+            - annotations
+            - annotations
+            id: id
+            title: title
+            params:
+              key:
+                bind: bind
+                const: const
+                description: description
+                default_value: default_value
+          description: description
+          version: version
+        next_page_token: next_page_token
+      properties:
+        pipelines:
+          description: The pipelines from the specified collection.
+          items:
+            $ref: '#/components/schemas/sajariv4beta1Pipeline1'
+          type: array
+        next_page_token:
+          description: |-
+            A token, which can be sent as `page_token` to retrieve the next page.
+
+            If this field is omitted, there are no subsequent pages.
+          type: string
+      type: object
+    v4beta1SetDefaultVersionRequest:
+      properties:
+        version:
+          description: The version to use as a default for this pipeline, e.g. `42`.
+          type: string
+      required:
+      - version
+      type: object
+    v4beta1SetDefaultVersionResponse:
+      type: object
+    v4beta1Step1:
+      description: Step creates a pipeline step.
+      example:
+        condition: condition
+        description: description
+        annotations:
+        - annotations
+        - annotations
+        id: id
+        title: title
+        params:
+          key:
+            bind: bind
+            const: const
+            description: description
+            default_value: default_value
+      properties:
+        id:
+          description: ID of the step template.
+          type: string
+        title:
+          description: Title for the step. Overrides the default title.
+          type: string
+        description:
+          description: Description for the step. Overrides the default description.
+          type: string
+        params:
+          additionalProperties:
+            $ref: '#/components/schemas/StepParamBinding'
+          description: Bindings for the step parameters.
+          type: object
+        condition:
+          description: |-
+            Condition expression to determine if the step should be run.
+
+            This is a filter expression much like the query filter expression, but it
+            acts upon the pipeline variables.
+
+            For example, to only run the step if the pipeline `q` variable is not
+            empty, set this to `q != ''`.
+          type: string
+        annotations:
+          description: Annotations added to the request when the step is run.
+          items:
+            type: string
+          type: array
+      required:
+      - id
+      type: object
+    gatewayruntimeError4:
+      properties:
+        error:
+          type: string
+        code:
+          format: int32
+          type: integer
+        message:
+          type: string
+        details:
+          items:
+            $ref: '#/components/schemas/protobufAny'
+          type: array
+      type: object
+    rpcStatus2:
+      description: |-
+        The `Status` type defines a logical error model that is suitable for
+        different programming environments, including REST APIs and RPC APIs. It is
+        used by [gRPC](https://github.com/grpc). Each `Status` message contains
+        three pieces of data: error code, error message, and error details.
+
+        You can find out more about this error model and how to work with it in the
+        [API Design Guide](https://cloud.google.com/apis/design/errors).
+      example:
+        code: 6
+        details:
+        - value: value
+          type_url: type_url
+        - value: value
+          type_url: type_url
+        message: message
+      properties:
+        code:
+          description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+          format: int32
+          type: integer
+        message:
+          description: |-
+            A developer-facing error message, which should be in English. Any
+            user-facing error message should be localized and sent in the
+            [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+          type: string
+        details:
+          description: |-
+            A list of messages that carry the error details.  There is a common set of
+            message types for APIs to use.
+          items:
+            $ref: '#/components/schemas/protobufAny'
+          type: array
+      type: object
+    v4beta1BatchCreateSchemaFieldsRequest:
+      properties:
+        fields:
+          description: |-
+            A list of fields to create.
+
+            A maximum of 1000 fields can be created in a batch.
+          items:
+            $ref: '#/components/schemas/v4beta1SchemaField1'
+          type: array
+      required:
+      - fields
+      type: object
+    v4beta1BatchCreateSchemaFieldsResponse:
+      example:
+        fields:
+        - name: name
+          list_length: 0
+          description: description
+          list: true
+        - name: name
+          list_length: 0
+          description: description
+          list: true
+        errors:
+        - index: 0
+          status:
+            code: 6
+            details:
+            - value: value
+              type_url: type_url
+            - value: value
+              type_url: type_url
+            message: message
+        - index: 0
+          status:
+            code: 6
+            details:
+            - value: value
+              type_url: type_url
+            - value: value
+              type_url: type_url
+            message: message
+      properties:
+        fields:
+          description: Schema fields created.
+          items:
+            $ref: '#/components/schemas/v4beta1SchemaField1'
+          type: array
+        errors:
+          description: Errors that occurred.
+          items:
+            $ref: '#/components/schemas/v4beta1BatchCreateSchemaFieldsResponseError'
+          type: array
+      type: object
+    v4beta1BatchCreateSchemaFieldsResponseError:
+      example:
+        index: 0
+        status:
+          code: 6
+          details:
+          - value: value
+            type_url: type_url
+          - value: value
+            type_url: type_url
+          message: message
+      properties:
+        index:
+          description: Index of the schema field in `fields` that this error corresponds
+            to.
+          format: int32
+          type: integer
+        status:
+          $ref: '#/components/schemas/rpcStatus2'
+      type: object
+    v4beta1ListSchemaFieldsResponse:
+      example:
+        next_page_token: next_page_token
+        total_size: 6
+        schema_fields:
+        - name: name
+          list_length: 0
+          description: description
+          list: true
+        - name: name
+          list_length: 0
+          description: description
+          list: true
+      properties:
+        schema_fields:
+          description: The schema fields.
+          items:
+            $ref: '#/components/schemas/v4beta1SchemaField1'
+          type: array
+        total_size:
+          description: Maximum number of fields to return.
+          format: int32
+          type: integer
+        next_page_token:
+          description: |-
+            A token, which can be sent as `page_token` to retrieve the next page.
+
+            If this field is omitted, there are no subsequent pages.
+          type: string
+      type: object
+    v4beta1SchemaField1:
+      description: SchemaField defines the properties of a field in the schema.
+      example:
+        name: name
+        list_length: 0
+        description: description
+        list: true
+      properties:
+        name:
+          description: The name of the field.
+          type: string
+        description:
+          description: The description of the field.
+          type: string
+        type:
+          $ref: '#/components/schemas/v4beta1SchemaFieldType'
+        mode:
+          $ref: '#/components/schemas/SchemaFieldMode'
+        list:
+          description: |-
+            List indicates if the field is a list of values.
+
+            A list is also known as an array.
+
+            For example, if `type` is string and `list` is `true`, then the field is a
+            list of strings.
+          format: boolean
+          type: boolean
+        list_length:
+          description: |-
+            The required length of the list, if `list` is `true`.
+
+            This allows you to enforce that a list contains an exact number of items.
+
+            For example, to store a 2x2 vector, you could set `type` to float, `list`
+            to `true` and `list_length` to `4`.
+          format: int32
+          type: integer
+      required:
+      - mode
+      - name
+      - type
+      type: object
+    v4beta1CreateSchemaFieldRequest: {}
+  securitySchemes:
+    BasicAuth:
+      description: |-
+        The Sajari API uses API keys to authenticate requests.
+
+        You should provide either your account's API key or your collection's API key. The type of key you provide depends on the required level of access for the request you are making. To administer your account (e.g. create and delete collections) you should provide an account key. For most other requests (e.g. query collection) you should provide a collection key.
+
+        Your API keys carry many privileges, so be sure to keep them secure. Do not share your API keys in publicly accessible areas such as GitHub, client-side code, and so forth.
+
+        Authentication to the API is performed via [HTTP Basic Auth](http://en.wikipedia.org/wiki/Basic_access_authentication). Provide your API key ID as the basic auth username value. Provide your API key secret as the basic auth password value.
+
+        ```$ curl https://api-gateway.sajari.com -u <key_id>:<key_secret>```
+
+        You can find your account's API keys in the [Sajari Console account credentials](https://www.sajari.com/console/project/credentials) page. You can find your collection's API keys in the [Sajari Console collection credentials](https://www.sajari.com/console/collection/credentials) page.
+
+        All API requests must be made over [HTTPS](http://en.wikipedia.org/wiki/HTTP_Secure). Calls made over plain HTTP will fail. API requests without authentication will also fail.
+      scheme: basic
+      type: http
