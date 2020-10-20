@@ -182,7 +182,12 @@ func (c *Client) DeleteRecord(ctx context.Context, k *Key) error {
 		Key: pbk,
 	})
 	if err != nil {
-		return fmt.Errorf("could not delete record: %w", err)
+		switch code := status.Code(err); code {
+		case codes.NotFound:
+			return fmt.Errorf("%v: %w", k, ErrNoSuchRecord)
+		default:
+			return fmt.Errorf("could not delete record: %w", err)
+		}
 	}
 	return nil
 }
