@@ -15,34 +15,34 @@ import (
 	"encoding/json"
 )
 
-// V4beta1BatchPutRecordsRequestPipeline The pipeline to use when putting the records.  If not provided the default record pipeline is used.
-type V4beta1BatchPutRecordsRequestPipeline struct {
+// V4beta1UpsertRecordRequestPipeline The pipeline to use when upserting the record.  If not provided the default record pipeline is used.
+type V4beta1UpsertRecordRequestPipeline struct {
 	// The record pipeline's name, e.g. `my-pipeline`.
 	Name string `json:"name"`
 	// The record pipeline's version, e.g. `42`.  If not provided the default version is used.
 	Version *string `json:"version,omitempty"`
 }
 
-// NewV4beta1BatchPutRecordsRequestPipeline instantiates a new V4beta1BatchPutRecordsRequestPipeline object
+// NewV4beta1UpsertRecordRequestPipeline instantiates a new V4beta1UpsertRecordRequestPipeline object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewV4beta1BatchPutRecordsRequestPipeline(name string) *V4beta1BatchPutRecordsRequestPipeline {
-	this := V4beta1BatchPutRecordsRequestPipeline{}
+func NewV4beta1UpsertRecordRequestPipeline(name string) *V4beta1UpsertRecordRequestPipeline {
+	this := V4beta1UpsertRecordRequestPipeline{}
 	this.Name = name
 	return &this
 }
 
-// NewV4beta1BatchPutRecordsRequestPipelineWithDefaults instantiates a new V4beta1BatchPutRecordsRequestPipeline object
+// NewV4beta1UpsertRecordRequestPipelineWithDefaults instantiates a new V4beta1UpsertRecordRequestPipeline object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewV4beta1BatchPutRecordsRequestPipelineWithDefaults() *V4beta1BatchPutRecordsRequestPipeline {
-	this := V4beta1BatchPutRecordsRequestPipeline{}
+func NewV4beta1UpsertRecordRequestPipelineWithDefaults() *V4beta1UpsertRecordRequestPipeline {
+	this := V4beta1UpsertRecordRequestPipeline{}
 	return &this
 }
 
 // GetName returns the Name field value
-func (o *V4beta1BatchPutRecordsRequestPipeline) GetName() string {
+func (o *V4beta1UpsertRecordRequestPipeline) GetName() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -53,7 +53,7 @@ func (o *V4beta1BatchPutRecordsRequestPipeline) GetName() string {
 
 // GetNameOk returns a tuple with the Name field value
 // and a boolean to check if the value has been set.
-func (o *V4beta1BatchPutRecordsRequestPipeline) GetNameOk() (*string, bool) {
+func (o *V4beta1UpsertRecordRequestPipeline) GetNameOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -61,12 +61,12 @@ func (o *V4beta1BatchPutRecordsRequestPipeline) GetNameOk() (*string, bool) {
 }
 
 // SetName sets field value
-func (o *V4beta1BatchPutRecordsRequestPipeline) SetName(v string) {
+func (o *V4beta1UpsertRecordRequestPipeline) SetName(v string) {
 	o.Name = v
 }
 
 // GetVersion returns the Version field value if set, zero value otherwise.
-func (o *V4beta1BatchPutRecordsRequestPipeline) GetVersion() string {
+func (o *V4beta1UpsertRecordRequestPipeline) GetVersion() string {
 	if o == nil || o.Version == nil {
 		var ret string
 		return ret
@@ -76,7 +76,7 @@ func (o *V4beta1BatchPutRecordsRequestPipeline) GetVersion() string {
 
 // GetVersionOk returns a tuple with the Version field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *V4beta1BatchPutRecordsRequestPipeline) GetVersionOk() (*string, bool) {
+func (o *V4beta1UpsertRecordRequestPipeline) GetVersionOk() (*string, bool) {
 	if o == nil || o.Version == nil {
 		return nil, false
 	}
@@ -84,7 +84,7 @@ func (o *V4beta1BatchPutRecordsRequestPipeline) GetVersionOk() (*string, bool) {
 }
 
 // HasVersion returns a boolean if a field has been set.
-func (o *V4beta1BatchPutRecordsRequestPipeline) HasVersion() bool {
+func (o *V4beta1UpsertRecordRequestPipeline) HasVersion() bool {
 	if o != nil && o.Version != nil {
 		return true
 	}
@@ -93,11 +93,11 @@ func (o *V4beta1BatchPutRecordsRequestPipeline) HasVersion() bool {
 }
 
 // SetVersion gets a reference to the given string and assigns it to the Version field.
-func (o *V4beta1BatchPutRecordsRequestPipeline) SetVersion(v string) {
+func (o *V4beta1UpsertRecordRequestPipeline) SetVersion(v string) {
 	o.Version = &v
 }
 
-func (o V4beta1BatchPutRecordsRequestPipeline) MarshalJSON() ([]byte, error) {
+func (o V4beta1UpsertRecordRequestPipeline) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
 		toSerialize["name"] = o.Name
@@ -108,38 +108,38 @@ func (o V4beta1BatchPutRecordsRequestPipeline) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableV4beta1BatchPutRecordsRequestPipeline struct {
-	value *V4beta1BatchPutRecordsRequestPipeline
+type NullableV4beta1UpsertRecordRequestPipeline struct {
+	value *V4beta1UpsertRecordRequestPipeline
 	isSet bool
 }
 
-func (v NullableV4beta1BatchPutRecordsRequestPipeline) Get() *V4beta1BatchPutRecordsRequestPipeline {
+func (v NullableV4beta1UpsertRecordRequestPipeline) Get() *V4beta1UpsertRecordRequestPipeline {
 	return v.value
 }
 
-func (v *NullableV4beta1BatchPutRecordsRequestPipeline) Set(val *V4beta1BatchPutRecordsRequestPipeline) {
+func (v *NullableV4beta1UpsertRecordRequestPipeline) Set(val *V4beta1UpsertRecordRequestPipeline) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableV4beta1BatchPutRecordsRequestPipeline) IsSet() bool {
+func (v NullableV4beta1UpsertRecordRequestPipeline) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableV4beta1BatchPutRecordsRequestPipeline) Unset() {
+func (v *NullableV4beta1UpsertRecordRequestPipeline) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableV4beta1BatchPutRecordsRequestPipeline(val *V4beta1BatchPutRecordsRequestPipeline) *NullableV4beta1BatchPutRecordsRequestPipeline {
-	return &NullableV4beta1BatchPutRecordsRequestPipeline{value: val, isSet: true}
+func NewNullableV4beta1UpsertRecordRequestPipeline(val *V4beta1UpsertRecordRequestPipeline) *NullableV4beta1UpsertRecordRequestPipeline {
+	return &NullableV4beta1UpsertRecordRequestPipeline{value: val, isSet: true}
 }
 
-func (v NullableV4beta1BatchPutRecordsRequestPipeline) MarshalJSON() ([]byte, error) {
+func (v NullableV4beta1UpsertRecordRequestPipeline) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableV4beta1BatchPutRecordsRequestPipeline) UnmarshalJSON(src []byte) error {
+func (v *NullableV4beta1UpsertRecordRequestPipeline) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

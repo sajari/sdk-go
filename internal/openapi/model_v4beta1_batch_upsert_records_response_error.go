@@ -15,32 +15,32 @@ import (
 	"encoding/json"
 )
 
-// V4beta1BatchPutRecordsResponseError struct for V4beta1BatchPutRecordsResponseError
-type V4beta1BatchPutRecordsResponseError struct {
+// V4beta1BatchUpsertRecordsResponseError struct for V4beta1BatchUpsertRecordsResponseError
+type V4beta1BatchUpsertRecordsResponseError struct {
 	// Index of the record in `records` that this error corresponds to.
 	Index  *int32      `json:"index,omitempty"`
 	Status *RpcStatus1 `json:"status,omitempty"`
 }
 
-// NewV4beta1BatchPutRecordsResponseError instantiates a new V4beta1BatchPutRecordsResponseError object
+// NewV4beta1BatchUpsertRecordsResponseError instantiates a new V4beta1BatchUpsertRecordsResponseError object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewV4beta1BatchPutRecordsResponseError() *V4beta1BatchPutRecordsResponseError {
-	this := V4beta1BatchPutRecordsResponseError{}
+func NewV4beta1BatchUpsertRecordsResponseError() *V4beta1BatchUpsertRecordsResponseError {
+	this := V4beta1BatchUpsertRecordsResponseError{}
 	return &this
 }
 
-// NewV4beta1BatchPutRecordsResponseErrorWithDefaults instantiates a new V4beta1BatchPutRecordsResponseError object
+// NewV4beta1BatchUpsertRecordsResponseErrorWithDefaults instantiates a new V4beta1BatchUpsertRecordsResponseError object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewV4beta1BatchPutRecordsResponseErrorWithDefaults() *V4beta1BatchPutRecordsResponseError {
-	this := V4beta1BatchPutRecordsResponseError{}
+func NewV4beta1BatchUpsertRecordsResponseErrorWithDefaults() *V4beta1BatchUpsertRecordsResponseError {
+	this := V4beta1BatchUpsertRecordsResponseError{}
 	return &this
 }
 
 // GetIndex returns the Index field value if set, zero value otherwise.
-func (o *V4beta1BatchPutRecordsResponseError) GetIndex() int32 {
+func (o *V4beta1BatchUpsertRecordsResponseError) GetIndex() int32 {
 	if o == nil || o.Index == nil {
 		var ret int32
 		return ret
@@ -50,7 +50,7 @@ func (o *V4beta1BatchPutRecordsResponseError) GetIndex() int32 {
 
 // GetIndexOk returns a tuple with the Index field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *V4beta1BatchPutRecordsResponseError) GetIndexOk() (*int32, bool) {
+func (o *V4beta1BatchUpsertRecordsResponseError) GetIndexOk() (*int32, bool) {
 	if o == nil || o.Index == nil {
 		return nil, false
 	}
@@ -58,7 +58,7 @@ func (o *V4beta1BatchPutRecordsResponseError) GetIndexOk() (*int32, bool) {
 }
 
 // HasIndex returns a boolean if a field has been set.
-func (o *V4beta1BatchPutRecordsResponseError) HasIndex() bool {
+func (o *V4beta1BatchUpsertRecordsResponseError) HasIndex() bool {
 	if o != nil && o.Index != nil {
 		return true
 	}
@@ -67,12 +67,12 @@ func (o *V4beta1BatchPutRecordsResponseError) HasIndex() bool {
 }
 
 // SetIndex gets a reference to the given int32 and assigns it to the Index field.
-func (o *V4beta1BatchPutRecordsResponseError) SetIndex(v int32) {
+func (o *V4beta1BatchUpsertRecordsResponseError) SetIndex(v int32) {
 	o.Index = &v
 }
 
 // GetStatus returns the Status field value if set, zero value otherwise.
-func (o *V4beta1BatchPutRecordsResponseError) GetStatus() RpcStatus1 {
+func (o *V4beta1BatchUpsertRecordsResponseError) GetStatus() RpcStatus1 {
 	if o == nil || o.Status == nil {
 		var ret RpcStatus1
 		return ret
@@ -82,7 +82,7 @@ func (o *V4beta1BatchPutRecordsResponseError) GetStatus() RpcStatus1 {
 
 // GetStatusOk returns a tuple with the Status field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *V4beta1BatchPutRecordsResponseError) GetStatusOk() (*RpcStatus1, bool) {
+func (o *V4beta1BatchUpsertRecordsResponseError) GetStatusOk() (*RpcStatus1, bool) {
 	if o == nil || o.Status == nil {
 		return nil, false
 	}
@@ -90,7 +90,7 @@ func (o *V4beta1BatchPutRecordsResponseError) GetStatusOk() (*RpcStatus1, bool) 
 }
 
 // HasStatus returns a boolean if a field has been set.
-func (o *V4beta1BatchPutRecordsResponseError) HasStatus() bool {
+func (o *V4beta1BatchUpsertRecordsResponseError) HasStatus() bool {
 	if o != nil && o.Status != nil {
 		return true
 	}
@@ -99,11 +99,11 @@ func (o *V4beta1BatchPutRecordsResponseError) HasStatus() bool {
 }
 
 // SetStatus gets a reference to the given RpcStatus1 and assigns it to the Status field.
-func (o *V4beta1BatchPutRecordsResponseError) SetStatus(v RpcStatus1) {
+func (o *V4beta1BatchUpsertRecordsResponseError) SetStatus(v RpcStatus1) {
 	o.Status = &v
 }
 
-func (o V4beta1BatchPutRecordsResponseError) MarshalJSON() ([]byte, error) {
+func (o V4beta1BatchUpsertRecordsResponseError) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Index != nil {
 		toSerialize["index"] = o.Index
@@ -114,38 +114,38 @@ func (o V4beta1BatchPutRecordsResponseError) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableV4beta1BatchPutRecordsResponseError struct {
-	value *V4beta1BatchPutRecordsResponseError
+type NullableV4beta1BatchUpsertRecordsResponseError struct {
+	value *V4beta1BatchUpsertRecordsResponseError
 	isSet bool
 }
 
-func (v NullableV4beta1BatchPutRecordsResponseError) Get() *V4beta1BatchPutRecordsResponseError {
+func (v NullableV4beta1BatchUpsertRecordsResponseError) Get() *V4beta1BatchUpsertRecordsResponseError {
 	return v.value
 }
 
-func (v *NullableV4beta1BatchPutRecordsResponseError) Set(val *V4beta1BatchPutRecordsResponseError) {
+func (v *NullableV4beta1BatchUpsertRecordsResponseError) Set(val *V4beta1BatchUpsertRecordsResponseError) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableV4beta1BatchPutRecordsResponseError) IsSet() bool {
+func (v NullableV4beta1BatchUpsertRecordsResponseError) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableV4beta1BatchPutRecordsResponseError) Unset() {
+func (v *NullableV4beta1BatchUpsertRecordsResponseError) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableV4beta1BatchPutRecordsResponseError(val *V4beta1BatchPutRecordsResponseError) *NullableV4beta1BatchPutRecordsResponseError {
-	return &NullableV4beta1BatchPutRecordsResponseError{value: val, isSet: true}
+func NewNullableV4beta1BatchUpsertRecordsResponseError(val *V4beta1BatchUpsertRecordsResponseError) *NullableV4beta1BatchUpsertRecordsResponseError {
+	return &NullableV4beta1BatchUpsertRecordsResponseError{value: val, isSet: true}
 }
 
-func (v NullableV4beta1BatchPutRecordsResponseError) MarshalJSON() ([]byte, error) {
+func (v NullableV4beta1BatchUpsertRecordsResponseError) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableV4beta1BatchPutRecordsResponseError) UnmarshalJSON(src []byte) error {
+func (v *NullableV4beta1BatchUpsertRecordsResponseError) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

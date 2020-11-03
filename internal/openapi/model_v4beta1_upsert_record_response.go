@@ -15,32 +15,32 @@ import (
 	"encoding/json"
 )
 
-// V4beta1PutRecordResponse struct for V4beta1PutRecordResponse
-type V4beta1PutRecordResponse struct {
+// V4beta1UpsertRecordResponse struct for V4beta1UpsertRecordResponse
+type V4beta1UpsertRecordResponse struct {
 	Key *Sajariv4beta1Key `json:"key,omitempty"`
 	// The modified variables returned by the pipeline after it has finished processing.
 	Variables *map[string]interface{} `json:"variables,omitempty"`
 }
 
-// NewV4beta1PutRecordResponse instantiates a new V4beta1PutRecordResponse object
+// NewV4beta1UpsertRecordResponse instantiates a new V4beta1UpsertRecordResponse object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewV4beta1PutRecordResponse() *V4beta1PutRecordResponse {
-	this := V4beta1PutRecordResponse{}
+func NewV4beta1UpsertRecordResponse() *V4beta1UpsertRecordResponse {
+	this := V4beta1UpsertRecordResponse{}
 	return &this
 }
 
-// NewV4beta1PutRecordResponseWithDefaults instantiates a new V4beta1PutRecordResponse object
+// NewV4beta1UpsertRecordResponseWithDefaults instantiates a new V4beta1UpsertRecordResponse object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewV4beta1PutRecordResponseWithDefaults() *V4beta1PutRecordResponse {
-	this := V4beta1PutRecordResponse{}
+func NewV4beta1UpsertRecordResponseWithDefaults() *V4beta1UpsertRecordResponse {
+	this := V4beta1UpsertRecordResponse{}
 	return &this
 }
 
 // GetKey returns the Key field value if set, zero value otherwise.
-func (o *V4beta1PutRecordResponse) GetKey() Sajariv4beta1Key {
+func (o *V4beta1UpsertRecordResponse) GetKey() Sajariv4beta1Key {
 	if o == nil || o.Key == nil {
 		var ret Sajariv4beta1Key
 		return ret
@@ -50,7 +50,7 @@ func (o *V4beta1PutRecordResponse) GetKey() Sajariv4beta1Key {
 
 // GetKeyOk returns a tuple with the Key field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *V4beta1PutRecordResponse) GetKeyOk() (*Sajariv4beta1Key, bool) {
+func (o *V4beta1UpsertRecordResponse) GetKeyOk() (*Sajariv4beta1Key, bool) {
 	if o == nil || o.Key == nil {
 		return nil, false
 	}
@@ -58,7 +58,7 @@ func (o *V4beta1PutRecordResponse) GetKeyOk() (*Sajariv4beta1Key, bool) {
 }
 
 // HasKey returns a boolean if a field has been set.
-func (o *V4beta1PutRecordResponse) HasKey() bool {
+func (o *V4beta1UpsertRecordResponse) HasKey() bool {
 	if o != nil && o.Key != nil {
 		return true
 	}
@@ -67,12 +67,12 @@ func (o *V4beta1PutRecordResponse) HasKey() bool {
 }
 
 // SetKey gets a reference to the given Sajariv4beta1Key and assigns it to the Key field.
-func (o *V4beta1PutRecordResponse) SetKey(v Sajariv4beta1Key) {
+func (o *V4beta1UpsertRecordResponse) SetKey(v Sajariv4beta1Key) {
 	o.Key = &v
 }
 
 // GetVariables returns the Variables field value if set, zero value otherwise.
-func (o *V4beta1PutRecordResponse) GetVariables() map[string]interface{} {
+func (o *V4beta1UpsertRecordResponse) GetVariables() map[string]interface{} {
 	if o == nil || o.Variables == nil {
 		var ret map[string]interface{}
 		return ret
@@ -82,7 +82,7 @@ func (o *V4beta1PutRecordResponse) GetVariables() map[string]interface{} {
 
 // GetVariablesOk returns a tuple with the Variables field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *V4beta1PutRecordResponse) GetVariablesOk() (*map[string]interface{}, bool) {
+func (o *V4beta1UpsertRecordResponse) GetVariablesOk() (*map[string]interface{}, bool) {
 	if o == nil || o.Variables == nil {
 		return nil, false
 	}
@@ -90,7 +90,7 @@ func (o *V4beta1PutRecordResponse) GetVariablesOk() (*map[string]interface{}, bo
 }
 
 // HasVariables returns a boolean if a field has been set.
-func (o *V4beta1PutRecordResponse) HasVariables() bool {
+func (o *V4beta1UpsertRecordResponse) HasVariables() bool {
 	if o != nil && o.Variables != nil {
 		return true
 	}
@@ -99,11 +99,11 @@ func (o *V4beta1PutRecordResponse) HasVariables() bool {
 }
 
 // SetVariables gets a reference to the given map[string]interface{} and assigns it to the Variables field.
-func (o *V4beta1PutRecordResponse) SetVariables(v map[string]interface{}) {
+func (o *V4beta1UpsertRecordResponse) SetVariables(v map[string]interface{}) {
 	o.Variables = &v
 }
 
-func (o V4beta1PutRecordResponse) MarshalJSON() ([]byte, error) {
+func (o V4beta1UpsertRecordResponse) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Key != nil {
 		toSerialize["key"] = o.Key
@@ -114,38 +114,38 @@ func (o V4beta1PutRecordResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableV4beta1PutRecordResponse struct {
-	value *V4beta1PutRecordResponse
+type NullableV4beta1UpsertRecordResponse struct {
+	value *V4beta1UpsertRecordResponse
 	isSet bool
 }
 
-func (v NullableV4beta1PutRecordResponse) Get() *V4beta1PutRecordResponse {
+func (v NullableV4beta1UpsertRecordResponse) Get() *V4beta1UpsertRecordResponse {
 	return v.value
 }
 
-func (v *NullableV4beta1PutRecordResponse) Set(val *V4beta1PutRecordResponse) {
+func (v *NullableV4beta1UpsertRecordResponse) Set(val *V4beta1UpsertRecordResponse) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableV4beta1PutRecordResponse) IsSet() bool {
+func (v NullableV4beta1UpsertRecordResponse) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableV4beta1PutRecordResponse) Unset() {
+func (v *NullableV4beta1UpsertRecordResponse) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableV4beta1PutRecordResponse(val *V4beta1PutRecordResponse) *NullableV4beta1PutRecordResponse {
-	return &NullableV4beta1PutRecordResponse{value: val, isSet: true}
+func NewNullableV4beta1UpsertRecordResponse(val *V4beta1UpsertRecordResponse) *NullableV4beta1UpsertRecordResponse {
+	return &NullableV4beta1UpsertRecordResponse{value: val, isSet: true}
 }
 
-func (v NullableV4beta1PutRecordResponse) MarshalJSON() ([]byte, error) {
+func (v NullableV4beta1UpsertRecordResponse) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableV4beta1PutRecordResponse) UnmarshalJSON(src []byte) error {
+func (v *NullableV4beta1UpsertRecordResponse) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

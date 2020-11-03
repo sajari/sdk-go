@@ -742,14 +742,14 @@ paths:
       summary: Set default pipeline version
       tags:
       - Pipelines
-  /v4beta1/collections/{collection_id}/records:batchPut:
+  /v4beta1/collections/{collection_id}/records:batchUpsert:
     post:
       description: |-
         The batch version of the
-        [PutRecord](/docs/api-reference#operation/PutRecord) call.
-      operationId: BatchPutRecords
+        [UpsertRecord](/docs/api-reference#operation/UpsertRecord) call.
+      operationId: BatchUpsertRecords
       parameters:
-      - description: The collection to put the records in, e.g. `my-collection`.
+      - description: The collection to upsert the records in, e.g. `my-collection`.
         explode: false
         in: path
         name: collection_id
@@ -758,13 +758,13 @@ paths:
           type: string
         style: simple
       requestBody:
-        $ref: '#/components/requestBodies/v4beta1BatchPutRecordsRequest'
+        $ref: '#/components/requestBodies/v4beta1BatchUpsertRecordsRequest'
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/v4beta1BatchPutRecordsResponse'
+                $ref: '#/components/schemas/v4beta1BatchUpsertRecordsResponse'
           description: A successful response.
         default:
           content:
@@ -772,7 +772,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/gatewayruntimeError'
           description: An unexpected error response
-      summary: Batch put records
+      summary: Batch upsert records
       tags:
       - Records
   /v4beta1/collections/{collection_id}/records:delete:
@@ -837,11 +837,11 @@ paths:
       summary: Get record
       tags:
       - Records
-  /v4beta1/collections/{collection_id}/records:put:
+  /v4beta1/collections/{collection_id}/records:upsert:
     post:
       description: |-
-        Upsert a record. If the record does not exist in your collection it is
-        inserted. If it does exist it is updated.
+        If the record does not exist in your collection it is inserted. If it does
+        exist it is updated.
 
         If no pipeline is specified, the default record pipeline is used to process
         the record.
@@ -865,9 +865,9 @@ paths:
           }
         }
         ```
-      operationId: PutRecord
+      operationId: UpsertRecord
       parameters:
-      - description: The collection to put the record in, e.g. `my-collection`.
+      - description: The collection to upsert the record in, e.g. `my-collection`.
         explode: false
         in: path
         name: collection_id
@@ -876,13 +876,13 @@ paths:
           type: string
         style: simple
       requestBody:
-        $ref: '#/components/requestBodies/v4beta1PutRecordRequest'
+        $ref: '#/components/requestBodies/v4beta1UpsertRecordRequest'
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/v4beta1PutRecordResponse'
+                $ref: '#/components/schemas/v4beta1UpsertRecordResponse'
           description: A successful response.
         default:
           content:
@@ -890,7 +890,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/gatewayruntimeError'
           description: An unexpected error response
-      summary: Put record
+      summary: Upsert record
       tags:
       - Records
   /v4beta1/collections/{collection_id}/schemaFields:
@@ -1056,11 +1056,17 @@ components:
           schema:
             $ref: '#/components/schemas/v4beta1SetDefaultVersionRequest'
       required: true
-    v4beta1BatchPutRecordsRequest:
+    v4beta1UpsertRecordRequest:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/v4beta1BatchPutRecordsRequest'
+            $ref: '#/components/schemas/v4beta1UpsertRecordRequest'
+      required: true
+    v4beta1BatchUpsertRecordsRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/v4beta1BatchUpsertRecordsRequest'
       required: true
     sajariv4beta1DeleteRecordRequest:
       content:
@@ -1073,12 +1079,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/sajariv4beta1GetRecordRequest'
-      required: true
-    v4beta1PutRecordRequest:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/v4beta1PutRecordRequest'
       required: true
     v4beta1SchemaField:
       content:
@@ -2660,7 +2660,7 @@ components:
       required:
       - id
       type: object
-    BatchPutRecordsResponseVariables:
+    BatchUpsertRecordsResponseVariables:
       example:
         variables: '{}'
         index: 6
@@ -2741,12 +2741,12 @@ components:
       - field
       - value
       type: object
-    v4beta1BatchPutRecordsRequest:
+    v4beta1BatchUpsertRecordsRequest:
       properties:
         pipeline:
-          $ref: '#/components/schemas/v4beta1BatchPutRecordsRequestPipeline'
+          $ref: '#/components/schemas/v4beta1BatchUpsertRecordsRequestPipeline'
         records:
-          description: A list of records to put.
+          description: A list of records to upsert.
           items:
             type: object
           type: array
@@ -2758,9 +2758,9 @@ components:
       required:
       - records
       type: object
-    v4beta1BatchPutRecordsRequestPipeline:
+    v4beta1BatchUpsertRecordsRequestPipeline:
       description: |-
-        The pipeline to use when putting the records.
+        The pipeline to use when upserting the records.
 
         If not provided the default record pipeline is used.
       properties:
@@ -2776,7 +2776,7 @@ components:
       required:
       - name
       type: object
-    v4beta1BatchPutRecordsResponse:
+    v4beta1BatchUpsertRecordsResponse:
       example:
         variables:
         - variables: '{}'
@@ -2823,22 +2823,22 @@ components:
             If a record was updated, keys contains no such entry for the updated
             record.
           items:
-            $ref: '#/components/schemas/v4beta1BatchPutRecordsResponseKey'
+            $ref: '#/components/schemas/v4beta1BatchUpsertRecordsResponseKey'
           type: array
         variables:
           description: |-
             A list of modified variables returned by the pipeline after it has finished
             processing each record.
           items:
-            $ref: '#/components/schemas/BatchPutRecordsResponseVariables'
+            $ref: '#/components/schemas/BatchUpsertRecordsResponseVariables'
           type: array
         errors:
           description: Errors that occurred.
           items:
-            $ref: '#/components/schemas/v4beta1BatchPutRecordsResponseError'
+            $ref: '#/components/schemas/v4beta1BatchUpsertRecordsResponseError'
           type: array
       type: object
-    v4beta1BatchPutRecordsResponseError:
+    v4beta1BatchUpsertRecordsResponseError:
       example:
         index: 1
         status:
@@ -2858,7 +2858,7 @@ components:
         status:
           $ref: '#/components/schemas/rpcStatus1'
       type: object
-    v4beta1BatchPutRecordsResponseKey:
+    v4beta1BatchUpsertRecordsResponseKey:
       example:
         index: 0
         key:
@@ -2873,10 +2873,10 @@ components:
         key:
           $ref: '#/components/schemas/sajariv4beta1Key'
       type: object
-    v4beta1PutRecordRequest:
+    v4beta1UpsertRecordRequest:
       properties:
         pipeline:
-          $ref: '#/components/schemas/v4beta1PutRecordRequestPipeline'
+          $ref: '#/components/schemas/v4beta1UpsertRecordRequestPipeline'
         record:
           description: An object made up of field-value pairs that contains the record
             data.
@@ -2889,9 +2889,9 @@ components:
       required:
       - record
       type: object
-    v4beta1PutRecordRequestPipeline:
+    v4beta1UpsertRecordRequestPipeline:
       description: |-
-        The pipeline to use when putting the record.
+        The pipeline to use when upserting the record.
 
         If not provided the default record pipeline is used.
       properties:
@@ -2907,7 +2907,7 @@ components:
       required:
       - name
       type: object
-    v4beta1PutRecordResponse:
+    v4beta1UpsertRecordResponse:
       example:
         variables: '{}'
         key:

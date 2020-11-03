@@ -27,32 +27,32 @@ var (
 // RecordsApiService RecordsApi service
 type RecordsApiService service
 
-type ApiBatchPutRecordsRequest struct {
-	ctx                           _context.Context
-	ApiService                    *RecordsApiService
-	collectionId                  string
-	v4beta1BatchPutRecordsRequest *V4beta1BatchPutRecordsRequest
+type ApiBatchUpsertRecordsRequest struct {
+	ctx                              _context.Context
+	ApiService                       *RecordsApiService
+	collectionId                     string
+	v4beta1BatchUpsertRecordsRequest *V4beta1BatchUpsertRecordsRequest
 }
 
-func (r ApiBatchPutRecordsRequest) V4beta1BatchPutRecordsRequest(v4beta1BatchPutRecordsRequest V4beta1BatchPutRecordsRequest) ApiBatchPutRecordsRequest {
-	r.v4beta1BatchPutRecordsRequest = &v4beta1BatchPutRecordsRequest
+func (r ApiBatchUpsertRecordsRequest) V4beta1BatchUpsertRecordsRequest(v4beta1BatchUpsertRecordsRequest V4beta1BatchUpsertRecordsRequest) ApiBatchUpsertRecordsRequest {
+	r.v4beta1BatchUpsertRecordsRequest = &v4beta1BatchUpsertRecordsRequest
 	return r
 }
 
-func (r ApiBatchPutRecordsRequest) Execute() (V4beta1BatchPutRecordsResponse, *_nethttp.Response, error) {
-	return r.ApiService.BatchPutRecordsExecute(r)
+func (r ApiBatchUpsertRecordsRequest) Execute() (V4beta1BatchUpsertRecordsResponse, *_nethttp.Response, error) {
+	return r.ApiService.BatchUpsertRecordsExecute(r)
 }
 
 /*
- * BatchPutRecords Batch put records
+ * BatchUpsertRecords Batch upsert records
  * The batch version of the
-[PutRecord](/docs/api-reference#operation/PutRecord) call.
+[UpsertRecord](/docs/api-reference#operation/UpsertRecord) call.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param collectionId The collection to put the records in, e.g. `my-collection`.
- * @return ApiBatchPutRecordsRequest
+ * @param collectionId The collection to upsert the records in, e.g. `my-collection`.
+ * @return ApiBatchUpsertRecordsRequest
 */
-func (a *RecordsApiService) BatchPutRecords(ctx _context.Context, collectionId string) ApiBatchPutRecordsRequest {
-	return ApiBatchPutRecordsRequest{
+func (a *RecordsApiService) BatchUpsertRecords(ctx _context.Context, collectionId string) ApiBatchUpsertRecordsRequest {
+	return ApiBatchUpsertRecordsRequest{
 		ApiService:   a,
 		ctx:          ctx,
 		collectionId: collectionId,
@@ -61,31 +61,31 @@ func (a *RecordsApiService) BatchPutRecords(ctx _context.Context, collectionId s
 
 /*
  * Execute executes the request
- * @return V4beta1BatchPutRecordsResponse
+ * @return V4beta1BatchUpsertRecordsResponse
  */
-func (a *RecordsApiService) BatchPutRecordsExecute(r ApiBatchPutRecordsRequest) (V4beta1BatchPutRecordsResponse, *_nethttp.Response, error) {
+func (a *RecordsApiService) BatchUpsertRecordsExecute(r ApiBatchUpsertRecordsRequest) (V4beta1BatchUpsertRecordsResponse, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  V4beta1BatchPutRecordsResponse
+		localVarReturnValue  V4beta1BatchUpsertRecordsResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RecordsApiService.BatchPutRecords")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RecordsApiService.BatchUpsertRecords")
 	if err != nil {
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}/records:batchPut"
+	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}/records:batchUpsert"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.v4beta1BatchPutRecordsRequest == nil {
-		return localVarReturnValue, nil, reportError("v4beta1BatchPutRecordsRequest is required and must be specified")
+	if r.v4beta1BatchUpsertRecordsRequest == nil {
+		return localVarReturnValue, nil, reportError("v4beta1BatchUpsertRecordsRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -106,7 +106,7 @@ func (a *RecordsApiService) BatchPutRecordsExecute(r ApiBatchPutRecordsRequest) 
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.v4beta1BatchPutRecordsRequest
+	localVarPostBody = r.v4beta1BatchUpsertRecordsRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -394,26 +394,26 @@ func (a *RecordsApiService) GetRecordExecute(r ApiGetRecordRequest) (map[string]
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiPutRecordRequest struct {
-	ctx                     _context.Context
-	ApiService              *RecordsApiService
-	collectionId            string
-	v4beta1PutRecordRequest *V4beta1PutRecordRequest
+type ApiUpsertRecordRequest struct {
+	ctx                        _context.Context
+	ApiService                 *RecordsApiService
+	collectionId               string
+	v4beta1UpsertRecordRequest *V4beta1UpsertRecordRequest
 }
 
-func (r ApiPutRecordRequest) V4beta1PutRecordRequest(v4beta1PutRecordRequest V4beta1PutRecordRequest) ApiPutRecordRequest {
-	r.v4beta1PutRecordRequest = &v4beta1PutRecordRequest
+func (r ApiUpsertRecordRequest) V4beta1UpsertRecordRequest(v4beta1UpsertRecordRequest V4beta1UpsertRecordRequest) ApiUpsertRecordRequest {
+	r.v4beta1UpsertRecordRequest = &v4beta1UpsertRecordRequest
 	return r
 }
 
-func (r ApiPutRecordRequest) Execute() (V4beta1PutRecordResponse, *_nethttp.Response, error) {
-	return r.ApiService.PutRecordExecute(r)
+func (r ApiUpsertRecordRequest) Execute() (V4beta1UpsertRecordResponse, *_nethttp.Response, error) {
+	return r.ApiService.UpsertRecordExecute(r)
 }
 
 /*
- * PutRecord Put record
- * Upsert a record. If the record does not exist in your collection it is
-inserted. If it does exist it is updated.
+ * UpsertRecord Upsert record
+ * If the record does not exist in your collection it is inserted. If it does
+exist it is updated.
 
 If no pipeline is specified, the default record pipeline is used to process
 the record.
@@ -438,11 +438,11 @@ collection, use the following call:
 }
 ```
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param collectionId The collection to put the record in, e.g. `my-collection`.
- * @return ApiPutRecordRequest
+ * @param collectionId The collection to upsert the record in, e.g. `my-collection`.
+ * @return ApiUpsertRecordRequest
 */
-func (a *RecordsApiService) PutRecord(ctx _context.Context, collectionId string) ApiPutRecordRequest {
-	return ApiPutRecordRequest{
+func (a *RecordsApiService) UpsertRecord(ctx _context.Context, collectionId string) ApiUpsertRecordRequest {
+	return ApiUpsertRecordRequest{
 		ApiService:   a,
 		ctx:          ctx,
 		collectionId: collectionId,
@@ -451,31 +451,31 @@ func (a *RecordsApiService) PutRecord(ctx _context.Context, collectionId string)
 
 /*
  * Execute executes the request
- * @return V4beta1PutRecordResponse
+ * @return V4beta1UpsertRecordResponse
  */
-func (a *RecordsApiService) PutRecordExecute(r ApiPutRecordRequest) (V4beta1PutRecordResponse, *_nethttp.Response, error) {
+func (a *RecordsApiService) UpsertRecordExecute(r ApiUpsertRecordRequest) (V4beta1UpsertRecordResponse, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  V4beta1PutRecordResponse
+		localVarReturnValue  V4beta1UpsertRecordResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RecordsApiService.PutRecord")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RecordsApiService.UpsertRecord")
 	if err != nil {
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}/records:put"
+	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}/records:upsert"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.v4beta1PutRecordRequest == nil {
-		return localVarReturnValue, nil, reportError("v4beta1PutRecordRequest is required and must be specified")
+	if r.v4beta1UpsertRecordRequest == nil {
+		return localVarReturnValue, nil, reportError("v4beta1UpsertRecordRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -496,7 +496,7 @@ func (a *RecordsApiService) PutRecordExecute(r ApiPutRecordRequest) (V4beta1PutR
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.v4beta1PutRecordRequest
+	localVarPostBody = r.v4beta1UpsertRecordRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
