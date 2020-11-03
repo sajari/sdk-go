@@ -15,33 +15,33 @@ import (
 	"encoding/json"
 )
 
-// BatchPutRecordsResponseVariables struct for BatchPutRecordsResponseVariables
-type BatchPutRecordsResponseVariables struct {
+// BatchUpsertRecordsResponseVariables struct for BatchUpsertRecordsResponseVariables
+type BatchUpsertRecordsResponseVariables struct {
 	// Index of the record in `records` that these variables correspond to.
 	Index *int32 `json:"index,omitempty"`
 	// The variables.
 	Variables *map[string]interface{} `json:"variables,omitempty"`
 }
 
-// NewBatchPutRecordsResponseVariables instantiates a new BatchPutRecordsResponseVariables object
+// NewBatchUpsertRecordsResponseVariables instantiates a new BatchUpsertRecordsResponseVariables object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewBatchPutRecordsResponseVariables() *BatchPutRecordsResponseVariables {
-	this := BatchPutRecordsResponseVariables{}
+func NewBatchUpsertRecordsResponseVariables() *BatchUpsertRecordsResponseVariables {
+	this := BatchUpsertRecordsResponseVariables{}
 	return &this
 }
 
-// NewBatchPutRecordsResponseVariablesWithDefaults instantiates a new BatchPutRecordsResponseVariables object
+// NewBatchUpsertRecordsResponseVariablesWithDefaults instantiates a new BatchUpsertRecordsResponseVariables object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewBatchPutRecordsResponseVariablesWithDefaults() *BatchPutRecordsResponseVariables {
-	this := BatchPutRecordsResponseVariables{}
+func NewBatchUpsertRecordsResponseVariablesWithDefaults() *BatchUpsertRecordsResponseVariables {
+	this := BatchUpsertRecordsResponseVariables{}
 	return &this
 }
 
 // GetIndex returns the Index field value if set, zero value otherwise.
-func (o *BatchPutRecordsResponseVariables) GetIndex() int32 {
+func (o *BatchUpsertRecordsResponseVariables) GetIndex() int32 {
 	if o == nil || o.Index == nil {
 		var ret int32
 		return ret
@@ -51,7 +51,7 @@ func (o *BatchPutRecordsResponseVariables) GetIndex() int32 {
 
 // GetIndexOk returns a tuple with the Index field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *BatchPutRecordsResponseVariables) GetIndexOk() (*int32, bool) {
+func (o *BatchUpsertRecordsResponseVariables) GetIndexOk() (*int32, bool) {
 	if o == nil || o.Index == nil {
 		return nil, false
 	}
@@ -59,7 +59,7 @@ func (o *BatchPutRecordsResponseVariables) GetIndexOk() (*int32, bool) {
 }
 
 // HasIndex returns a boolean if a field has been set.
-func (o *BatchPutRecordsResponseVariables) HasIndex() bool {
+func (o *BatchUpsertRecordsResponseVariables) HasIndex() bool {
 	if o != nil && o.Index != nil {
 		return true
 	}
@@ -68,12 +68,12 @@ func (o *BatchPutRecordsResponseVariables) HasIndex() bool {
 }
 
 // SetIndex gets a reference to the given int32 and assigns it to the Index field.
-func (o *BatchPutRecordsResponseVariables) SetIndex(v int32) {
+func (o *BatchUpsertRecordsResponseVariables) SetIndex(v int32) {
 	o.Index = &v
 }
 
 // GetVariables returns the Variables field value if set, zero value otherwise.
-func (o *BatchPutRecordsResponseVariables) GetVariables() map[string]interface{} {
+func (o *BatchUpsertRecordsResponseVariables) GetVariables() map[string]interface{} {
 	if o == nil || o.Variables == nil {
 		var ret map[string]interface{}
 		return ret
@@ -83,7 +83,7 @@ func (o *BatchPutRecordsResponseVariables) GetVariables() map[string]interface{}
 
 // GetVariablesOk returns a tuple with the Variables field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *BatchPutRecordsResponseVariables) GetVariablesOk() (*map[string]interface{}, bool) {
+func (o *BatchUpsertRecordsResponseVariables) GetVariablesOk() (*map[string]interface{}, bool) {
 	if o == nil || o.Variables == nil {
 		return nil, false
 	}
@@ -91,7 +91,7 @@ func (o *BatchPutRecordsResponseVariables) GetVariablesOk() (*map[string]interfa
 }
 
 // HasVariables returns a boolean if a field has been set.
-func (o *BatchPutRecordsResponseVariables) HasVariables() bool {
+func (o *BatchUpsertRecordsResponseVariables) HasVariables() bool {
 	if o != nil && o.Variables != nil {
 		return true
 	}
@@ -100,11 +100,11 @@ func (o *BatchPutRecordsResponseVariables) HasVariables() bool {
 }
 
 // SetVariables gets a reference to the given map[string]interface{} and assigns it to the Variables field.
-func (o *BatchPutRecordsResponseVariables) SetVariables(v map[string]interface{}) {
+func (o *BatchUpsertRecordsResponseVariables) SetVariables(v map[string]interface{}) {
 	o.Variables = &v
 }
 
-func (o BatchPutRecordsResponseVariables) MarshalJSON() ([]byte, error) {
+func (o BatchUpsertRecordsResponseVariables) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Index != nil {
 		toSerialize["index"] = o.Index
@@ -115,38 +115,38 @@ func (o BatchPutRecordsResponseVariables) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableBatchPutRecordsResponseVariables struct {
-	value *BatchPutRecordsResponseVariables
+type NullableBatchUpsertRecordsResponseVariables struct {
+	value *BatchUpsertRecordsResponseVariables
 	isSet bool
 }
 
-func (v NullableBatchPutRecordsResponseVariables) Get() *BatchPutRecordsResponseVariables {
+func (v NullableBatchUpsertRecordsResponseVariables) Get() *BatchUpsertRecordsResponseVariables {
 	return v.value
 }
 
-func (v *NullableBatchPutRecordsResponseVariables) Set(val *BatchPutRecordsResponseVariables) {
+func (v *NullableBatchUpsertRecordsResponseVariables) Set(val *BatchUpsertRecordsResponseVariables) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableBatchPutRecordsResponseVariables) IsSet() bool {
+func (v NullableBatchUpsertRecordsResponseVariables) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableBatchPutRecordsResponseVariables) Unset() {
+func (v *NullableBatchUpsertRecordsResponseVariables) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableBatchPutRecordsResponseVariables(val *BatchPutRecordsResponseVariables) *NullableBatchPutRecordsResponseVariables {
-	return &NullableBatchPutRecordsResponseVariables{value: val, isSet: true}
+func NewNullableBatchUpsertRecordsResponseVariables(val *BatchUpsertRecordsResponseVariables) *NullableBatchUpsertRecordsResponseVariables {
+	return &NullableBatchUpsertRecordsResponseVariables{value: val, isSet: true}
 }
 
-func (v NullableBatchPutRecordsResponseVariables) MarshalJSON() ([]byte, error) {
+func (v NullableBatchUpsertRecordsResponseVariables) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableBatchPutRecordsResponseVariables) UnmarshalJSON(src []byte) error {
+func (v *NullableBatchUpsertRecordsResponseVariables) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

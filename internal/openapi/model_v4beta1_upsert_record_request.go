@@ -15,37 +15,37 @@ import (
 	"encoding/json"
 )
 
-// V4beta1PutRecordRequest struct for V4beta1PutRecordRequest
-type V4beta1PutRecordRequest struct {
-	Pipeline *V4beta1PutRecordRequestPipeline `json:"pipeline,omitempty"`
+// V4beta1UpsertRecordRequest struct for V4beta1UpsertRecordRequest
+type V4beta1UpsertRecordRequest struct {
+	Pipeline *V4beta1UpsertRecordRequestPipeline `json:"pipeline,omitempty"`
 	// An object made up of field-value pairs that contains the record data.
 	Record map[string]interface{} `json:"record"`
 	// The initial values for the variables the pipeline operates on and transforms throughout its steps.
 	Variables *map[string]interface{} `json:"variables,omitempty"`
 }
 
-// NewV4beta1PutRecordRequest instantiates a new V4beta1PutRecordRequest object
+// NewV4beta1UpsertRecordRequest instantiates a new V4beta1UpsertRecordRequest object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewV4beta1PutRecordRequest(record map[string]interface{}) *V4beta1PutRecordRequest {
-	this := V4beta1PutRecordRequest{}
+func NewV4beta1UpsertRecordRequest(record map[string]interface{}) *V4beta1UpsertRecordRequest {
+	this := V4beta1UpsertRecordRequest{}
 	this.Record = record
 	return &this
 }
 
-// NewV4beta1PutRecordRequestWithDefaults instantiates a new V4beta1PutRecordRequest object
+// NewV4beta1UpsertRecordRequestWithDefaults instantiates a new V4beta1UpsertRecordRequest object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewV4beta1PutRecordRequestWithDefaults() *V4beta1PutRecordRequest {
-	this := V4beta1PutRecordRequest{}
+func NewV4beta1UpsertRecordRequestWithDefaults() *V4beta1UpsertRecordRequest {
+	this := V4beta1UpsertRecordRequest{}
 	return &this
 }
 
 // GetPipeline returns the Pipeline field value if set, zero value otherwise.
-func (o *V4beta1PutRecordRequest) GetPipeline() V4beta1PutRecordRequestPipeline {
+func (o *V4beta1UpsertRecordRequest) GetPipeline() V4beta1UpsertRecordRequestPipeline {
 	if o == nil || o.Pipeline == nil {
-		var ret V4beta1PutRecordRequestPipeline
+		var ret V4beta1UpsertRecordRequestPipeline
 		return ret
 	}
 	return *o.Pipeline
@@ -53,7 +53,7 @@ func (o *V4beta1PutRecordRequest) GetPipeline() V4beta1PutRecordRequestPipeline 
 
 // GetPipelineOk returns a tuple with the Pipeline field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *V4beta1PutRecordRequest) GetPipelineOk() (*V4beta1PutRecordRequestPipeline, bool) {
+func (o *V4beta1UpsertRecordRequest) GetPipelineOk() (*V4beta1UpsertRecordRequestPipeline, bool) {
 	if o == nil || o.Pipeline == nil {
 		return nil, false
 	}
@@ -61,7 +61,7 @@ func (o *V4beta1PutRecordRequest) GetPipelineOk() (*V4beta1PutRecordRequestPipel
 }
 
 // HasPipeline returns a boolean if a field has been set.
-func (o *V4beta1PutRecordRequest) HasPipeline() bool {
+func (o *V4beta1UpsertRecordRequest) HasPipeline() bool {
 	if o != nil && o.Pipeline != nil {
 		return true
 	}
@@ -69,13 +69,13 @@ func (o *V4beta1PutRecordRequest) HasPipeline() bool {
 	return false
 }
 
-// SetPipeline gets a reference to the given V4beta1PutRecordRequestPipeline and assigns it to the Pipeline field.
-func (o *V4beta1PutRecordRequest) SetPipeline(v V4beta1PutRecordRequestPipeline) {
+// SetPipeline gets a reference to the given V4beta1UpsertRecordRequestPipeline and assigns it to the Pipeline field.
+func (o *V4beta1UpsertRecordRequest) SetPipeline(v V4beta1UpsertRecordRequestPipeline) {
 	o.Pipeline = &v
 }
 
 // GetRecord returns the Record field value
-func (o *V4beta1PutRecordRequest) GetRecord() map[string]interface{} {
+func (o *V4beta1UpsertRecordRequest) GetRecord() map[string]interface{} {
 	if o == nil {
 		var ret map[string]interface{}
 		return ret
@@ -86,7 +86,7 @@ func (o *V4beta1PutRecordRequest) GetRecord() map[string]interface{} {
 
 // GetRecordOk returns a tuple with the Record field value
 // and a boolean to check if the value has been set.
-func (o *V4beta1PutRecordRequest) GetRecordOk() (*map[string]interface{}, bool) {
+func (o *V4beta1UpsertRecordRequest) GetRecordOk() (*map[string]interface{}, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -94,12 +94,12 @@ func (o *V4beta1PutRecordRequest) GetRecordOk() (*map[string]interface{}, bool) 
 }
 
 // SetRecord sets field value
-func (o *V4beta1PutRecordRequest) SetRecord(v map[string]interface{}) {
+func (o *V4beta1UpsertRecordRequest) SetRecord(v map[string]interface{}) {
 	o.Record = v
 }
 
 // GetVariables returns the Variables field value if set, zero value otherwise.
-func (o *V4beta1PutRecordRequest) GetVariables() map[string]interface{} {
+func (o *V4beta1UpsertRecordRequest) GetVariables() map[string]interface{} {
 	if o == nil || o.Variables == nil {
 		var ret map[string]interface{}
 		return ret
@@ -109,7 +109,7 @@ func (o *V4beta1PutRecordRequest) GetVariables() map[string]interface{} {
 
 // GetVariablesOk returns a tuple with the Variables field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *V4beta1PutRecordRequest) GetVariablesOk() (*map[string]interface{}, bool) {
+func (o *V4beta1UpsertRecordRequest) GetVariablesOk() (*map[string]interface{}, bool) {
 	if o == nil || o.Variables == nil {
 		return nil, false
 	}
@@ -117,7 +117,7 @@ func (o *V4beta1PutRecordRequest) GetVariablesOk() (*map[string]interface{}, boo
 }
 
 // HasVariables returns a boolean if a field has been set.
-func (o *V4beta1PutRecordRequest) HasVariables() bool {
+func (o *V4beta1UpsertRecordRequest) HasVariables() bool {
 	if o != nil && o.Variables != nil {
 		return true
 	}
@@ -126,11 +126,11 @@ func (o *V4beta1PutRecordRequest) HasVariables() bool {
 }
 
 // SetVariables gets a reference to the given map[string]interface{} and assigns it to the Variables field.
-func (o *V4beta1PutRecordRequest) SetVariables(v map[string]interface{}) {
+func (o *V4beta1UpsertRecordRequest) SetVariables(v map[string]interface{}) {
 	o.Variables = &v
 }
 
-func (o V4beta1PutRecordRequest) MarshalJSON() ([]byte, error) {
+func (o V4beta1UpsertRecordRequest) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Pipeline != nil {
 		toSerialize["pipeline"] = o.Pipeline
@@ -144,38 +144,38 @@ func (o V4beta1PutRecordRequest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableV4beta1PutRecordRequest struct {
-	value *V4beta1PutRecordRequest
+type NullableV4beta1UpsertRecordRequest struct {
+	value *V4beta1UpsertRecordRequest
 	isSet bool
 }
 
-func (v NullableV4beta1PutRecordRequest) Get() *V4beta1PutRecordRequest {
+func (v NullableV4beta1UpsertRecordRequest) Get() *V4beta1UpsertRecordRequest {
 	return v.value
 }
 
-func (v *NullableV4beta1PutRecordRequest) Set(val *V4beta1PutRecordRequest) {
+func (v *NullableV4beta1UpsertRecordRequest) Set(val *V4beta1UpsertRecordRequest) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableV4beta1PutRecordRequest) IsSet() bool {
+func (v NullableV4beta1UpsertRecordRequest) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableV4beta1PutRecordRequest) Unset() {
+func (v *NullableV4beta1UpsertRecordRequest) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableV4beta1PutRecordRequest(val *V4beta1PutRecordRequest) *NullableV4beta1PutRecordRequest {
-	return &NullableV4beta1PutRecordRequest{value: val, isSet: true}
+func NewNullableV4beta1UpsertRecordRequest(val *V4beta1UpsertRecordRequest) *NullableV4beta1UpsertRecordRequest {
+	return &NullableV4beta1UpsertRecordRequest{value: val, isSet: true}
 }
 
-func (v NullableV4beta1PutRecordRequest) MarshalJSON() ([]byte, error) {
+func (v NullableV4beta1UpsertRecordRequest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableV4beta1PutRecordRequest) UnmarshalJSON(src []byte) error {
+func (v *NullableV4beta1UpsertRecordRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
