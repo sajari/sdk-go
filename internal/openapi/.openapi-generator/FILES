@@ -9,10 +9,6 @@ model_batch_put_records_response_variables.go
 model_buckets_bucket.go
 model_enginev2_value.go
 model_gatewayruntime_error.go
-model_gatewayruntime_error1.go
-model_gatewayruntime_error2.go
-model_gatewayruntime_error3.go
-model_gatewayruntime_error4.go
 model_protobuf_any.go
 model_protobuf_null_value.go
 model_query_aggregate_result_analysis.go

@@ -128,7 +128,7 @@ func (a *SchemaApiService) BatchCreateSchemaFieldsExecute(r ApiBatchCreateSchema
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError4
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -250,7 +250,7 @@ func (a *SchemaApiService) CreateSchemaFieldExecute(r ApiCreateSchemaFieldReques
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError4
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -378,7 +378,7 @@ func (a *SchemaApiService) ListSchemaFieldsExecute(r ApiListSchemaFieldsRequest)
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError4
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()

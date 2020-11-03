@@ -208,7 +208,7 @@ func (c *Client) getRecordV4(ctx context.Context, k *Key) (Record, error) {
 		case openapi.GenericOpenAPIError:
 			m := x.Model()
 
-			if m, ok := m.(openapi.GatewayruntimeError3); ok {
+			if m, ok := m.(openapi.GatewayruntimeError); ok {
 				switch codes.Code(m.GetCode()) {
 				case codes.NotFound:
 					return nil, fmt.Errorf("%v: %w", k, ErrNoSuchRecord)

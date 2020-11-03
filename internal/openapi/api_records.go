@@ -128,7 +128,7 @@ func (a *RecordsApiService) BatchPutRecordsExecute(r ApiBatchPutRecordsRequest) 
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError2
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -250,7 +250,7 @@ func (a *RecordsApiService) DeleteRecordExecute(r ApiDeleteRecordRequest) (inter
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError2
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -372,7 +372,7 @@ func (a *RecordsApiService) GetRecordExecute(r ApiGetRecordRequest) (map[string]
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError2
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -518,7 +518,7 @@ func (a *RecordsApiService) PutRecordExecute(r ApiPutRecordRequest) (V4beta1PutR
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError2
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()

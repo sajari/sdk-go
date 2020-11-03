@@ -31,7 +31,7 @@ func (c *Client) DeleteCollection(ctx context.Context, id string) error {
 		case openapi.GenericOpenAPIError:
 			m := x.Model()
 
-			if m, ok := m.(openapi.GatewayruntimeError1); ok {
+			if m, ok := m.(openapi.GatewayruntimeError); ok {
 				switch codes.Code(m.GetCode()) {
 				case codes.NotFound:
 					return fmt.Errorf("%v: %w", id, ErrNoSuchCollection)

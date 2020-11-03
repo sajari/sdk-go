@@ -157,7 +157,7 @@ func (a *CollectionsApiService) CreateCollectionExecute(r ApiCreateCollectionReq
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v GatewayruntimeError1
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -280,7 +280,7 @@ func (a *CollectionsApiService) DeleteCollectionExecute(r ApiDeleteCollectionReq
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v GatewayruntimeError1
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -391,7 +391,7 @@ func (a *CollectionsApiService) GetCollectionExecute(r ApiGetCollectionRequest) 
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError1
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -515,7 +515,7 @@ func (a *CollectionsApiService) ListCollectionsExecute(r ApiListCollectionsReque
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError1
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -655,7 +655,7 @@ func (a *CollectionsApiService) QueryCollectionExecute(r ApiQueryCollectionReque
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError1
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
