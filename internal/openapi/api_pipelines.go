@@ -137,7 +137,7 @@ func (a *PipelinesApiService) CreatePipelineExecute(r ApiCreatePipelineRequest) 
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError3
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -268,7 +268,7 @@ func (a *PipelinesApiService) GeneratePipelinesExecute(r ApiGeneratePipelinesReq
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError1
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -403,7 +403,7 @@ func (a *PipelinesApiService) GetPipelineExecute(r ApiGetPipelineRequest) (Sajar
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError3
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -539,7 +539,7 @@ func (a *PipelinesApiService) ListPipelinesExecute(r ApiListPipelinesRequest) (V
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError3
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -673,7 +673,7 @@ func (a *PipelinesApiService) SetDefaultPipelineExecute(r ApiSetDefaultPipelineR
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError1
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -807,7 +807,7 @@ func (a *PipelinesApiService) SetDefaultVersionExecute(r ApiSetDefaultVersionReq
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError3
+		var v GatewayruntimeError
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()

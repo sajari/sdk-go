@@ -152,7 +152,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError1'
+                $ref: '#/components/schemas/gatewayruntimeError'
           description: An unexpected error response
       summary: List collections
       tags:
@@ -221,7 +221,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError1'
+                $ref: '#/components/schemas/gatewayruntimeError'
           description: An unexpected error response
       summary: Create collection
       tags:
@@ -264,7 +264,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError1'
+                $ref: '#/components/schemas/gatewayruntimeError'
           description: An unexpected error response
       summary: Delete collection
       tags:
@@ -292,7 +292,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError1'
+                $ref: '#/components/schemas/gatewayruntimeError'
           description: An unexpected error response
       summary: Get collection
       tags:
@@ -356,10 +356,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError1'
+                $ref: '#/components/schemas/gatewayruntimeError'
             application/yaml:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError1'
+                $ref: '#/components/schemas/gatewayruntimeError'
           description: An unexpected error response
       summary: Generate pipelines
       tags:
@@ -409,7 +409,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError1'
+                $ref: '#/components/schemas/gatewayruntimeError'
           description: An unexpected error response
       summary: Query collection
       tags:
@@ -453,162 +453,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError1'
+                $ref: '#/components/schemas/gatewayruntimeError'
           description: An unexpected error response
       summary: Set default pipeline
       tags:
       - Pipelines
-  /v4beta1/collections/{collection_id}/records:batchPut:
-    post:
-      description: |-
-        The batch version of the
-        [PutRecord](/docs/api-reference#operation/PutRecord) call.
-      operationId: BatchPutRecords
-      parameters:
-      - description: The collection to put the records in, e.g. `my-collection`.
-        explode: false
-        in: path
-        name: collection_id
-        required: true
-        schema:
-          type: string
-        style: simple
-      requestBody:
-        $ref: '#/components/requestBodies/v4beta1BatchPutRecordsRequest'
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/v4beta1BatchPutRecordsResponse'
-          description: A successful response.
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/gatewayruntimeError2'
-          description: An unexpected error response
-      summary: Batch put records
-      tags:
-      - Records
-  /v4beta1/collections/{collection_id}/records:delete:
-    post:
-      description: Delete a record with the given key.
-      operationId: DeleteRecord
-      parameters:
-      - description: The collection that contains the record to delete, e.g. `my-collection`.
-        explode: false
-        in: path
-        name: collection_id
-        required: true
-        schema:
-          type: string
-        style: simple
-      requestBody:
-        $ref: '#/components/requestBodies/sajariv4beta1DeleteRecordRequest'
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                properties: {}
-          description: A successful response.
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/gatewayruntimeError2'
-          description: An unexpected error response
-      summary: Delete record
-      tags:
-      - Records
-  /v4beta1/collections/{collection_id}/records:get:
-    post:
-      description: Retrieve a record with the given key.
-      operationId: GetRecord
-      parameters:
-      - description: The collection that contains the record to retrieve, e.g. `my-collection`.
-        explode: false
-        in: path
-        name: collection_id
-        required: true
-        schema:
-          type: string
-        style: simple
-      requestBody:
-        $ref: '#/components/requestBodies/sajariv4beta1GetRecordRequest'
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: object
-          description: A successful response.
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/gatewayruntimeError2'
-          description: An unexpected error response
-      summary: Get record
-      tags:
-      - Records
-  /v4beta1/collections/{collection_id}/records:put:
-    post:
-      description: |-
-        Upsert a record. If the record does not exist in your collection it is
-        inserted. If it does exist it is updated.
-
-        If no pipeline is specified, the default record pipeline is used to process
-        the record.
-
-        For example, to add a single product from your ecommerce store to a
-        collection, use the following call:
-
-        ```json
-        {
-          "pipeline": {
-            "name": "my-pipeline",
-            "version": "1"
-          },
-          "record": {
-            "id": "54hdc7h2334h",
-            "name": "Smart TV",
-            "price": 1999,
-            "brand": "Acme",
-            "description": "...",
-            "in_stock": true
-          }
-        }
-        ```
-      operationId: PutRecord
-      parameters:
-      - description: The collection to put the record in, e.g. `my-collection`.
-        explode: false
-        in: path
-        name: collection_id
-        required: true
-        schema:
-          type: string
-        style: simple
-      requestBody:
-        $ref: '#/components/requestBodies/v4beta1PutRecordRequest'
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/v4beta1PutRecordResponse'
-          description: A successful response.
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/gatewayruntimeError2'
-          description: An unexpected error response
-      summary: Put record
-      tags:
-      - Records
   /v4beta1/collections/{collection_id}/pipelines:
     get:
       description: Retrieve a list of pipelines.
@@ -687,7 +536,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError3'
+                $ref: '#/components/schemas/gatewayruntimeError'
           description: An unexpected error response
       summary: List pipelines
       tags:
@@ -731,10 +580,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError3'
+                $ref: '#/components/schemas/gatewayruntimeError'
             application/yaml:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError3'
+                $ref: '#/components/schemas/gatewayruntimeError'
           description: An unexpected error response
       summary: Create pipeline
       tags:
@@ -828,10 +677,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError3'
+                $ref: '#/components/schemas/gatewayruntimeError'
             application/yaml:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError3'
+                $ref: '#/components/schemas/gatewayruntimeError'
           description: An unexpected error response
       summary: Get pipeline
       tags:
@@ -888,11 +737,162 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError3'
+                $ref: '#/components/schemas/gatewayruntimeError'
           description: An unexpected error response
       summary: Set default pipeline version
       tags:
       - Pipelines
+  /v4beta1/collections/{collection_id}/records:batchPut:
+    post:
+      description: |-
+        The batch version of the
+        [PutRecord](/docs/api-reference#operation/PutRecord) call.
+      operationId: BatchPutRecords
+      parameters:
+      - description: The collection to put the records in, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/v4beta1BatchPutRecordsRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v4beta1BatchPutRecordsResponse'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError'
+          description: An unexpected error response
+      summary: Batch put records
+      tags:
+      - Records
+  /v4beta1/collections/{collection_id}/records:delete:
+    post:
+      description: Delete a record with the given key.
+      operationId: DeleteRecord
+      parameters:
+      - description: The collection that contains the record to delete, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/sajariv4beta1DeleteRecordRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                properties: {}
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError'
+          description: An unexpected error response
+      summary: Delete record
+      tags:
+      - Records
+  /v4beta1/collections/{collection_id}/records:get:
+    post:
+      description: Retrieve a record with the given key.
+      operationId: GetRecord
+      parameters:
+      - description: The collection that contains the record to retrieve, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/sajariv4beta1GetRecordRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError'
+          description: An unexpected error response
+      summary: Get record
+      tags:
+      - Records
+  /v4beta1/collections/{collection_id}/records:put:
+    post:
+      description: |-
+        Upsert a record. If the record does not exist in your collection it is
+        inserted. If it does exist it is updated.
+
+        If no pipeline is specified, the default record pipeline is used to process
+        the record.
+
+        For example, to add a single product from your ecommerce store to a
+        collection, use the following call:
+
+        ```json
+        {
+          "pipeline": {
+            "name": "my-pipeline",
+            "version": "1"
+          },
+          "record": {
+            "id": "54hdc7h2334h",
+            "name": "Smart TV",
+            "price": 1999,
+            "brand": "Acme",
+            "description": "...",
+            "in_stock": true
+          }
+        }
+        ```
+      operationId: PutRecord
+      parameters:
+      - description: The collection to put the record in, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/v4beta1PutRecordRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v4beta1PutRecordResponse'
+          description: A successful response.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError'
+          description: An unexpected error response
+      summary: Put record
+      tags:
+      - Records
   /v4beta1/collections/{collection_id}/schemaFields:
     get:
       description: Retrieve a list of schema fields in the collection.
@@ -948,7 +948,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError4'
+                $ref: '#/components/schemas/gatewayruntimeError'
           description: An unexpected error response
       summary: List schema fields
       tags:
@@ -978,7 +978,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError4'
+                $ref: '#/components/schemas/gatewayruntimeError'
           description: An unexpected error response
       summary: Create schema field
       tags:
@@ -1011,7 +1011,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/gatewayruntimeError4'
+                $ref: '#/components/schemas/gatewayruntimeError'
           description: An unexpected error response
       summary: Batch create schema fields
       tags:
@@ -1043,6 +1043,19 @@ components:
           schema:
             $ref: '#/components/schemas/v4beta1SetDefaultPipelineRequest'
       required: true
+    sajariv4beta1Pipeline:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/sajariv4beta1Pipeline1'
+      description: The pipeline to create.
+      required: true
+    v4beta1SetDefaultVersionRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/v4beta1SetDefaultVersionRequest'
+      required: true
     v4beta1BatchPutRecordsRequest:
       content:
         application/json:
@@ -1066,19 +1079,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/v4beta1PutRecordRequest'
-      required: true
-    sajariv4beta1Pipeline:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/sajariv4beta1Pipeline1'
-      description: The pipeline to create.
-      required: true
-    v4beta1SetDefaultVersionRequest:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/v4beta1SetDefaultVersionRequest'
       required: true
     v4beta1SchemaField:
       content:
@@ -1414,20 +1414,6 @@ components:
           type: string
         repeated:
           $ref: '#/components/schemas/ValueRepeated'
-      type: object
-    gatewayruntimeError1:
-      properties:
-        error:
-          type: string
-        code:
-          format: int32
-          type: integer
-        message:
-          type: string
-        details:
-          items:
-            $ref: '#/components/schemas/protobufAny'
-          type: array
       type: object
     protobufNullValue:
       default: NULL_VALUE
@@ -2339,297 +2325,6 @@ components:
       required:
       - id
       type: object
-    BatchPutRecordsResponseVariables:
-      example:
-        variables: '{}'
-        index: 6
-      properties:
-        index:
-          description: Index of the record in `records` that these variables correspond
-            to.
-          format: int32
-          type: integer
-        variables:
-          description: The variables.
-          type: object
-      type: object
-    gatewayruntimeError2:
-      properties:
-        error:
-          type: string
-        code:
-          format: int32
-          type: integer
-        message:
-          type: string
-        details:
-          items:
-            $ref: '#/components/schemas/protobufAny'
-          type: array
-      type: object
-    rpcStatus1:
-      description: |-
-        The `Status` type defines a logical error model that is suitable for
-        different programming environments, including REST APIs and RPC APIs. It is
-        used by [gRPC](https://github.com/grpc). Each `Status` message contains
-        three pieces of data: error code, error message, and error details.
-
-        You can find out more about this error model and how to work with it in the
-        [API Design Guide](https://cloud.google.com/apis/design/errors).
-      example:
-        code: 5
-        details:
-        - value: value
-          type_url: type_url
-        - value: value
-          type_url: type_url
-        message: message
-      properties:
-        code:
-          description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
-          format: int32
-          type: integer
-        message:
-          description: |-
-            A developer-facing error message, which should be in English. Any
-            user-facing error message should be localized and sent in the
-            [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
-          type: string
-        details:
-          description: |-
-            A list of messages that carry the error details.  There is a common set of
-            message types for APIs to use.
-          items:
-            $ref: '#/components/schemas/protobufAny'
-          type: array
-      type: object
-    sajariv4beta1DeleteRecordRequest:
-      properties:
-        key:
-          $ref: '#/components/schemas/sajariv4beta1Key'
-      required:
-      - key
-      type: object
-    sajariv4beta1GetRecordRequest:
-      properties:
-        key:
-          $ref: '#/components/schemas/sajariv4beta1Key'
-      required:
-      - key
-      type: object
-    sajariv4beta1Key:
-      example:
-        field: field
-        value: value
-      properties:
-        field:
-          description: A field in your record that uniquely identifies it, e.g. `id`.
-          type: string
-        value:
-          description: |-
-            The value of `field` in your record, e.g.
-            `b217a995-597c-410f-bef2-60e9f8c0aadd`.
-          type: string
-      required:
-      - field
-      - value
-      type: object
-    v4beta1BatchPutRecordsRequest:
-      properties:
-        pipeline:
-          $ref: '#/components/schemas/v4beta1BatchPutRecordsRequestPipeline'
-        records:
-          description: A list of records to put.
-          items:
-            type: object
-          type: array
-        variables:
-          description: |-
-            The initial values for the variables the pipeline operates on and
-            transforms throughout its steps.
-          type: object
-      required:
-      - records
-      type: object
-    v4beta1BatchPutRecordsRequestPipeline:
-      description: |-
-        The pipeline to use when putting the records.
-
-        If not provided the default record pipeline is used.
-      properties:
-        name:
-          description: The record pipeline's name, e.g. `my-pipeline`.
-          type: string
-        version:
-          description: |-
-            The record pipeline's version, e.g. `42`.
-
-            If not provided the default version is used.
-          type: string
-      required:
-      - name
-      type: object
-    v4beta1BatchPutRecordsResponse:
-      example:
-        variables:
-        - variables: '{}'
-          index: 6
-        - variables: '{}'
-          index: 6
-        keys:
-        - index: 0
-          key:
-            field: field
-            value: value
-        - index: 0
-          key:
-            field: field
-            value: value
-        errors:
-        - index: 1
-          status:
-            code: 5
-            details:
-            - value: value
-              type_url: type_url
-            - value: value
-              type_url: type_url
-            message: message
-        - index: 1
-          status:
-            code: 5
-            details:
-            - value: value
-              type_url: type_url
-            - value: value
-              type_url: type_url
-            message: message
-      properties:
-        keys:
-          description: |-
-            A list of keys of the records that were inserted.
-
-            If a record was inserted, keys contains an entry containing the index of
-            the inserted record from `records` and the key. You can use the key if you
-            need to retrieve or delete the record.
-
-            If a record was updated, keys contains no such entry for the updated
-            record.
-          items:
-            $ref: '#/components/schemas/v4beta1BatchPutRecordsResponseKey'
-          type: array
-        variables:
-          description: |-
-            A list of modified variables returned by the pipeline after it has finished
-            processing each record.
-          items:
-            $ref: '#/components/schemas/BatchPutRecordsResponseVariables'
-          type: array
-        errors:
-          description: Errors that occurred.
-          items:
-            $ref: '#/components/schemas/v4beta1BatchPutRecordsResponseError'
-          type: array
-      type: object
-    v4beta1BatchPutRecordsResponseError:
-      example:
-        index: 1
-        status:
-          code: 5
-          details:
-          - value: value
-            type_url: type_url
-          - value: value
-            type_url: type_url
-          message: message
-      properties:
-        index:
-          description: Index of the record in `records` that this error corresponds
-            to.
-          format: int32
-          type: integer
-        status:
-          $ref: '#/components/schemas/rpcStatus1'
-      type: object
-    v4beta1BatchPutRecordsResponseKey:
-      example:
-        index: 0
-        key:
-          field: field
-          value: value
-      properties:
-        index:
-          description: Index of the record in `records` that this key corresponds
-            to.
-          format: int32
-          type: integer
-        key:
-          $ref: '#/components/schemas/sajariv4beta1Key'
-      type: object
-    v4beta1PutRecordRequest:
-      properties:
-        pipeline:
-          $ref: '#/components/schemas/v4beta1PutRecordRequestPipeline'
-        record:
-          description: An object made up of field-value pairs that contains the record
-            data.
-          type: object
-        variables:
-          description: |-
-            The initial values for the variables the pipeline operates on and
-            transforms throughout its steps.
-          type: object
-      required:
-      - record
-      type: object
-    v4beta1PutRecordRequestPipeline:
-      description: |-
-        The pipeline to use when putting the record.
-
-        If not provided the default record pipeline is used.
-      properties:
-        name:
-          description: The record pipeline's name, e.g. `my-pipeline`.
-          type: string
-        version:
-          description: |-
-            The record pipeline's version, e.g. `42`.
-
-            If not provided the default version is used.
-          type: string
-      required:
-      - name
-      type: object
-    v4beta1PutRecordResponse:
-      example:
-        variables: '{}'
-        key:
-          field: field
-          value: value
-      properties:
-        key:
-          $ref: '#/components/schemas/sajariv4beta1Key'
-        variables:
-          description: |-
-            The modified variables returned by the pipeline after it has finished
-            processing.
-          type: object
-      type: object
-    v4beta1PatchRecordRequest: {}
-    gatewayruntimeError3:
-      properties:
-        error:
-          type: string
-        code:
-          format: int32
-          type: integer
-        message:
-          type: string
-        details:
-          items:
-            $ref: '#/components/schemas/protobufAny'
-          type: array
-      type: object
     sajariv4beta1Pipeline1:
       example:
         create_time: 2000-01-23T04:56:07.000+00:00
@@ -2965,20 +2660,269 @@ components:
       required:
       - id
       type: object
-    gatewayruntimeError4:
+    BatchPutRecordsResponseVariables:
+      example:
+        variables: '{}'
+        index: 6
       properties:
-        error:
-          type: string
+        index:
+          description: Index of the record in `records` that these variables correspond
+            to.
+          format: int32
+          type: integer
+        variables:
+          description: The variables.
+          type: object
+      type: object
+    rpcStatus1:
+      description: |-
+        The `Status` type defines a logical error model that is suitable for
+        different programming environments, including REST APIs and RPC APIs. It is
+        used by [gRPC](https://github.com/grpc). Each `Status` message contains
+        three pieces of data: error code, error message, and error details.
+
+        You can find out more about this error model and how to work with it in the
+        [API Design Guide](https://cloud.google.com/apis/design/errors).
+      example:
+        code: 5
+        details:
+        - value: value
+          type_url: type_url
+        - value: value
+          type_url: type_url
+        message: message
+      properties:
         code:
+          description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
           format: int32
           type: integer
         message:
+          description: |-
+            A developer-facing error message, which should be in English. Any
+            user-facing error message should be localized and sent in the
+            [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
           type: string
         details:
+          description: |-
+            A list of messages that carry the error details.  There is a common set of
+            message types for APIs to use.
           items:
             $ref: '#/components/schemas/protobufAny'
           type: array
       type: object
+    sajariv4beta1DeleteRecordRequest:
+      properties:
+        key:
+          $ref: '#/components/schemas/sajariv4beta1Key'
+      required:
+      - key
+      type: object
+    sajariv4beta1GetRecordRequest:
+      properties:
+        key:
+          $ref: '#/components/schemas/sajariv4beta1Key'
+      required:
+      - key
+      type: object
+    sajariv4beta1Key:
+      example:
+        field: field
+        value: value
+      properties:
+        field:
+          description: A field in your record that uniquely identifies it, e.g. `id`.
+          type: string
+        value:
+          description: |-
+            The value of `field` in your record, e.g.
+            `b217a995-597c-410f-bef2-60e9f8c0aadd`.
+          type: string
+      required:
+      - field
+      - value
+      type: object
+    v4beta1BatchPutRecordsRequest:
+      properties:
+        pipeline:
+          $ref: '#/components/schemas/v4beta1BatchPutRecordsRequestPipeline'
+        records:
+          description: A list of records to put.
+          items:
+            type: object
+          type: array
+        variables:
+          description: |-
+            The initial values for the variables the pipeline operates on and
+            transforms throughout its steps.
+          type: object
+      required:
+      - records
+      type: object
+    v4beta1BatchPutRecordsRequestPipeline:
+      description: |-
+        The pipeline to use when putting the records.
+
+        If not provided the default record pipeline is used.
+      properties:
+        name:
+          description: The record pipeline's name, e.g. `my-pipeline`.
+          type: string
+        version:
+          description: |-
+            The record pipeline's version, e.g. `42`.
+
+            If not provided the default version is used.
+          type: string
+      required:
+      - name
+      type: object
+    v4beta1BatchPutRecordsResponse:
+      example:
+        variables:
+        - variables: '{}'
+          index: 6
+        - variables: '{}'
+          index: 6
+        keys:
+        - index: 0
+          key:
+            field: field
+            value: value
+        - index: 0
+          key:
+            field: field
+            value: value
+        errors:
+        - index: 1
+          status:
+            code: 5
+            details:
+            - value: value
+              type_url: type_url
+            - value: value
+              type_url: type_url
+            message: message
+        - index: 1
+          status:
+            code: 5
+            details:
+            - value: value
+              type_url: type_url
+            - value: value
+              type_url: type_url
+            message: message
+      properties:
+        keys:
+          description: |-
+            A list of keys of the records that were inserted.
+
+            If a record was inserted, keys contains an entry containing the index of
+            the inserted record from `records` and the key. You can use the key if you
+            need to retrieve or delete the record.
+
+            If a record was updated, keys contains no such entry for the updated
+            record.
+          items:
+            $ref: '#/components/schemas/v4beta1BatchPutRecordsResponseKey'
+          type: array
+        variables:
+          description: |-
+            A list of modified variables returned by the pipeline after it has finished
+            processing each record.
+          items:
+            $ref: '#/components/schemas/BatchPutRecordsResponseVariables'
+          type: array
+        errors:
+          description: Errors that occurred.
+          items:
+            $ref: '#/components/schemas/v4beta1BatchPutRecordsResponseError'
+          type: array
+      type: object
+    v4beta1BatchPutRecordsResponseError:
+      example:
+        index: 1
+        status:
+          code: 5
+          details:
+          - value: value
+            type_url: type_url
+          - value: value
+            type_url: type_url
+          message: message
+      properties:
+        index:
+          description: Index of the record in `records` that this error corresponds
+            to.
+          format: int32
+          type: integer
+        status:
+          $ref: '#/components/schemas/rpcStatus1'
+      type: object
+    v4beta1BatchPutRecordsResponseKey:
+      example:
+        index: 0
+        key:
+          field: field
+          value: value
+      properties:
+        index:
+          description: Index of the record in `records` that this key corresponds
+            to.
+          format: int32
+          type: integer
+        key:
+          $ref: '#/components/schemas/sajariv4beta1Key'
+      type: object
+    v4beta1PutRecordRequest:
+      properties:
+        pipeline:
+          $ref: '#/components/schemas/v4beta1PutRecordRequestPipeline'
+        record:
+          description: An object made up of field-value pairs that contains the record
+            data.
+          type: object
+        variables:
+          description: |-
+            The initial values for the variables the pipeline operates on and
+            transforms throughout its steps.
+          type: object
+      required:
+      - record
+      type: object
+    v4beta1PutRecordRequestPipeline:
+      description: |-
+        The pipeline to use when putting the record.
+
+        If not provided the default record pipeline is used.
+      properties:
+        name:
+          description: The record pipeline's name, e.g. `my-pipeline`.
+          type: string
+        version:
+          description: |-
+            The record pipeline's version, e.g. `42`.
+
+            If not provided the default version is used.
+          type: string
+      required:
+      - name
+      type: object
+    v4beta1PutRecordResponse:
+      example:
+        variables: '{}'
+        key:
+          field: field
+          value: value
+      properties:
+        key:
+          $ref: '#/components/schemas/sajariv4beta1Key'
+        variables:
+          description: |-
+            The modified variables returned by the pipeline after it has finished
+            processing.
+          type: object
+      type: object
+    v4beta1PatchRecordRequest: {}
     rpcStatus2:
       description: |-
         The `Status` type defines a logical error model that is suitable for
