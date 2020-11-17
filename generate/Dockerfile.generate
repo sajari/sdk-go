@@ -1,0 +1,1 @@
+FROM openapitools/openapi-generator-cli@sha256:90f2a1b52c21760d089c42439c66ffcbf573a44fcb26a82f4e91de1728a53a39

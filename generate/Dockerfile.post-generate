@@ -1,0 +1,5 @@
+FROM golang:1.15.5
+
+WORKDIR /app
+
+RUN go get golang.org/x/tools/cmd/goimports
