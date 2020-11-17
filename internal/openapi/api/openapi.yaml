@@ -297,6 +297,65 @@ paths:
       summary: Get collection
       tags:
       - Collections
+    patch:
+      description: Update the details of a collection.
+      operationId: UpdateCollection
+      parameters:
+      - description: The collection to update, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: |-
+          The list of fields to be updated, separated by a comma, e.g.
+          `field1,field2`.
+
+          For each field that you want to update, provide a corresponding value in
+          the collection containing the new value.
+        explode: true
+        in: query
+        name: update_mask
+        required: false
+        schema:
+          type: string
+        style: form
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v4beta1Collection'
+        description: Details of the collection to update.
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v4beta1Collection'
+          description: A successful response.
+        "404":
+          content:
+            application/json:
+              examples:
+                response:
+                  value:
+                    code: 5
+                    message: resource not found
+              schema:
+                $ref: '#/components/schemas/rpcStatus'
+          description: Returned when the collection was not found.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gatewayruntimeError'
+          description: An unexpected error response
+      summary: Update collection
+      tags:
+      - Collections
   /v4beta1/collections/{collection_id}:generatePipelines:
     post:
       description: |-
