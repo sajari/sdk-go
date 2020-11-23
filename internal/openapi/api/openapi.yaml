@@ -2981,7 +2981,6 @@ components:
             processing.
           type: object
       type: object
-    v4beta1PatchRecordRequest: {}
     rpcStatus2:
       description: |-
         The `Status` type defines a logical error model that is suitable for
@@ -3166,7 +3165,6 @@ components:
       - name
       - type
       type: object
-    v4beta1CreateSchemaFieldRequest: {}
   securitySchemes:
     BasicAuth:
       description: |-
