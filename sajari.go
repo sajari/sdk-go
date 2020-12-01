@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	endpoint         = "api.sajari.com:443"
-	userAgent        = "sdk-go-07072016"
+	endpoint         = "api.sajari.com:50051"
+	userAgent        = "sdk-go-01122020"
 	overrideHostname = "api.sajari.com"
 )
 
