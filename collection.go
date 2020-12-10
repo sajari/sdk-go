@@ -27,6 +27,15 @@ func SetCollectionDisplayName(displayName string) UpdateCollectionOpt {
 	}
 }
 
+// SetAuthorizedQueryDomains is a collection mutation that set a collection's
+// authorized query domains.
+func SetAuthorizedQueryDomains(domains []string) UpdateCollectionOpt {
+	return func(c *openapi.Collection, updateMask map[string]struct{}) {
+		c.AuthorizedQueryDomains = &domains
+		updateMask["authorized_query_domains"] = struct{}{}
+	}
+}
+
 // UpdateCollection updates a collection identified by the provided ID.
 //
 // If there is no such collection matching the given ID this method returns an
@@ -34,6 +43,10 @@ func SetCollectionDisplayName(displayName string) UpdateCollectionOpt {
 func (c *Client) UpdateCollection(ctx context.Context, id string, opts ...UpdateCollectionOpt) error {
 	if !c.v4 {
 		return errors.New("not supported on non-v4 endpoints")
+	}
+
+	if id == "" {
+		return errors.New("collection id cannot be empty")
 	}
 
 	col := &openapi.Collection{}
@@ -50,14 +63,14 @@ func (c *Client) UpdateCollection(ctx context.Context, id string, opts ...Update
 
 	ctx = context.WithValue(ctx, openapi.ContextBasicAuth, c.openAPI.auth)
 
-	req := c.openAPI.client.CollectionsApi.UpdateCollection(ctx, id)
-	req.Collection(*col)
-	req.UpdateMask(strings.Join(um, ","))
+	req := c.openAPI.client.CollectionsApi.
+		UpdateCollection(ctx, id).
+		Collection(*col).
+		UpdateMask(strings.Join(um, ","))
 
 	_, _, err := req.Execute()
 	if err != nil {
-		ok, err := handleGenericOpenAPIError(err)
-		if ok {
+		if ok, err := handleGenericOpenAPIError(err); ok {
 			return err
 		}
 		return fmt.Errorf("could not update collection: %w", err)
@@ -79,8 +92,7 @@ func (c *Client) DeleteCollection(ctx context.Context, id string) error {
 
 	_, _, err := c.openAPI.client.CollectionsApi.DeleteCollection(ctx, id).Execute()
 	if err != nil {
-		ok, err := handleGenericOpenAPIError(err)
-		if ok {
+		if ok, err := handleGenericOpenAPIError(err); ok {
 			return err
 		}
 		return fmt.Errorf("could not delete collection: %w", err)
