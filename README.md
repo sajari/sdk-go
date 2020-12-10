@@ -1,7 +1,7 @@
 # Sajari APIs Go client
 
 [![GoDoc](https://godoc.org/code.sajari.com/sdk-go?status.svg)](http://godoc.org/code.sajari.com/sdk-go)
-[![Build status](https://travis-ci.org/sajari/sdk-go.svg?branch=master)](https://travis-ci.org/sajari/sdk-go)
+[![Build status](https://github.com/sajari/sdk-go/workflows/Go/badge.svg?branch=v2)](https://github.com/sajari/sdk-go/actions)
 [![Report card](https://goreportcard.com/badge/code.sajari.com/sdk-go)](https://goreportcard.com/report/code.sajari.com/sdk-go)
 [![Sourcegraph](https://sourcegraph.com/github.com/sajari/sdk-go/-/badge.svg)](https://sourcegraph.com/github.com/sajari/sdk-go?badge)
 
