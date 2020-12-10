@@ -2611,6 +2611,9 @@ components:
     Collection:
       example:
         account_id: account_id
+        authorized_query_domains:
+        - authorized_query_domains
+        - authorized_query_domains
         create_time: 2000-01-23T04:56:07.000+00:00
         id: id
         display_name: display_name
@@ -2631,6 +2634,18 @@ components:
         display_name:
           description: The collection's display name. You can change this at any time.
           type: string
+        authorized_query_domains:
+          description: |-
+            The list of authorized query domains for the collection.
+
+            Client-side / browser requests to the
+            [QueryCollection](/docs/api-reference#operation/QueryCollection) call can
+            be made by any authorized query domain or any of its subdomains. This
+            allows your interface to make search requests without having to provide an
+            API key in the client-side request.
+          items:
+            type: string
+          type: array
       required:
       - display_name
       type: object
@@ -2914,10 +2929,16 @@ components:
         next_page_token: next_page_token
         collections:
         - account_id: account_id
+          authorized_query_domains:
+          - authorized_query_domains
+          - authorized_query_domains
           create_time: 2000-01-23T04:56:07.000+00:00
           id: id
           display_name: display_name
         - account_id: account_id
+          authorized_query_domains:
+          - authorized_query_domains
+          - authorized_query_domains
           create_time: 2000-01-23T04:56:07.000+00:00
           id: id
           display_name: display_name

@@ -26,6 +26,8 @@ type Collection struct {
 	CreateTime *time.Time `json:"create_time,omitempty"`
 	// The collection's display name. You can change this at any time.
 	DisplayName string `json:"display_name"`
+	// The list of authorized query domains for the collection.  Client-side / browser requests to the [QueryCollection](/docs/api-reference#operation/QueryCollection) call can be made by any authorized query domain or any of its subdomains. This allows your interface to make search requests without having to provide an API key in the client-side request.
+	AuthorizedQueryDomains *[]string `json:"authorized_query_domains,omitempty"`
 }
 
 // NewCollection instantiates a new Collection object
@@ -166,6 +168,38 @@ func (o *Collection) SetDisplayName(v string) {
 	o.DisplayName = v
 }
 
+// GetAuthorizedQueryDomains returns the AuthorizedQueryDomains field value if set, zero value otherwise.
+func (o *Collection) GetAuthorizedQueryDomains() []string {
+	if o == nil || o.AuthorizedQueryDomains == nil {
+		var ret []string
+		return ret
+	}
+	return *o.AuthorizedQueryDomains
+}
+
+// GetAuthorizedQueryDomainsOk returns a tuple with the AuthorizedQueryDomains field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Collection) GetAuthorizedQueryDomainsOk() (*[]string, bool) {
+	if o == nil || o.AuthorizedQueryDomains == nil {
+		return nil, false
+	}
+	return o.AuthorizedQueryDomains, true
+}
+
+// HasAuthorizedQueryDomains returns a boolean if a field has been set.
+func (o *Collection) HasAuthorizedQueryDomains() bool {
+	if o != nil && o.AuthorizedQueryDomains != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetAuthorizedQueryDomains gets a reference to the given []string and assigns it to the AuthorizedQueryDomains field.
+func (o *Collection) SetAuthorizedQueryDomains(v []string) {
+	o.AuthorizedQueryDomains = &v
+}
+
 func (o Collection) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Id != nil {
@@ -179,6 +213,9 @@ func (o Collection) MarshalJSON() ([]byte, error) {
 	}
 	if true {
 		toSerialize["display_name"] = o.DisplayName
+	}
+	if o.AuthorizedQueryDomains != nil {
+		toSerialize["authorized_query_domains"] = o.AuthorizedQueryDomains
 	}
 	return json.Marshal(toSerialize)
 }
