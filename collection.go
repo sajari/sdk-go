@@ -16,12 +16,12 @@ import (
 var ErrNoSuchCollection = errors.New("no such collection")
 
 // UpdateCollectionOpt is a type which defines options to update a collection.
-type UpdateCollectionOpt func(c *openapi.V4beta1Collection, updateMask map[string]struct{})
+type UpdateCollectionOpt func(c *openapi.Collection, updateMask map[string]struct{})
 
 // SetCollectionDisplayName is a collection mutation that set a collection's
 // display name.
 func SetCollectionDisplayName(displayName string) UpdateCollectionOpt {
-	return func(c *openapi.V4beta1Collection, updateMask map[string]struct{}) {
+	return func(c *openapi.Collection, updateMask map[string]struct{}) {
 		c.DisplayName = displayName
 		updateMask["display_name"] = struct{}{}
 	}
@@ -36,7 +36,7 @@ func (c *Client) UpdateCollection(ctx context.Context, id string, opts ...Update
 		return errors.New("not supported on non-v4 endpoints")
 	}
 
-	col := &openapi.V4beta1Collection{}
+	col := &openapi.Collection{}
 	updateMask := map[string]struct{}{}
 
 	for _, opt := range opts {
@@ -51,7 +51,7 @@ func (c *Client) UpdateCollection(ctx context.Context, id string, opts ...Update
 	ctx = context.WithValue(ctx, openapi.ContextBasicAuth, c.openAPI.auth)
 
 	req := c.openAPI.client.CollectionsApi.UpdateCollection(ctx, id)
-	req.V4beta1Collection(*col)
+	req.Collection(*col)
 	req.UpdateMask(strings.Join(um, ","))
 
 	_, _, err := req.Execute()
@@ -94,7 +94,7 @@ func handleGenericOpenAPIError(err error) (handled bool, rerr error) {
 	case openapi.GenericOpenAPIError:
 		m := x.Model()
 
-		if m, ok := m.(openapi.GatewayruntimeError); ok {
+		if m, ok := m.(openapi.Error); ok {
 			switch codes.Code(m.GetCode()) {
 			case codes.NotFound:
 				return true, fmt.Errorf("%w", ErrNoSuchCollection)

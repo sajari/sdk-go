@@ -3,7 +3,7 @@
  *
  * Sajari is a smart, highly-configurable, real-time search service that enables thousands of businesses worldwide to provide amazing search experiences on their websites, stores, and applications.
  *
- * API version: v4beta1
+ * API version: v4
  * Contact: support@sajari.com
  */
 
@@ -17,7 +17,7 @@ import (
 
 // QueryAggregateResultBuckets Buckets is a full set of buckets computed in an aggregation.
 type QueryAggregateResultBuckets struct {
-	Buckets *map[string]BucketsBucket `json:"buckets,omitempty"`
+	Buckets *map[string]QueryAggregateResultBucketsBucket `json:"buckets,omitempty"`
 }
 
 // NewQueryAggregateResultBuckets instantiates a new QueryAggregateResultBuckets object
@@ -38,9 +38,9 @@ func NewQueryAggregateResultBucketsWithDefaults() *QueryAggregateResultBuckets {
 }
 
 // GetBuckets returns the Buckets field value if set, zero value otherwise.
-func (o *QueryAggregateResultBuckets) GetBuckets() map[string]BucketsBucket {
+func (o *QueryAggregateResultBuckets) GetBuckets() map[string]QueryAggregateResultBucketsBucket {
 	if o == nil || o.Buckets == nil {
-		var ret map[string]BucketsBucket
+		var ret map[string]QueryAggregateResultBucketsBucket
 		return ret
 	}
 	return *o.Buckets
@@ -48,7 +48,7 @@ func (o *QueryAggregateResultBuckets) GetBuckets() map[string]BucketsBucket {
 
 // GetBucketsOk returns a tuple with the Buckets field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *QueryAggregateResultBuckets) GetBucketsOk() (*map[string]BucketsBucket, bool) {
+func (o *QueryAggregateResultBuckets) GetBucketsOk() (*map[string]QueryAggregateResultBucketsBucket, bool) {
 	if o == nil || o.Buckets == nil {
 		return nil, false
 	}
@@ -64,8 +64,8 @@ func (o *QueryAggregateResultBuckets) HasBuckets() bool {
 	return false
 }
 
-// SetBuckets gets a reference to the given map[string]BucketsBucket and assigns it to the Buckets field.
-func (o *QueryAggregateResultBuckets) SetBuckets(v map[string]BucketsBucket) {
+// SetBuckets gets a reference to the given map[string]QueryAggregateResultBucketsBucket and assigns it to the Buckets field.
+func (o *QueryAggregateResultBuckets) SetBuckets(v map[string]QueryAggregateResultBucketsBucket) {
 	o.Buckets = &v
 }
 

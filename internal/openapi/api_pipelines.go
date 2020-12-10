@@ -3,7 +3,7 @@
  *
  * Sajari is a smart, highly-configurable, real-time search service that enables thousands of businesses worldwide to provide amazing search experiences on their websites, stores, and applications.
  *
- * API version: v4beta1
+ * API version: v4
  * Contact: support@sajari.com
  */
 
@@ -28,18 +28,18 @@ var (
 type PipelinesApiService service
 
 type ApiCreatePipelineRequest struct {
-	ctx                    _context.Context
-	ApiService             *PipelinesApiService
-	collectionId           string
-	sajariv4beta1Pipeline1 *Sajariv4beta1Pipeline1
+	ctx          _context.Context
+	ApiService   *PipelinesApiService
+	collectionId string
+	pipeline     *Pipeline
 }
 
-func (r ApiCreatePipelineRequest) Sajariv4beta1Pipeline1(sajariv4beta1Pipeline1 Sajariv4beta1Pipeline1) ApiCreatePipelineRequest {
-	r.sajariv4beta1Pipeline1 = &sajariv4beta1Pipeline1
+func (r ApiCreatePipelineRequest) Pipeline(pipeline Pipeline) ApiCreatePipelineRequest {
+	r.pipeline = &pipeline
 	return r
 }
 
-func (r ApiCreatePipelineRequest) Execute() (Sajariv4beta1Pipeline1, *_nethttp.Response, error) {
+func (r ApiCreatePipelineRequest) Execute() (Pipeline, *_nethttp.Response, error) {
 	return r.ApiService.CreatePipelineExecute(r)
 }
 
@@ -70,16 +70,16 @@ func (a *PipelinesApiService) CreatePipeline(ctx _context.Context, collectionId 
 
 /*
  * Execute executes the request
- * @return Sajariv4beta1Pipeline1
+ * @return Pipeline
  */
-func (a *PipelinesApiService) CreatePipelineExecute(r ApiCreatePipelineRequest) (Sajariv4beta1Pipeline1, *_nethttp.Response, error) {
+func (a *PipelinesApiService) CreatePipelineExecute(r ApiCreatePipelineRequest) (Pipeline, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  Sajariv4beta1Pipeline1
+		localVarReturnValue  Pipeline
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PipelinesApiService.CreatePipeline")
@@ -87,18 +87,18 @@ func (a *PipelinesApiService) CreatePipelineExecute(r ApiCreatePipelineRequest) 
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}/pipelines"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/pipelines"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.sajariv4beta1Pipeline1 == nil {
-		return localVarReturnValue, nil, reportError("sajariv4beta1Pipeline1 is required and must be specified")
+	if r.pipeline == nil {
+		return localVarReturnValue, nil, reportError("pipeline is required and must be specified")
 	}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHTTPContentTypes := []string{"application/json", "application/yaml"}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -115,7 +115,7 @@ func (a *PipelinesApiService) CreatePipelineExecute(r ApiCreatePipelineRequest) 
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.sajariv4beta1Pipeline1
+	localVarPostBody = r.pipeline
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -137,7 +137,47 @@ func (a *PipelinesApiService) CreatePipelineExecute(r ApiCreatePipelineRequest) 
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -160,18 +200,18 @@ func (a *PipelinesApiService) CreatePipelineExecute(r ApiCreatePipelineRequest) 
 }
 
 type ApiGeneratePipelinesRequest struct {
-	ctx                             _context.Context
-	ApiService                      *PipelinesApiService
-	collectionId                    string
-	v4beta1GeneratePipelinesRequest *V4beta1GeneratePipelinesRequest
+	ctx                      _context.Context
+	ApiService               *PipelinesApiService
+	collectionId             string
+	generatePipelinesRequest *GeneratePipelinesRequest
 }
 
-func (r ApiGeneratePipelinesRequest) V4beta1GeneratePipelinesRequest(v4beta1GeneratePipelinesRequest V4beta1GeneratePipelinesRequest) ApiGeneratePipelinesRequest {
-	r.v4beta1GeneratePipelinesRequest = &v4beta1GeneratePipelinesRequest
+func (r ApiGeneratePipelinesRequest) GeneratePipelinesRequest(generatePipelinesRequest GeneratePipelinesRequest) ApiGeneratePipelinesRequest {
+	r.generatePipelinesRequest = &generatePipelinesRequest
 	return r
 }
 
-func (r ApiGeneratePipelinesRequest) Execute() (V4beta1GeneratePipelinesResponse, *_nethttp.Response, error) {
+func (r ApiGeneratePipelinesRequest) Execute() (GeneratePipelinesResponse, *_nethttp.Response, error) {
 	return r.ApiService.GeneratePipelinesExecute(r)
 }
 
@@ -201,16 +241,16 @@ func (a *PipelinesApiService) GeneratePipelines(ctx _context.Context, collection
 
 /*
  * Execute executes the request
- * @return V4beta1GeneratePipelinesResponse
+ * @return GeneratePipelinesResponse
  */
-func (a *PipelinesApiService) GeneratePipelinesExecute(r ApiGeneratePipelinesRequest) (V4beta1GeneratePipelinesResponse, *_nethttp.Response, error) {
+func (a *PipelinesApiService) GeneratePipelinesExecute(r ApiGeneratePipelinesRequest) (GeneratePipelinesResponse, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  V4beta1GeneratePipelinesResponse
+		localVarReturnValue  GeneratePipelinesResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PipelinesApiService.GeneratePipelines")
@@ -218,14 +258,14 @@ func (a *PipelinesApiService) GeneratePipelinesExecute(r ApiGeneratePipelinesReq
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}:generatePipelines"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}:generatePipelines"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.v4beta1GeneratePipelinesRequest == nil {
-		return localVarReturnValue, nil, reportError("v4beta1GeneratePipelinesRequest is required and must be specified")
+	if r.generatePipelinesRequest == nil {
+		return localVarReturnValue, nil, reportError("generatePipelinesRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -246,7 +286,7 @@ func (a *PipelinesApiService) GeneratePipelinesExecute(r ApiGeneratePipelinesReq
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.v4beta1GeneratePipelinesRequest
+	localVarPostBody = r.generatePipelinesRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -268,7 +308,394 @@ func (a *PipelinesApiService) GeneratePipelinesExecute(r ApiGeneratePipelinesReq
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetDefaultPipelineRequest struct {
+	ctx          _context.Context
+	ApiService   *PipelinesApiService
+	collectionId string
+	type_        *string
+}
+
+func (r ApiGetDefaultPipelineRequest) Type_(type_ string) ApiGetDefaultPipelineRequest {
+	r.type_ = &type_
+	return r
+}
+
+func (r ApiGetDefaultPipelineRequest) Execute() (GetDefaultPipelineResponse, *_nethttp.Response, error) {
+	return r.ApiService.GetDefaultPipelineExecute(r)
+}
+
+/*
+ * GetDefaultPipeline Get default pipeline
+ * Get the default pipeline for a collection.
+
+Every collection has a default record pipeline and a default query
+pipeline.
+
+When a pipeline is required to complete an operation, it can be omitted
+from the request if a default pipeline has been set. When adding a record
+to a collection, the default record pipeline is used if none is provided.
+When querying a collection, the default query pipeline is used if none is
+provided.
+ * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param collectionId The collection to get the default query pipeline of, e.g. `my-collection`.
+ * @return ApiGetDefaultPipelineRequest
+*/
+func (a *PipelinesApiService) GetDefaultPipeline(ctx _context.Context, collectionId string) ApiGetDefaultPipelineRequest {
+	return ApiGetDefaultPipelineRequest{
+		ApiService:   a,
+		ctx:          ctx,
+		collectionId: collectionId,
+	}
+}
+
+/*
+ * Execute executes the request
+ * @return GetDefaultPipelineResponse
+ */
+func (a *PipelinesApiService) GetDefaultPipelineExecute(r ApiGetDefaultPipelineRequest) (GetDefaultPipelineResponse, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  GetDefaultPipelineResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PipelinesApiService.GetDefaultPipeline")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/v4/collections/{collection_id}:getDefaultPipeline"
+	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+	if r.type_ == nil {
+		return localVarReturnValue, nil, reportError("type_ is required and must be specified")
+	}
+
+	localVarQueryParams.Add("type", parameterToString(*r.type_, ""))
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetDefaultVersionRequest struct {
+	ctx          _context.Context
+	ApiService   *PipelinesApiService
+	collectionId string
+	type_        string
+	name         string
+	view         *string
+}
+
+func (r ApiGetDefaultVersionRequest) View(view string) ApiGetDefaultVersionRequest {
+	r.view = &view
+	return r
+}
+
+func (r ApiGetDefaultVersionRequest) Execute() (Pipeline, *_nethttp.Response, error) {
+	return r.ApiService.GetDefaultVersionExecute(r)
+}
+
+/*
+ * GetDefaultVersion Get default pipeline version
+ * Get the default version for a given pipeline.
+
+The default version of a pipeline is used when a pipeline is referred to
+without specifying a version.
+
+This allows you to change the pipeline version used for requests without
+having to change your code.
+
+To retrieve the pipeline in YAML, set the request's `Accept` header to
+`application/yaml`.
+ * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param collectionId The collection that owns the pipeline to get the default version of, e.g. `my-collection`.
+ * @param type_ The type of the pipeline to get the default version of.
+ * @param name The name of the pipeline to get the default version of, e.g. `my-pipeline`.
+ * @return ApiGetDefaultVersionRequest
+*/
+func (a *PipelinesApiService) GetDefaultVersion(ctx _context.Context, collectionId string, type_ string, name string) ApiGetDefaultVersionRequest {
+	return ApiGetDefaultVersionRequest{
+		ApiService:   a,
+		ctx:          ctx,
+		collectionId: collectionId,
+		type_:        type_,
+		name:         name,
+	}
+}
+
+/*
+ * Execute executes the request
+ * @return Pipeline
+ */
+func (a *PipelinesApiService) GetDefaultVersionExecute(r ApiGetDefaultVersionRequest) (Pipeline, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  Pipeline
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PipelinesApiService.GetDefaultVersion")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/pipelines/{type}/{name}:getDefaultVersion"
+	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"type"+"}", _neturl.PathEscape(parameterToString(r.type_, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"name"+"}", _neturl.PathEscape(parameterToString(r.name, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	if r.view != nil {
+		localVarQueryParams.Add("view", parameterToString(*r.view, ""))
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json", "application/yaml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v Status
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -305,7 +732,7 @@ func (r ApiGetPipelineRequest) View(view string) ApiGetPipelineRequest {
 	return r
 }
 
-func (r ApiGetPipelineRequest) Execute() (Sajariv4beta1Pipeline1, *_nethttp.Response, error) {
+func (r ApiGetPipelineRequest) Execute() (Pipeline, *_nethttp.Response, error) {
 	return r.ApiService.GetPipelineExecute(r)
 }
 
@@ -317,7 +744,7 @@ To retrieve the pipeline in YAML, set the request's `Accept` header to
 `application/yaml`.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param collectionId The collection that owns the pipeline, e.g. `my-collection`.
- * @param type_ The type of the pipeline to retrieve, either `record` or `query`.
+ * @param type_ The type of the pipeline to retrieve.
  * @param name The name of the pipeline to retrieve, e.g. `my-pipeline`.
  * @param version The version of the pipeline to retrieve, e.g. `42`.
  * @return ApiGetPipelineRequest
@@ -335,16 +762,16 @@ func (a *PipelinesApiService) GetPipeline(ctx _context.Context, collectionId str
 
 /*
  * Execute executes the request
- * @return Sajariv4beta1Pipeline1
+ * @return Pipeline
  */
-func (a *PipelinesApiService) GetPipelineExecute(r ApiGetPipelineRequest) (Sajariv4beta1Pipeline1, *_nethttp.Response, error) {
+func (a *PipelinesApiService) GetPipelineExecute(r ApiGetPipelineRequest) (Pipeline, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  Sajariv4beta1Pipeline1
+		localVarReturnValue  Pipeline
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PipelinesApiService.GetPipeline")
@@ -352,7 +779,7 @@ func (a *PipelinesApiService) GetPipelineExecute(r ApiGetPipelineRequest) (Sajar
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}/pipelines/{type}/{name}/{version}"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/pipelines/{type}/{name}/{version}"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"type"+"}", _neturl.PathEscape(parameterToString(r.type_, "")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"name"+"}", _neturl.PathEscape(parameterToString(r.name, "")), -1)
@@ -403,7 +830,47 @@ func (a *PipelinesApiService) GetPipelineExecute(r ApiGetPipelineRequest) (Sajar
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -447,7 +914,7 @@ func (r ApiListPipelinesRequest) View(view string) ApiListPipelinesRequest {
 	return r
 }
 
-func (r ApiListPipelinesRequest) Execute() (V4beta1ListPipelinesResponse, *_nethttp.Response, error) {
+func (r ApiListPipelinesRequest) Execute() (ListPipelinesResponse, *_nethttp.Response, error) {
 	return r.ApiService.ListPipelinesExecute(r)
 }
 
@@ -468,16 +935,16 @@ func (a *PipelinesApiService) ListPipelines(ctx _context.Context, collectionId s
 
 /*
  * Execute executes the request
- * @return V4beta1ListPipelinesResponse
+ * @return ListPipelinesResponse
  */
-func (a *PipelinesApiService) ListPipelinesExecute(r ApiListPipelinesRequest) (V4beta1ListPipelinesResponse, *_nethttp.Response, error) {
+func (a *PipelinesApiService) ListPipelinesExecute(r ApiListPipelinesRequest) (ListPipelinesResponse, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  V4beta1ListPipelinesResponse
+		localVarReturnValue  ListPipelinesResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PipelinesApiService.ListPipelines")
@@ -485,7 +952,7 @@ func (a *PipelinesApiService) ListPipelinesExecute(r ApiListPipelinesRequest) (V
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}/pipelines"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/pipelines"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -539,7 +1006,47 @@ func (a *PipelinesApiService) ListPipelinesExecute(r ApiListPipelinesRequest) (V
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -562,14 +1069,14 @@ func (a *PipelinesApiService) ListPipelinesExecute(r ApiListPipelinesRequest) (V
 }
 
 type ApiSetDefaultPipelineRequest struct {
-	ctx                              _context.Context
-	ApiService                       *PipelinesApiService
-	collectionId                     string
-	v4beta1SetDefaultPipelineRequest *V4beta1SetDefaultPipelineRequest
+	ctx                       _context.Context
+	ApiService                *PipelinesApiService
+	collectionId              string
+	setDefaultPipelineRequest *SetDefaultPipelineRequest
 }
 
-func (r ApiSetDefaultPipelineRequest) V4beta1SetDefaultPipelineRequest(v4beta1SetDefaultPipelineRequest V4beta1SetDefaultPipelineRequest) ApiSetDefaultPipelineRequest {
-	r.v4beta1SetDefaultPipelineRequest = &v4beta1SetDefaultPipelineRequest
+func (r ApiSetDefaultPipelineRequest) SetDefaultPipelineRequest(setDefaultPipelineRequest SetDefaultPipelineRequest) ApiSetDefaultPipelineRequest {
+	r.setDefaultPipelineRequest = &setDefaultPipelineRequest
 	return r
 }
 
@@ -581,13 +1088,13 @@ func (r ApiSetDefaultPipelineRequest) Execute() (map[string]interface{}, *_netht
  * SetDefaultPipeline Set default pipeline
  * Set the default pipeline for a collection.
 
-Every collection has a default `record` pipeline and a default `query`
+Every collection has a default record pipeline and a default query
 pipeline.
 
 When a pipeline is required to complete an operation, it can be omitted
 from the request if a default pipeline has been set. When adding a record
-to a collection, the default `record` pipeline is used if none is provided.
-When querying a collection, the default `query` pipeline is used if none is
+to a collection, the default record pipeline is used if none is provided.
+When querying a collection, the default query pipeline is used if none is
 provided.
 
 Once a default pipeline has been set it cannot be cleared, only set to
@@ -623,14 +1130,14 @@ func (a *PipelinesApiService) SetDefaultPipelineExecute(r ApiSetDefaultPipelineR
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}:setDefaultPipeline"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}:setDefaultPipeline"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.v4beta1SetDefaultPipelineRequest == nil {
-		return localVarReturnValue, nil, reportError("v4beta1SetDefaultPipelineRequest is required and must be specified")
+	if r.setDefaultPipelineRequest == nil {
+		return localVarReturnValue, nil, reportError("setDefaultPipelineRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -651,7 +1158,7 @@ func (a *PipelinesApiService) SetDefaultPipelineExecute(r ApiSetDefaultPipelineR
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.v4beta1SetDefaultPipelineRequest
+	localVarPostBody = r.setDefaultPipelineRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -673,7 +1180,47 @@ func (a *PipelinesApiService) SetDefaultPipelineExecute(r ApiSetDefaultPipelineR
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -696,16 +1243,16 @@ func (a *PipelinesApiService) SetDefaultPipelineExecute(r ApiSetDefaultPipelineR
 }
 
 type ApiSetDefaultVersionRequest struct {
-	ctx                             _context.Context
-	ApiService                      *PipelinesApiService
-	collectionId                    string
-	type_                           string
-	name                            string
-	v4beta1SetDefaultVersionRequest *V4beta1SetDefaultVersionRequest
+	ctx                      _context.Context
+	ApiService               *PipelinesApiService
+	collectionId             string
+	type_                    string
+	name                     string
+	setDefaultVersionRequest *SetDefaultVersionRequest
 }
 
-func (r ApiSetDefaultVersionRequest) V4beta1SetDefaultVersionRequest(v4beta1SetDefaultVersionRequest V4beta1SetDefaultVersionRequest) ApiSetDefaultVersionRequest {
-	r.v4beta1SetDefaultVersionRequest = &v4beta1SetDefaultVersionRequest
+func (r ApiSetDefaultVersionRequest) SetDefaultVersionRequest(setDefaultVersionRequest SetDefaultVersionRequest) ApiSetDefaultVersionRequest {
+	r.setDefaultVersionRequest = &setDefaultVersionRequest
 	return r
 }
 
@@ -717,12 +1264,14 @@ func (r ApiSetDefaultVersionRequest) Execute() (map[string]interface{}, *_nethtt
  * SetDefaultVersion Set default pipeline version
  * Set the default version for a given pipeline.
 
-The default version of a pipeline allows you to refer to a pipeline without
-having to specify a version. This means you can change the pipeline version
-used for requests without having to change your code.
+The default version of a pipeline is used when a pipeline is referred to
+without specifying a version.
+
+This allows you to change the pipeline version used for requests without
+having to change your code.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param collectionId The collection that owns the pipeline to set the default version of, e.g. `my-collection`.
- * @param type_ The type of the pipeline to set the default version of, either `record` or `query`.
+ * @param type_ The type of the pipeline to set the default version of.
  * @param name The name of the pipeline to set the default version of, e.g. `my-pipeline`.
  * @return ApiSetDefaultVersionRequest
 */
@@ -755,7 +1304,7 @@ func (a *PipelinesApiService) SetDefaultVersionExecute(r ApiSetDefaultVersionReq
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}/pipelines/{type}/{name}:setDefaultVersion"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/pipelines/{type}/{name}:setDefaultVersion"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"type"+"}", _neturl.PathEscape(parameterToString(r.type_, "")), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"name"+"}", _neturl.PathEscape(parameterToString(r.name, "")), -1)
@@ -763,8 +1312,8 @@ func (a *PipelinesApiService) SetDefaultVersionExecute(r ApiSetDefaultVersionReq
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.v4beta1SetDefaultVersionRequest == nil {
-		return localVarReturnValue, nil, reportError("v4beta1SetDefaultVersionRequest is required and must be specified")
+	if r.setDefaultVersionRequest == nil {
+		return localVarReturnValue, nil, reportError("setDefaultVersionRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -785,7 +1334,7 @@ func (a *PipelinesApiService) SetDefaultVersionExecute(r ApiSetDefaultVersionReq
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.v4beta1SetDefaultVersionRequest
+	localVarPostBody = r.setDefaultVersionRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -807,7 +1356,47 @@ func (a *PipelinesApiService) SetDefaultVersionExecute(r ApiSetDefaultVersionReq
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()

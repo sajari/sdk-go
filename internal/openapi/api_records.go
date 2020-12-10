@@ -3,7 +3,7 @@
  *
  * Sajari is a smart, highly-configurable, real-time search service that enables thousands of businesses worldwide to provide amazing search experiences on their websites, stores, and applications.
  *
- * API version: v4beta1
+ * API version: v4
  * Contact: support@sajari.com
  */
 
@@ -28,18 +28,18 @@ var (
 type RecordsApiService service
 
 type ApiBatchUpsertRecordsRequest struct {
-	ctx                              _context.Context
-	ApiService                       *RecordsApiService
-	collectionId                     string
-	v4beta1BatchUpsertRecordsRequest *V4beta1BatchUpsertRecordsRequest
+	ctx                       _context.Context
+	ApiService                *RecordsApiService
+	collectionId              string
+	batchUpsertRecordsRequest *BatchUpsertRecordsRequest
 }
 
-func (r ApiBatchUpsertRecordsRequest) V4beta1BatchUpsertRecordsRequest(v4beta1BatchUpsertRecordsRequest V4beta1BatchUpsertRecordsRequest) ApiBatchUpsertRecordsRequest {
-	r.v4beta1BatchUpsertRecordsRequest = &v4beta1BatchUpsertRecordsRequest
+func (r ApiBatchUpsertRecordsRequest) BatchUpsertRecordsRequest(batchUpsertRecordsRequest BatchUpsertRecordsRequest) ApiBatchUpsertRecordsRequest {
+	r.batchUpsertRecordsRequest = &batchUpsertRecordsRequest
 	return r
 }
 
-func (r ApiBatchUpsertRecordsRequest) Execute() (V4beta1BatchUpsertRecordsResponse, *_nethttp.Response, error) {
+func (r ApiBatchUpsertRecordsRequest) Execute() (BatchUpsertRecordsResponse, *_nethttp.Response, error) {
 	return r.ApiService.BatchUpsertRecordsExecute(r)
 }
 
@@ -61,16 +61,16 @@ func (a *RecordsApiService) BatchUpsertRecords(ctx _context.Context, collectionI
 
 /*
  * Execute executes the request
- * @return V4beta1BatchUpsertRecordsResponse
+ * @return BatchUpsertRecordsResponse
  */
-func (a *RecordsApiService) BatchUpsertRecordsExecute(r ApiBatchUpsertRecordsRequest) (V4beta1BatchUpsertRecordsResponse, *_nethttp.Response, error) {
+func (a *RecordsApiService) BatchUpsertRecordsExecute(r ApiBatchUpsertRecordsRequest) (BatchUpsertRecordsResponse, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  V4beta1BatchUpsertRecordsResponse
+		localVarReturnValue  BatchUpsertRecordsResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RecordsApiService.BatchUpsertRecords")
@@ -78,14 +78,14 @@ func (a *RecordsApiService) BatchUpsertRecordsExecute(r ApiBatchUpsertRecordsReq
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}/records:batchUpsert"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/records:batchUpsert"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.v4beta1BatchUpsertRecordsRequest == nil {
-		return localVarReturnValue, nil, reportError("v4beta1BatchUpsertRecordsRequest is required and must be specified")
+	if r.batchUpsertRecordsRequest == nil {
+		return localVarReturnValue, nil, reportError("batchUpsertRecordsRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -106,7 +106,7 @@ func (a *RecordsApiService) BatchUpsertRecordsExecute(r ApiBatchUpsertRecordsReq
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.v4beta1BatchUpsertRecordsRequest
+	localVarPostBody = r.batchUpsertRecordsRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -128,7 +128,47 @@ func (a *RecordsApiService) BatchUpsertRecordsExecute(r ApiBatchUpsertRecordsReq
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -151,14 +191,14 @@ func (a *RecordsApiService) BatchUpsertRecordsExecute(r ApiBatchUpsertRecordsReq
 }
 
 type ApiDeleteRecordRequest struct {
-	ctx                              _context.Context
-	ApiService                       *RecordsApiService
-	collectionId                     string
-	sajariv4beta1DeleteRecordRequest *Sajariv4beta1DeleteRecordRequest
+	ctx                 _context.Context
+	ApiService          *RecordsApiService
+	collectionId        string
+	deleteRecordRequest *DeleteRecordRequest
 }
 
-func (r ApiDeleteRecordRequest) Sajariv4beta1DeleteRecordRequest(sajariv4beta1DeleteRecordRequest Sajariv4beta1DeleteRecordRequest) ApiDeleteRecordRequest {
-	r.sajariv4beta1DeleteRecordRequest = &sajariv4beta1DeleteRecordRequest
+func (r ApiDeleteRecordRequest) DeleteRecordRequest(deleteRecordRequest DeleteRecordRequest) ApiDeleteRecordRequest {
+	r.deleteRecordRequest = &deleteRecordRequest
 	return r
 }
 
@@ -200,14 +240,14 @@ func (a *RecordsApiService) DeleteRecordExecute(r ApiDeleteRecordRequest) (inter
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}/records:delete"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/records:delete"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.sajariv4beta1DeleteRecordRequest == nil {
-		return localVarReturnValue, nil, reportError("sajariv4beta1DeleteRecordRequest is required and must be specified")
+	if r.deleteRecordRequest == nil {
+		return localVarReturnValue, nil, reportError("deleteRecordRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -228,7 +268,7 @@ func (a *RecordsApiService) DeleteRecordExecute(r ApiDeleteRecordRequest) (inter
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.sajariv4beta1DeleteRecordRequest
+	localVarPostBody = r.deleteRecordRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -250,7 +290,47 @@ func (a *RecordsApiService) DeleteRecordExecute(r ApiDeleteRecordRequest) (inter
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -273,14 +353,14 @@ func (a *RecordsApiService) DeleteRecordExecute(r ApiDeleteRecordRequest) (inter
 }
 
 type ApiGetRecordRequest struct {
-	ctx                           _context.Context
-	ApiService                    *RecordsApiService
-	collectionId                  string
-	sajariv4beta1GetRecordRequest *Sajariv4beta1GetRecordRequest
+	ctx              _context.Context
+	ApiService       *RecordsApiService
+	collectionId     string
+	getRecordRequest *GetRecordRequest
 }
 
-func (r ApiGetRecordRequest) Sajariv4beta1GetRecordRequest(sajariv4beta1GetRecordRequest Sajariv4beta1GetRecordRequest) ApiGetRecordRequest {
-	r.sajariv4beta1GetRecordRequest = &sajariv4beta1GetRecordRequest
+func (r ApiGetRecordRequest) GetRecordRequest(getRecordRequest GetRecordRequest) ApiGetRecordRequest {
+	r.getRecordRequest = &getRecordRequest
 	return r
 }
 
@@ -322,14 +402,14 @@ func (a *RecordsApiService) GetRecordExecute(r ApiGetRecordRequest) (map[string]
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}/records:get"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/records:get"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.sajariv4beta1GetRecordRequest == nil {
-		return localVarReturnValue, nil, reportError("sajariv4beta1GetRecordRequest is required and must be specified")
+	if r.getRecordRequest == nil {
+		return localVarReturnValue, nil, reportError("getRecordRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -350,7 +430,7 @@ func (a *RecordsApiService) GetRecordExecute(r ApiGetRecordRequest) (map[string]
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.sajariv4beta1GetRecordRequest
+	localVarPostBody = r.getRecordRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -372,7 +452,47 @@ func (a *RecordsApiService) GetRecordExecute(r ApiGetRecordRequest) (map[string]
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -395,18 +515,18 @@ func (a *RecordsApiService) GetRecordExecute(r ApiGetRecordRequest) (map[string]
 }
 
 type ApiUpsertRecordRequest struct {
-	ctx                        _context.Context
-	ApiService                 *RecordsApiService
-	collectionId               string
-	v4beta1UpsertRecordRequest *V4beta1UpsertRecordRequest
+	ctx                 _context.Context
+	ApiService          *RecordsApiService
+	collectionId        string
+	upsertRecordRequest *UpsertRecordRequest
 }
 
-func (r ApiUpsertRecordRequest) V4beta1UpsertRecordRequest(v4beta1UpsertRecordRequest V4beta1UpsertRecordRequest) ApiUpsertRecordRequest {
-	r.v4beta1UpsertRecordRequest = &v4beta1UpsertRecordRequest
+func (r ApiUpsertRecordRequest) UpsertRecordRequest(upsertRecordRequest UpsertRecordRequest) ApiUpsertRecordRequest {
+	r.upsertRecordRequest = &upsertRecordRequest
 	return r
 }
 
-func (r ApiUpsertRecordRequest) Execute() (V4beta1UpsertRecordResponse, *_nethttp.Response, error) {
+func (r ApiUpsertRecordRequest) Execute() (UpsertRecordResponse, *_nethttp.Response, error) {
 	return r.ApiService.UpsertRecordExecute(r)
 }
 
@@ -451,16 +571,16 @@ func (a *RecordsApiService) UpsertRecord(ctx _context.Context, collectionId stri
 
 /*
  * Execute executes the request
- * @return V4beta1UpsertRecordResponse
+ * @return UpsertRecordResponse
  */
-func (a *RecordsApiService) UpsertRecordExecute(r ApiUpsertRecordRequest) (V4beta1UpsertRecordResponse, *_nethttp.Response, error) {
+func (a *RecordsApiService) UpsertRecordExecute(r ApiUpsertRecordRequest) (UpsertRecordResponse, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  V4beta1UpsertRecordResponse
+		localVarReturnValue  UpsertRecordResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RecordsApiService.UpsertRecord")
@@ -468,14 +588,14 @@ func (a *RecordsApiService) UpsertRecordExecute(r ApiUpsertRecordRequest) (V4bet
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}/records:upsert"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/records:upsert"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.v4beta1UpsertRecordRequest == nil {
-		return localVarReturnValue, nil, reportError("v4beta1UpsertRecordRequest is required and must be specified")
+	if r.upsertRecordRequest == nil {
+		return localVarReturnValue, nil, reportError("upsertRecordRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -496,7 +616,7 @@ func (a *RecordsApiService) UpsertRecordExecute(r ApiUpsertRecordRequest) (V4bet
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.v4beta1UpsertRecordRequest
+	localVarPostBody = r.upsertRecordRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -518,7 +638,47 @@ func (a *RecordsApiService) UpsertRecordExecute(r ApiUpsertRecordRequest) (V4bet
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
