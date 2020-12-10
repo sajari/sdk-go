@@ -196,19 +196,19 @@ func (c *Client) DeleteRecord(ctx context.Context, k *Key) error {
 func (c *Client) getRecordV4(ctx context.Context, k *Key) (Record, error) {
 	ctx = context.WithValue(ctx, openapi.ContextBasicAuth, c.openAPI.auth)
 
-	req := openapi.Sajariv4beta1GetRecordRequest{
-		Key: openapi.Sajariv4beta1Key{
+	req := openapi.GetRecordRequest{
+		Key: openapi.RecordKey{
 			Field: k.field,
 			Value: fmt.Sprintf("%v", k.value),
 		},
 	}
-	resp, _, err := c.openAPI.client.RecordsApi.GetRecord(ctx, c.Collection).Sajariv4beta1GetRecordRequest(req).Execute()
+	resp, _, err := c.openAPI.client.RecordsApi.GetRecord(ctx, c.Collection).GetRecordRequest(req).Execute()
 	if err != nil {
 		switch x := err.(type) {
 		case openapi.GenericOpenAPIError:
 			m := x.Model()
 
-			if m, ok := m.(openapi.GatewayruntimeError); ok {
+			if m, ok := m.(openapi.Error); ok {
 				switch codes.Code(m.GetCode()) {
 				case codes.NotFound:
 					return nil, fmt.Errorf("%v: %w", k, ErrNoSuchRecord)

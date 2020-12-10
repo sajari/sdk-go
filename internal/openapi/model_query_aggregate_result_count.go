@@ -3,7 +3,7 @@
  *
  * Sajari is a smart, highly-configurable, real-time search service that enables thousands of businesses worldwide to provide amazing search experiences on their websites, stores, and applications.
  *
- * API version: v4beta1
+ * API version: v4
  * Contact: support@sajari.com
  */
 
@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// QueryAggregateResultCount struct for QueryAggregateResultCount
+// QueryAggregateResultCount Count contains the counts for the set of values returned.
 type QueryAggregateResultCount struct {
 	Counts *map[string]int32 `json:"counts,omitempty"`
 }

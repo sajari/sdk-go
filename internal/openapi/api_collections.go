@@ -3,7 +3,7 @@
  *
  * Sajari is a smart, highly-configurable, real-time search service that enables thousands of businesses worldwide to provide amazing search experiences on their websites, stores, and applications.
  *
- * API version: v4beta1
+ * API version: v4
  * Contact: support@sajari.com
  */
 
@@ -28,22 +28,22 @@ var (
 type CollectionsApiService service
 
 type ApiCreateCollectionRequest struct {
-	ctx               _context.Context
-	ApiService        *CollectionsApiService
-	collectionId      *string
-	v4beta1Collection *V4beta1Collection
+	ctx          _context.Context
+	ApiService   *CollectionsApiService
+	collectionId *string
+	collection   *Collection
 }
 
 func (r ApiCreateCollectionRequest) CollectionId(collectionId string) ApiCreateCollectionRequest {
 	r.collectionId = &collectionId
 	return r
 }
-func (r ApiCreateCollectionRequest) V4beta1Collection(v4beta1Collection V4beta1Collection) ApiCreateCollectionRequest {
-	r.v4beta1Collection = &v4beta1Collection
+func (r ApiCreateCollectionRequest) Collection(collection Collection) ApiCreateCollectionRequest {
+	r.collection = &collection
 	return r
 }
 
-func (r ApiCreateCollectionRequest) Execute() (V4beta1Collection, *_nethttp.Response, error) {
+func (r ApiCreateCollectionRequest) Execute() (Collection, *_nethttp.Response, error) {
 	return r.ApiService.CreateCollectionExecute(r)
 }
 
@@ -67,16 +67,16 @@ func (a *CollectionsApiService) CreateCollection(ctx _context.Context) ApiCreate
 
 /*
  * Execute executes the request
- * @return V4beta1Collection
+ * @return Collection
  */
-func (a *CollectionsApiService) CreateCollectionExecute(r ApiCreateCollectionRequest) (V4beta1Collection, *_nethttp.Response, error) {
+func (a *CollectionsApiService) CreateCollectionExecute(r ApiCreateCollectionRequest) (Collection, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  V4beta1Collection
+		localVarReturnValue  Collection
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "CollectionsApiService.CreateCollection")
@@ -84,7 +84,7 @@ func (a *CollectionsApiService) CreateCollectionExecute(r ApiCreateCollectionReq
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections"
+	localVarPath := localBasePath + "/v4/collections"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -92,8 +92,8 @@ func (a *CollectionsApiService) CreateCollectionExecute(r ApiCreateCollectionReq
 	if r.collectionId == nil {
 		return localVarReturnValue, nil, reportError("collectionId is required and must be specified")
 	}
-	if r.v4beta1Collection == nil {
-		return localVarReturnValue, nil, reportError("v4beta1Collection is required and must be specified")
+	if r.collection == nil {
+		return localVarReturnValue, nil, reportError("collection is required and must be specified")
 	}
 
 	localVarQueryParams.Add("collection_id", parameterToString(*r.collectionId, ""))
@@ -115,7 +115,7 @@ func (a *CollectionsApiService) CreateCollectionExecute(r ApiCreateCollectionReq
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.v4beta1Collection
+	localVarPostBody = r.collection
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -138,7 +138,37 @@ func (a *CollectionsApiService) CreateCollectionExecute(r ApiCreateCollectionReq
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 400 {
-			var v RpcStatus
+			var v Status
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -148,7 +178,7 @@ func (a *CollectionsApiService) CreateCollectionExecute(r ApiCreateCollectionReq
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 409 {
-			var v RpcStatus
+			var v Status
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -157,7 +187,17 @@ func (a *CollectionsApiService) CreateCollectionExecute(r ApiCreateCollectionReq
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -225,7 +265,7 @@ func (a *CollectionsApiService) DeleteCollectionExecute(r ApiDeleteCollectionReq
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -270,8 +310,8 @@ func (a *CollectionsApiService) DeleteCollectionExecute(r ApiDeleteCollectionReq
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v RpcStatus
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -280,7 +320,37 @@ func (a *CollectionsApiService) DeleteCollectionExecute(r ApiDeleteCollectionReq
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v Status
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -308,7 +378,7 @@ type ApiGetCollectionRequest struct {
 	collectionId string
 }
 
-func (r ApiGetCollectionRequest) Execute() (V4beta1Collection, *_nethttp.Response, error) {
+func (r ApiGetCollectionRequest) Execute() (Collection, *_nethttp.Response, error) {
 	return r.ApiService.GetCollectionExecute(r)
 }
 
@@ -329,16 +399,16 @@ func (a *CollectionsApiService) GetCollection(ctx _context.Context, collectionId
 
 /*
  * Execute executes the request
- * @return V4beta1Collection
+ * @return Collection
  */
-func (a *CollectionsApiService) GetCollectionExecute(r ApiGetCollectionRequest) (V4beta1Collection, *_nethttp.Response, error) {
+func (a *CollectionsApiService) GetCollectionExecute(r ApiGetCollectionRequest) (Collection, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  V4beta1Collection
+		localVarReturnValue  Collection
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "CollectionsApiService.GetCollection")
@@ -346,7 +416,7 @@ func (a *CollectionsApiService) GetCollectionExecute(r ApiGetCollectionRequest) 
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -391,7 +461,47 @@ func (a *CollectionsApiService) GetCollectionExecute(r ApiGetCollectionRequest) 
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -429,7 +539,7 @@ func (r ApiListCollectionsRequest) PageToken(pageToken string) ApiListCollection
 	return r
 }
 
-func (r ApiListCollectionsRequest) Execute() (V4beta1ListCollectionsResponse, *_nethttp.Response, error) {
+func (r ApiListCollectionsRequest) Execute() (ListCollectionsResponse, *_nethttp.Response, error) {
 	return r.ApiService.ListCollectionsExecute(r)
 }
 
@@ -448,16 +558,16 @@ func (a *CollectionsApiService) ListCollections(ctx _context.Context) ApiListCol
 
 /*
  * Execute executes the request
- * @return V4beta1ListCollectionsResponse
+ * @return ListCollectionsResponse
  */
-func (a *CollectionsApiService) ListCollectionsExecute(r ApiListCollectionsRequest) (V4beta1ListCollectionsResponse, *_nethttp.Response, error) {
+func (a *CollectionsApiService) ListCollectionsExecute(r ApiListCollectionsRequest) (ListCollectionsResponse, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  V4beta1ListCollectionsResponse
+		localVarReturnValue  ListCollectionsResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "CollectionsApiService.ListCollections")
@@ -465,7 +575,7 @@ func (a *CollectionsApiService) ListCollectionsExecute(r ApiListCollectionsReque
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections"
+	localVarPath := localBasePath + "/v4/collections"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -515,7 +625,47 @@ func (a *CollectionsApiService) ListCollectionsExecute(r ApiListCollectionsReque
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -538,18 +688,18 @@ func (a *CollectionsApiService) ListCollectionsExecute(r ApiListCollectionsReque
 }
 
 type ApiQueryCollectionRequest struct {
-	ctx                           _context.Context
-	ApiService                    *CollectionsApiService
-	collectionId                  string
-	v4beta1QueryCollectionRequest *V4beta1QueryCollectionRequest
+	ctx                    _context.Context
+	ApiService             *CollectionsApiService
+	collectionId           string
+	queryCollectionRequest *QueryCollectionRequest
 }
 
-func (r ApiQueryCollectionRequest) V4beta1QueryCollectionRequest(v4beta1QueryCollectionRequest V4beta1QueryCollectionRequest) ApiQueryCollectionRequest {
-	r.v4beta1QueryCollectionRequest = &v4beta1QueryCollectionRequest
+func (r ApiQueryCollectionRequest) QueryCollectionRequest(queryCollectionRequest QueryCollectionRequest) ApiQueryCollectionRequest {
+	r.queryCollectionRequest = &queryCollectionRequest
 	return r
 }
 
-func (r ApiQueryCollectionRequest) Execute() (V4beta1QueryCollectionResponse, *_nethttp.Response, error) {
+func (r ApiQueryCollectionRequest) Execute() (QueryCollectionResponse, *_nethttp.Response, error) {
 	return r.ApiService.QueryCollectionExecute(r)
 }
 
@@ -588,16 +738,16 @@ func (a *CollectionsApiService) QueryCollection(ctx _context.Context, collection
 
 /*
  * Execute executes the request
- * @return V4beta1QueryCollectionResponse
+ * @return QueryCollectionResponse
  */
-func (a *CollectionsApiService) QueryCollectionExecute(r ApiQueryCollectionRequest) (V4beta1QueryCollectionResponse, *_nethttp.Response, error) {
+func (a *CollectionsApiService) QueryCollectionExecute(r ApiQueryCollectionRequest) (QueryCollectionResponse, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  V4beta1QueryCollectionResponse
+		localVarReturnValue  QueryCollectionResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "CollectionsApiService.QueryCollection")
@@ -605,14 +755,14 @@ func (a *CollectionsApiService) QueryCollectionExecute(r ApiQueryCollectionReque
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}:queryCollection"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}:queryCollection"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.v4beta1QueryCollectionRequest == nil {
-		return localVarReturnValue, nil, reportError("v4beta1QueryCollectionRequest is required and must be specified")
+	if r.queryCollectionRequest == nil {
+		return localVarReturnValue, nil, reportError("queryCollectionRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -633,7 +783,7 @@ func (a *CollectionsApiService) QueryCollectionExecute(r ApiQueryCollectionReque
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.v4beta1QueryCollectionRequest
+	localVarPostBody = r.queryCollectionRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -655,7 +805,47 @@ func (a *CollectionsApiService) QueryCollectionExecute(r ApiQueryCollectionReque
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -678,15 +868,15 @@ func (a *CollectionsApiService) QueryCollectionExecute(r ApiQueryCollectionReque
 }
 
 type ApiUpdateCollectionRequest struct {
-	ctx               _context.Context
-	ApiService        *CollectionsApiService
-	collectionId      string
-	v4beta1Collection *V4beta1Collection
-	updateMask        *string
+	ctx          _context.Context
+	ApiService   *CollectionsApiService
+	collectionId string
+	collection   *Collection
+	updateMask   *string
 }
 
-func (r ApiUpdateCollectionRequest) V4beta1Collection(v4beta1Collection V4beta1Collection) ApiUpdateCollectionRequest {
-	r.v4beta1Collection = &v4beta1Collection
+func (r ApiUpdateCollectionRequest) Collection(collection Collection) ApiUpdateCollectionRequest {
+	r.collection = &collection
 	return r
 }
 func (r ApiUpdateCollectionRequest) UpdateMask(updateMask string) ApiUpdateCollectionRequest {
@@ -694,7 +884,7 @@ func (r ApiUpdateCollectionRequest) UpdateMask(updateMask string) ApiUpdateColle
 	return r
 }
 
-func (r ApiUpdateCollectionRequest) Execute() (V4beta1Collection, *_nethttp.Response, error) {
+func (r ApiUpdateCollectionRequest) Execute() (Collection, *_nethttp.Response, error) {
 	return r.ApiService.UpdateCollectionExecute(r)
 }
 
@@ -715,16 +905,16 @@ func (a *CollectionsApiService) UpdateCollection(ctx _context.Context, collectio
 
 /*
  * Execute executes the request
- * @return V4beta1Collection
+ * @return Collection
  */
-func (a *CollectionsApiService) UpdateCollectionExecute(r ApiUpdateCollectionRequest) (V4beta1Collection, *_nethttp.Response, error) {
+func (a *CollectionsApiService) UpdateCollectionExecute(r ApiUpdateCollectionRequest) (Collection, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPatch
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  V4beta1Collection
+		localVarReturnValue  Collection
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "CollectionsApiService.UpdateCollection")
@@ -732,14 +922,14 @@ func (a *CollectionsApiService) UpdateCollectionExecute(r ApiUpdateCollectionReq
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.v4beta1Collection == nil {
-		return localVarReturnValue, nil, reportError("v4beta1Collection is required and must be specified")
+	if r.collection == nil {
+		return localVarReturnValue, nil, reportError("collection is required and must be specified")
 	}
 
 	if r.updateMask != nil {
@@ -763,7 +953,7 @@ func (a *CollectionsApiService) UpdateCollectionExecute(r ApiUpdateCollectionReq
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.v4beta1Collection
+	localVarPostBody = r.collection
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -785,8 +975,8 @@ func (a *CollectionsApiService) UpdateCollectionExecute(r ApiUpdateCollectionReq
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v RpcStatus
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -795,7 +985,37 @@ func (a *CollectionsApiService) UpdateCollectionExecute(r ApiUpdateCollectionReq
 			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v Status
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()

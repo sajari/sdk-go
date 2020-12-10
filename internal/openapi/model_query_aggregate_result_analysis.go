@@ -3,7 +3,7 @@
  *
  * Sajari is a smart, highly-configurable, real-time search service that enables thousands of businesses worldwide to provide amazing search experiences on their websites, stores, and applications.
  *
- * API version: v4beta1
+ * API version: v4
  * Contact: support@sajari.com
  */
 
@@ -21,12 +21,12 @@ type QueryAggregateResultAnalysis struct {
 	Coverage *int32 `json:"coverage,omitempty"`
 	// Cardinality is the number of different values in a field.
 	Cardinality *int32 `json:"cardinality,omitempty"`
-	// Min length of a repeated field.
-	MinLen *int32 `json:"min_len,omitempty"`
-	// Max number of values in a repeated field.
-	MaxLen *int32 `json:"max_len,omitempty"`
-	// Avg number of items in repeated field.
-	AvgLen *float32 `json:"avg_len,omitempty"`
+	// Minimum length of an array field.
+	MinLength *int32 `json:"min_length,omitempty"`
+	// Maximum number of values in an array field.
+	MaxLength *int32 `json:"max_length,omitempty"`
+	// Average number of items in an array field.
+	AvgLength *float32 `json:"avg_length,omitempty"`
 }
 
 // NewQueryAggregateResultAnalysis instantiates a new QueryAggregateResultAnalysis object
@@ -110,100 +110,100 @@ func (o *QueryAggregateResultAnalysis) SetCardinality(v int32) {
 	o.Cardinality = &v
 }
 
-// GetMinLen returns the MinLen field value if set, zero value otherwise.
-func (o *QueryAggregateResultAnalysis) GetMinLen() int32 {
-	if o == nil || o.MinLen == nil {
+// GetMinLength returns the MinLength field value if set, zero value otherwise.
+func (o *QueryAggregateResultAnalysis) GetMinLength() int32 {
+	if o == nil || o.MinLength == nil {
 		var ret int32
 		return ret
 	}
-	return *o.MinLen
+	return *o.MinLength
 }
 
-// GetMinLenOk returns a tuple with the MinLen field value if set, nil otherwise
+// GetMinLengthOk returns a tuple with the MinLength field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *QueryAggregateResultAnalysis) GetMinLenOk() (*int32, bool) {
-	if o == nil || o.MinLen == nil {
+func (o *QueryAggregateResultAnalysis) GetMinLengthOk() (*int32, bool) {
+	if o == nil || o.MinLength == nil {
 		return nil, false
 	}
-	return o.MinLen, true
+	return o.MinLength, true
 }
 
-// HasMinLen returns a boolean if a field has been set.
-func (o *QueryAggregateResultAnalysis) HasMinLen() bool {
-	if o != nil && o.MinLen != nil {
+// HasMinLength returns a boolean if a field has been set.
+func (o *QueryAggregateResultAnalysis) HasMinLength() bool {
+	if o != nil && o.MinLength != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetMinLen gets a reference to the given int32 and assigns it to the MinLen field.
-func (o *QueryAggregateResultAnalysis) SetMinLen(v int32) {
-	o.MinLen = &v
+// SetMinLength gets a reference to the given int32 and assigns it to the MinLength field.
+func (o *QueryAggregateResultAnalysis) SetMinLength(v int32) {
+	o.MinLength = &v
 }
 
-// GetMaxLen returns the MaxLen field value if set, zero value otherwise.
-func (o *QueryAggregateResultAnalysis) GetMaxLen() int32 {
-	if o == nil || o.MaxLen == nil {
+// GetMaxLength returns the MaxLength field value if set, zero value otherwise.
+func (o *QueryAggregateResultAnalysis) GetMaxLength() int32 {
+	if o == nil || o.MaxLength == nil {
 		var ret int32
 		return ret
 	}
-	return *o.MaxLen
+	return *o.MaxLength
 }
 
-// GetMaxLenOk returns a tuple with the MaxLen field value if set, nil otherwise
+// GetMaxLengthOk returns a tuple with the MaxLength field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *QueryAggregateResultAnalysis) GetMaxLenOk() (*int32, bool) {
-	if o == nil || o.MaxLen == nil {
+func (o *QueryAggregateResultAnalysis) GetMaxLengthOk() (*int32, bool) {
+	if o == nil || o.MaxLength == nil {
 		return nil, false
 	}
-	return o.MaxLen, true
+	return o.MaxLength, true
 }
 
-// HasMaxLen returns a boolean if a field has been set.
-func (o *QueryAggregateResultAnalysis) HasMaxLen() bool {
-	if o != nil && o.MaxLen != nil {
+// HasMaxLength returns a boolean if a field has been set.
+func (o *QueryAggregateResultAnalysis) HasMaxLength() bool {
+	if o != nil && o.MaxLength != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetMaxLen gets a reference to the given int32 and assigns it to the MaxLen field.
-func (o *QueryAggregateResultAnalysis) SetMaxLen(v int32) {
-	o.MaxLen = &v
+// SetMaxLength gets a reference to the given int32 and assigns it to the MaxLength field.
+func (o *QueryAggregateResultAnalysis) SetMaxLength(v int32) {
+	o.MaxLength = &v
 }
 
-// GetAvgLen returns the AvgLen field value if set, zero value otherwise.
-func (o *QueryAggregateResultAnalysis) GetAvgLen() float32 {
-	if o == nil || o.AvgLen == nil {
+// GetAvgLength returns the AvgLength field value if set, zero value otherwise.
+func (o *QueryAggregateResultAnalysis) GetAvgLength() float32 {
+	if o == nil || o.AvgLength == nil {
 		var ret float32
 		return ret
 	}
-	return *o.AvgLen
+	return *o.AvgLength
 }
 
-// GetAvgLenOk returns a tuple with the AvgLen field value if set, nil otherwise
+// GetAvgLengthOk returns a tuple with the AvgLength field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *QueryAggregateResultAnalysis) GetAvgLenOk() (*float32, bool) {
-	if o == nil || o.AvgLen == nil {
+func (o *QueryAggregateResultAnalysis) GetAvgLengthOk() (*float32, bool) {
+	if o == nil || o.AvgLength == nil {
 		return nil, false
 	}
-	return o.AvgLen, true
+	return o.AvgLength, true
 }
 
-// HasAvgLen returns a boolean if a field has been set.
-func (o *QueryAggregateResultAnalysis) HasAvgLen() bool {
-	if o != nil && o.AvgLen != nil {
+// HasAvgLength returns a boolean if a field has been set.
+func (o *QueryAggregateResultAnalysis) HasAvgLength() bool {
+	if o != nil && o.AvgLength != nil {
 		return true
 	}
 
 	return false
 }
 
-// SetAvgLen gets a reference to the given float32 and assigns it to the AvgLen field.
-func (o *QueryAggregateResultAnalysis) SetAvgLen(v float32) {
-	o.AvgLen = &v
+// SetAvgLength gets a reference to the given float32 and assigns it to the AvgLength field.
+func (o *QueryAggregateResultAnalysis) SetAvgLength(v float32) {
+	o.AvgLength = &v
 }
 
 func (o QueryAggregateResultAnalysis) MarshalJSON() ([]byte, error) {
@@ -214,14 +214,14 @@ func (o QueryAggregateResultAnalysis) MarshalJSON() ([]byte, error) {
 	if o.Cardinality != nil {
 		toSerialize["cardinality"] = o.Cardinality
 	}
-	if o.MinLen != nil {
-		toSerialize["min_len"] = o.MinLen
+	if o.MinLength != nil {
+		toSerialize["min_length"] = o.MinLength
 	}
-	if o.MaxLen != nil {
-		toSerialize["max_len"] = o.MaxLen
+	if o.MaxLength != nil {
+		toSerialize["max_length"] = o.MaxLength
 	}
-	if o.AvgLen != nil {
-		toSerialize["avg_len"] = o.AvgLen
+	if o.AvgLength != nil {
+		toSerialize["avg_length"] = o.AvgLength
 	}
 	return json.Marshal(toSerialize)
 }

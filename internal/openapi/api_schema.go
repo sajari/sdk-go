@@ -3,7 +3,7 @@
  *
  * Sajari is a smart, highly-configurable, real-time search service that enables thousands of businesses worldwide to provide amazing search experiences on their websites, stores, and applications.
  *
- * API version: v4beta1
+ * API version: v4
  * Contact: support@sajari.com
  */
 
@@ -28,18 +28,18 @@ var (
 type SchemaApiService service
 
 type ApiBatchCreateSchemaFieldsRequest struct {
-	ctx                                   _context.Context
-	ApiService                            *SchemaApiService
-	collectionId                          string
-	v4beta1BatchCreateSchemaFieldsRequest *V4beta1BatchCreateSchemaFieldsRequest
+	ctx                            _context.Context
+	ApiService                     *SchemaApiService
+	collectionId                   string
+	batchCreateSchemaFieldsRequest *BatchCreateSchemaFieldsRequest
 }
 
-func (r ApiBatchCreateSchemaFieldsRequest) V4beta1BatchCreateSchemaFieldsRequest(v4beta1BatchCreateSchemaFieldsRequest V4beta1BatchCreateSchemaFieldsRequest) ApiBatchCreateSchemaFieldsRequest {
-	r.v4beta1BatchCreateSchemaFieldsRequest = &v4beta1BatchCreateSchemaFieldsRequest
+func (r ApiBatchCreateSchemaFieldsRequest) BatchCreateSchemaFieldsRequest(batchCreateSchemaFieldsRequest BatchCreateSchemaFieldsRequest) ApiBatchCreateSchemaFieldsRequest {
+	r.batchCreateSchemaFieldsRequest = &batchCreateSchemaFieldsRequest
 	return r
 }
 
-func (r ApiBatchCreateSchemaFieldsRequest) Execute() (V4beta1BatchCreateSchemaFieldsResponse, *_nethttp.Response, error) {
+func (r ApiBatchCreateSchemaFieldsRequest) Execute() (BatchCreateSchemaFieldsResponse, *_nethttp.Response, error) {
 	return r.ApiService.BatchCreateSchemaFieldsExecute(r)
 }
 
@@ -61,16 +61,16 @@ func (a *SchemaApiService) BatchCreateSchemaFields(ctx _context.Context, collect
 
 /*
  * Execute executes the request
- * @return V4beta1BatchCreateSchemaFieldsResponse
+ * @return BatchCreateSchemaFieldsResponse
  */
-func (a *SchemaApiService) BatchCreateSchemaFieldsExecute(r ApiBatchCreateSchemaFieldsRequest) (V4beta1BatchCreateSchemaFieldsResponse, *_nethttp.Response, error) {
+func (a *SchemaApiService) BatchCreateSchemaFieldsExecute(r ApiBatchCreateSchemaFieldsRequest) (BatchCreateSchemaFieldsResponse, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  V4beta1BatchCreateSchemaFieldsResponse
+		localVarReturnValue  BatchCreateSchemaFieldsResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SchemaApiService.BatchCreateSchemaFields")
@@ -78,14 +78,14 @@ func (a *SchemaApiService) BatchCreateSchemaFieldsExecute(r ApiBatchCreateSchema
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}/schemaFields:batchCreate"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/schemaFields:batchCreate"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.v4beta1BatchCreateSchemaFieldsRequest == nil {
-		return localVarReturnValue, nil, reportError("v4beta1BatchCreateSchemaFieldsRequest is required and must be specified")
+	if r.batchCreateSchemaFieldsRequest == nil {
+		return localVarReturnValue, nil, reportError("batchCreateSchemaFieldsRequest is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -106,7 +106,7 @@ func (a *SchemaApiService) BatchCreateSchemaFieldsExecute(r ApiBatchCreateSchema
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.v4beta1BatchCreateSchemaFieldsRequest
+	localVarPostBody = r.batchCreateSchemaFieldsRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -128,7 +128,47 @@ func (a *SchemaApiService) BatchCreateSchemaFieldsExecute(r ApiBatchCreateSchema
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -151,18 +191,18 @@ func (a *SchemaApiService) BatchCreateSchemaFieldsExecute(r ApiBatchCreateSchema
 }
 
 type ApiCreateSchemaFieldRequest struct {
-	ctx                 _context.Context
-	ApiService          *SchemaApiService
-	collectionId        string
-	v4beta1SchemaField1 *V4beta1SchemaField1
+	ctx          _context.Context
+	ApiService   *SchemaApiService
+	collectionId string
+	schemaField  *SchemaField
 }
 
-func (r ApiCreateSchemaFieldRequest) V4beta1SchemaField1(v4beta1SchemaField1 V4beta1SchemaField1) ApiCreateSchemaFieldRequest {
-	r.v4beta1SchemaField1 = &v4beta1SchemaField1
+func (r ApiCreateSchemaFieldRequest) SchemaField(schemaField SchemaField) ApiCreateSchemaFieldRequest {
+	r.schemaField = &schemaField
 	return r
 }
 
-func (r ApiCreateSchemaFieldRequest) Execute() (V4beta1SchemaField1, *_nethttp.Response, error) {
+func (r ApiCreateSchemaFieldRequest) Execute() (SchemaField, *_nethttp.Response, error) {
 	return r.ApiService.CreateSchemaFieldExecute(r)
 }
 
@@ -183,16 +223,16 @@ func (a *SchemaApiService) CreateSchemaField(ctx _context.Context, collectionId 
 
 /*
  * Execute executes the request
- * @return V4beta1SchemaField1
+ * @return SchemaField
  */
-func (a *SchemaApiService) CreateSchemaFieldExecute(r ApiCreateSchemaFieldRequest) (V4beta1SchemaField1, *_nethttp.Response, error) {
+func (a *SchemaApiService) CreateSchemaFieldExecute(r ApiCreateSchemaFieldRequest) (SchemaField, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  V4beta1SchemaField1
+		localVarReturnValue  SchemaField
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SchemaApiService.CreateSchemaField")
@@ -200,14 +240,14 @@ func (a *SchemaApiService) CreateSchemaFieldExecute(r ApiCreateSchemaFieldReques
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}/schemaFields"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/schemaFields"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.v4beta1SchemaField1 == nil {
-		return localVarReturnValue, nil, reportError("v4beta1SchemaField1 is required and must be specified")
+	if r.schemaField == nil {
+		return localVarReturnValue, nil, reportError("schemaField is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -228,7 +268,7 @@ func (a *SchemaApiService) CreateSchemaFieldExecute(r ApiCreateSchemaFieldReques
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.v4beta1SchemaField1
+	localVarPostBody = r.schemaField
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -250,7 +290,47 @@ func (a *SchemaApiService) CreateSchemaFieldExecute(r ApiCreateSchemaFieldReques
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
@@ -289,7 +369,7 @@ func (r ApiListSchemaFieldsRequest) PageToken(pageToken string) ApiListSchemaFie
 	return r
 }
 
-func (r ApiListSchemaFieldsRequest) Execute() (V4beta1ListSchemaFieldsResponse, *_nethttp.Response, error) {
+func (r ApiListSchemaFieldsRequest) Execute() (ListSchemaFieldsResponse, *_nethttp.Response, error) {
 	return r.ApiService.ListSchemaFieldsExecute(r)
 }
 
@@ -310,16 +390,16 @@ func (a *SchemaApiService) ListSchemaFields(ctx _context.Context, collectionId s
 
 /*
  * Execute executes the request
- * @return V4beta1ListSchemaFieldsResponse
+ * @return ListSchemaFieldsResponse
  */
-func (a *SchemaApiService) ListSchemaFieldsExecute(r ApiListSchemaFieldsRequest) (V4beta1ListSchemaFieldsResponse, *_nethttp.Response, error) {
+func (a *SchemaApiService) ListSchemaFieldsExecute(r ApiListSchemaFieldsRequest) (ListSchemaFieldsResponse, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  V4beta1ListSchemaFieldsResponse
+		localVarReturnValue  ListSchemaFieldsResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SchemaApiService.ListSchemaFields")
@@ -327,7 +407,7 @@ func (a *SchemaApiService) ListSchemaFieldsExecute(r ApiListSchemaFieldsRequest)
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4beta1/collections/{collection_id}/schemaFields"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/schemaFields"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -378,7 +458,47 @@ func (a *SchemaApiService) ListSchemaFieldsExecute(r ApiListSchemaFieldsRequest)
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		var v GatewayruntimeError
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
 		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 		if err != nil {
 			newErr.error = err.Error()
