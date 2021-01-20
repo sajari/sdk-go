@@ -15,6 +15,37 @@ import (
 // no such collection.
 var ErrNoSuchCollection = errors.New("no such collection")
 
+// A Collection stores the records that can be searched.
+type Collection = openapi.Collection
+
+// GetCollection gets a collection identified by the provided ID.
+//
+// If there is no such collection matching the given ID this method returns an
+// error wrapping ErrNoSuchCollection.
+func (c *Client) GetCollection(ctx context.Context, id string) (*Collection, error) {
+	if !c.v4 {
+		return nil, errors.New("not supported on non-v4 endpoints")
+	}
+
+	if id == "" {
+		return nil, errors.New("collection id cannot be empty")
+	}
+
+	ctx = context.WithValue(ctx, openapi.ContextBasicAuth, c.openAPI.auth)
+
+	req := c.openAPI.client.CollectionsApi.GetCollection(ctx, id)
+
+	collection, _, err := req.Execute()
+	if err != nil {
+		if ok, err := handleGenericOpenAPIError(err); ok {
+			return nil, err
+		}
+		return nil, fmt.Errorf("could not get collection: %w", err)
+	}
+
+	return &collection, nil
+}
+
 // UpdateCollectionOpt is a type which defines options to update a collection.
 type UpdateCollectionOpt func(c *openapi.Collection, updateMask map[string]struct{})
 
