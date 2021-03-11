@@ -13,7 +13,7 @@ import (
 
 const (
 	endpoint         = "api-us-valkyrie.sajari.com:50051"
-	userAgent        = "sdk-go-07072016"
+	userAgent        = "sdk-go-11032021"
 	overrideHostname = "api.sajari.com"
 )
 
