@@ -62,6 +62,23 @@ defer client.Close()
 
 > Note: do not forget to close the client when you are finished with it.
 
+#### Overriding the default endpoint
+
+If you need to override the default endpoint, you can use the `WithEndpoint` client option.
+
+```go
+opts := []sajari.Opt{
+	sajari.WithEndpoint("api-au-valkyrie.sajari.com:50051"),
+	sajari.WithCredentials(sajari.KeyCredentials("key-id", "key-secret")),
+}
+
+client, err := sajari.New(shop.AccountID, shop.CollectionID, opts...)
+if err != nil {
+	// handle
+}
+defer client.Close()
+```
+
 ### Adding a record
 
 A record can be added to a collection using the `CreateRecord` method on a record `Pipeline`.
