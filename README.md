@@ -79,6 +79,13 @@ if err != nil {
 defer client.Close()
 ```
 
+#### Available endpoints
+
+The endpoints that you can pass to `WithEndpoint` include:
+
+- `api-au-valkyrie.sajari.com:50051`
+- `api-us-valkyrie.sajari.com:50051`
+
 ### Adding a record
 
 A record can be added to a collection using the `CreateRecord` method on a record `Pipeline`.
