@@ -74,7 +74,7 @@ func (k *Key) proto() (*enginepb.Key, error) {
 	}
 	vv, err := protoutil.Single(k.value)
 	if err != nil {
-		return nil, fmt.Errorf("error marshalling key value: %v", err)
+		return nil, fmt.Errorf("could not marshal key value: %v", err)
 	}
 	return &enginepb.Key{
 		Field: k.field,
