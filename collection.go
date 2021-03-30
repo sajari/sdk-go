@@ -37,7 +37,7 @@ func (c *Client) GetCollection(ctx context.Context, id string) (*Collection, err
 
 	collection, _, err := req.Execute()
 	if err != nil {
-		if ok, err := handleGenericOpenAPIError(err); ok {
+		if ok, err := collectionsHandleGenericOpenAPIError(err); ok {
 			return nil, err
 		}
 		return nil, fmt.Errorf("could not get collection: %w", err)
@@ -101,7 +101,7 @@ func (c *Client) UpdateCollection(ctx context.Context, id string, opts ...Update
 
 	_, _, err := req.Execute()
 	if err != nil {
-		if ok, err := handleGenericOpenAPIError(err); ok {
+		if ok, err := collectionsHandleGenericOpenAPIError(err); ok {
 			return err
 		}
 		return fmt.Errorf("could not update collection: %w", err)
@@ -123,7 +123,7 @@ func (c *Client) DeleteCollection(ctx context.Context, id string) error {
 
 	_, _, err := c.openAPI.client.CollectionsApi.DeleteCollection(ctx, id).Execute()
 	if err != nil {
-		if ok, err := handleGenericOpenAPIError(err); ok {
+		if ok, err := collectionsHandleGenericOpenAPIError(err); ok {
 			return err
 		}
 		return fmt.Errorf("could not delete collection: %w", err)
@@ -132,7 +132,39 @@ func (c *Client) DeleteCollection(ctx context.Context, id string) error {
 	return nil
 }
 
-func handleGenericOpenAPIError(err error) (handled bool, rerr error) {
+// GetDefaultPipeline gets the default pipeline for a collection.
+func (c *Client) GetDefaultPipeline(ctx context.Context, id string, typ PipelineType) (string, error) {
+	if !c.v4 {
+		return "", errors.New("not supported on non-v4 endpoints")
+	}
+
+	if id == "" {
+		return "", errors.New("collection id cannot be empty")
+	}
+	if typ == "" {
+		return "", errors.New("type cannot be empty")
+	}
+
+	ctx = context.WithValue(ctx, openapi.ContextBasicAuth, c.openAPI.auth)
+
+	req := c.openAPI.client.PipelinesApi.
+		GetDefaultPipeline(ctx, id).
+		Type_(string(typ))
+
+	resp, _, err := req.Execute()
+	if err != nil {
+		if ok, err := collectionsHandleGenericOpenAPIError(err); ok {
+			return "", err
+		}
+		return "", fmt.Errorf("could not get default pipeline: %w", err)
+	}
+
+	return resp.GetPipeline(), nil
+}
+
+// collectionsHandleGenericOpenAPIError handles generic OpenAPI errors in the
+// context of collections. E.g. 404 is converted to ErrNoSuchCollection.
+func collectionsHandleGenericOpenAPIError(err error) (handled bool, rerr error) {
 	switch x := err.(type) {
 	case openapi.GenericOpenAPIError:
 		m := x.Model()
@@ -141,6 +173,8 @@ func handleGenericOpenAPIError(err error) (handled bool, rerr error) {
 			switch codes.Code(m.GetCode()) {
 			case codes.NotFound:
 				return true, fmt.Errorf("%w", ErrNoSuchCollection)
+			default:
+				return true, fmt.Errorf("%s: %w", m.GetMessage(), err)
 			}
 		}
 	}
