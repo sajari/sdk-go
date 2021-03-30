@@ -17,6 +17,16 @@ import (
 	pipelinepb "code.sajari.com/protogen-go/sajari/pipeline/v2"
 )
 
+// PipelineType represents the type of a pipeline.
+type PipelineType string
+
+const (
+	// RecordPipelineType is the record pipeline type.
+	RecordPipelineType PipelineType = "RECORD"
+	// QueryPipelineType is the query pipeline type.
+	QueryPipelineType PipelineType = "QUERY"
+)
+
 // NoDefaultPipelineError is the error type returned when the collection does
 // not have a default version set for a given pipeline.
 // To resolve errors of this type, the caller should either pass an explicit
