@@ -208,7 +208,7 @@ func (r ApiCreateSchemaFieldRequest) Execute() (SchemaField, *_nethttp.Response,
 
 /*
  * CreateSchemaField Create schema field
- * Create a new field in your collection's schema.
+ * Create a new field in a collection's schema.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param collectionId The collection to create a schema field in, e.g. `my-collection`.
  * @return ApiCreateSchemaFieldRequest
@@ -375,7 +375,7 @@ func (r ApiListSchemaFieldsRequest) Execute() (ListSchemaFieldsResponse, *_netht
 
 /*
  * ListSchemaFields List schema fields
- * Retrieve a list of schema fields in the collection.
+ * Retrieve a list of schema fields in a collection.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param collectionId The collection that owns this set of schema fields, e.g. `my-collection`.
  * @return ApiListSchemaFieldsRequest

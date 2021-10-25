@@ -17,11 +17,12 @@ import (
 
 // QueryAggregateResult A query aggregate result contains results of aggregations.
 type QueryAggregateResult struct {
-	Metric   *QueryAggregateResultMetric   `json:"metric,omitempty"`
-	Count    *QueryAggregateResultCount    `json:"count,omitempty"`
-	Buckets  *QueryAggregateResultBuckets  `json:"buckets,omitempty"`
-	Date     *QueryAggregateResultDate     `json:"date,omitempty"`
-	Analysis *QueryAggregateResultAnalysis `json:"analysis,omitempty"`
+	Metric     *QueryAggregateResultMetric     `json:"metric,omitempty"`
+	Count      *QueryAggregateResultCount      `json:"count,omitempty"`
+	Buckets    *QueryAggregateResultBuckets    `json:"buckets,omitempty"`
+	Date       *QueryAggregateResultDate       `json:"date,omitempty"`
+	Analysis   *QueryAggregateResultAnalysis   `json:"analysis,omitempty"`
+	Percentile *QueryAggregateResultPercentile `json:"percentile,omitempty"`
 }
 
 // NewQueryAggregateResult instantiates a new QueryAggregateResult object
@@ -201,6 +202,38 @@ func (o *QueryAggregateResult) SetAnalysis(v QueryAggregateResultAnalysis) {
 	o.Analysis = &v
 }
 
+// GetPercentile returns the Percentile field value if set, zero value otherwise.
+func (o *QueryAggregateResult) GetPercentile() QueryAggregateResultPercentile {
+	if o == nil || o.Percentile == nil {
+		var ret QueryAggregateResultPercentile
+		return ret
+	}
+	return *o.Percentile
+}
+
+// GetPercentileOk returns a tuple with the Percentile field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *QueryAggregateResult) GetPercentileOk() (*QueryAggregateResultPercentile, bool) {
+	if o == nil || o.Percentile == nil {
+		return nil, false
+	}
+	return o.Percentile, true
+}
+
+// HasPercentile returns a boolean if a field has been set.
+func (o *QueryAggregateResult) HasPercentile() bool {
+	if o != nil && o.Percentile != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetPercentile gets a reference to the given QueryAggregateResultPercentile and assigns it to the Percentile field.
+func (o *QueryAggregateResult) SetPercentile(v QueryAggregateResultPercentile) {
+	o.Percentile = &v
+}
+
 func (o QueryAggregateResult) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Metric != nil {
@@ -217,6 +250,9 @@ func (o QueryAggregateResult) MarshalJSON() ([]byte, error) {
 	}
 	if o.Analysis != nil {
 		toSerialize["analysis"] = o.Analysis
+	}
+	if o.Percentile != nil {
+		toSerialize["percentile"] = o.Percentile
 	}
 	return json.Marshal(toSerialize)
 }

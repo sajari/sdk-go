@@ -19,7 +19,7 @@ import (
 type QueryCollectionResponse struct {
 	Pipeline *QueryCollectionResponsePipeline `json:"pipeline,omitempty"`
 	// The modified variables returned by the pipeline after it has finished processing.
-	Variables *map[string]interface{} `json:"variables,omitempty"`
+	Variables *map[string]map[string]interface{} `json:"variables,omitempty"`
 	// The results returned by the query.
 	Results *[]QueryResult `json:"results,omitempty"`
 	// The total number of results that match the query.
@@ -30,6 +30,10 @@ type QueryCollectionResponse struct {
 	Aggregates *map[string]QueryAggregateResult `json:"aggregates,omitempty"`
 	// The aggregates run with filters.
 	AggregateFilters *map[string]QueryAggregateResult `json:"aggregate_filters,omitempty"`
+	// A mapping of redirects triggered for all possible variations of the query.
+	Redirects *map[string]RedirectResult `json:"redirects,omitempty"`
+	// A list of the promotions activated when running the query.
+	ActivePromotions *[]ActivePromotion `json:"active_promotions,omitempty"`
 }
 
 // NewQueryCollectionResponse instantiates a new QueryCollectionResponse object
@@ -82,9 +86,9 @@ func (o *QueryCollectionResponse) SetPipeline(v QueryCollectionResponsePipeline)
 }
 
 // GetVariables returns the Variables field value if set, zero value otherwise.
-func (o *QueryCollectionResponse) GetVariables() map[string]interface{} {
+func (o *QueryCollectionResponse) GetVariables() map[string]map[string]interface{} {
 	if o == nil || o.Variables == nil {
-		var ret map[string]interface{}
+		var ret map[string]map[string]interface{}
 		return ret
 	}
 	return *o.Variables
@@ -92,7 +96,7 @@ func (o *QueryCollectionResponse) GetVariables() map[string]interface{} {
 
 // GetVariablesOk returns a tuple with the Variables field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *QueryCollectionResponse) GetVariablesOk() (*map[string]interface{}, bool) {
+func (o *QueryCollectionResponse) GetVariablesOk() (*map[string]map[string]interface{}, bool) {
 	if o == nil || o.Variables == nil {
 		return nil, false
 	}
@@ -108,8 +112,8 @@ func (o *QueryCollectionResponse) HasVariables() bool {
 	return false
 }
 
-// SetVariables gets a reference to the given map[string]interface{} and assigns it to the Variables field.
-func (o *QueryCollectionResponse) SetVariables(v map[string]interface{}) {
+// SetVariables gets a reference to the given map[string]map[string]interface{} and assigns it to the Variables field.
+func (o *QueryCollectionResponse) SetVariables(v map[string]map[string]interface{}) {
 	o.Variables = &v
 }
 
@@ -273,6 +277,70 @@ func (o *QueryCollectionResponse) SetAggregateFilters(v map[string]QueryAggregat
 	o.AggregateFilters = &v
 }
 
+// GetRedirects returns the Redirects field value if set, zero value otherwise.
+func (o *QueryCollectionResponse) GetRedirects() map[string]RedirectResult {
+	if o == nil || o.Redirects == nil {
+		var ret map[string]RedirectResult
+		return ret
+	}
+	return *o.Redirects
+}
+
+// GetRedirectsOk returns a tuple with the Redirects field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *QueryCollectionResponse) GetRedirectsOk() (*map[string]RedirectResult, bool) {
+	if o == nil || o.Redirects == nil {
+		return nil, false
+	}
+	return o.Redirects, true
+}
+
+// HasRedirects returns a boolean if a field has been set.
+func (o *QueryCollectionResponse) HasRedirects() bool {
+	if o != nil && o.Redirects != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetRedirects gets a reference to the given map[string]RedirectResult and assigns it to the Redirects field.
+func (o *QueryCollectionResponse) SetRedirects(v map[string]RedirectResult) {
+	o.Redirects = &v
+}
+
+// GetActivePromotions returns the ActivePromotions field value if set, zero value otherwise.
+func (o *QueryCollectionResponse) GetActivePromotions() []ActivePromotion {
+	if o == nil || o.ActivePromotions == nil {
+		var ret []ActivePromotion
+		return ret
+	}
+	return *o.ActivePromotions
+}
+
+// GetActivePromotionsOk returns a tuple with the ActivePromotions field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *QueryCollectionResponse) GetActivePromotionsOk() (*[]ActivePromotion, bool) {
+	if o == nil || o.ActivePromotions == nil {
+		return nil, false
+	}
+	return o.ActivePromotions, true
+}
+
+// HasActivePromotions returns a boolean if a field has been set.
+func (o *QueryCollectionResponse) HasActivePromotions() bool {
+	if o != nil && o.ActivePromotions != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetActivePromotions gets a reference to the given []ActivePromotion and assigns it to the ActivePromotions field.
+func (o *QueryCollectionResponse) SetActivePromotions(v []ActivePromotion) {
+	o.ActivePromotions = &v
+}
+
 func (o QueryCollectionResponse) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Pipeline != nil {
@@ -295,6 +363,12 @@ func (o QueryCollectionResponse) MarshalJSON() ([]byte, error) {
 	}
 	if o.AggregateFilters != nil {
 		toSerialize["aggregate_filters"] = o.AggregateFilters
+	}
+	if o.Redirects != nil {
+		toSerialize["redirects"] = o.Redirects
+	}
+	if o.ActivePromotions != nil {
+		toSerialize["active_promotions"] = o.ActivePromotions
 	}
 	return json.Marshal(toSerialize)
 }

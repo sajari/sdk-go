@@ -532,11 +532,16 @@ func (r ApiUpsertRecordRequest) Execute() (UpsertRecordResponse, *_nethttp.Respo
 
 /*
  * UpsertRecord Upsert record
- * If the record does not exist in your collection it is inserted. If it does
+ * If the record does not exist in the collection it is inserted. If it does
 exist it is updated.
 
 If no pipeline is specified, the default record pipeline is used to process
 the record.
+
+If the record is inserted, the response contains the key of the inserted
+record. You can use this if you need to retrieve or delete the record. If
+the record is updated, the response does not contain a key. Callers can use
+this as a signal to determine if the record is inserted/created or updated.
 
 For example, to add a single product from your ecommerce store to a
 collection, use the following call:

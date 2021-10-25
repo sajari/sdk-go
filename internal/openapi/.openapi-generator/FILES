@@ -1,10 +1,12 @@
 api/openapi.yaml
 api_collections.go
+api_events.go
 api_pipelines.go
 api_records.go
 api_schema.go
 client.go
 configuration.go
+model_active_promotion.go
 model_batch_create_schema_fields_request.go
 model_batch_create_schema_fields_response.go
 model_batch_create_schema_fields_response_error.go
@@ -27,10 +29,13 @@ model_list_collections_response.go
 model_list_pipelines_request_view.go
 model_list_pipelines_response.go
 model_list_schema_fields_response.go
+model_percentile_data_point.go
 model_pipeline.go
 model_pipeline_step.go
 model_pipeline_step_param_binding.go
 model_pipeline_type.go
+model_promotion_exclusion.go
+model_promotion_pin.go
 model_protobuf_any.go
 model_protobuf_null_value.go
 model_query_aggregate_result.go
@@ -40,6 +45,7 @@ model_query_aggregate_result_buckets_bucket.go
 model_query_aggregate_result_count.go
 model_query_aggregate_result_date.go
 model_query_aggregate_result_metric.go
+model_query_aggregate_result_percentile.go
 model_query_collection_request.go
 model_query_collection_request_pipeline.go
 model_query_collection_request_tracking.go
@@ -51,9 +57,12 @@ model_query_result_token.go
 model_query_result_token_click.go
 model_query_result_token_pos_neg.go
 model_record_key.go
+model_redirect.go
+model_redirect_result.go
 model_schema_field.go
 model_schema_field_mode.go
 model_schema_field_type.go
+model_send_event_request.go
 model_set_default_pipeline_request.go
 model_set_default_version_request.go
 model_status.go

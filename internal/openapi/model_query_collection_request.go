@@ -15,19 +15,19 @@ import (
 	"encoding/json"
 )
 
-// QueryCollectionRequest QueryCollectionRequest is a request to perform a search using a pipeline.
+// QueryCollectionRequest A request to perform a search using a pipeline.
 type QueryCollectionRequest struct {
 	Pipeline *QueryCollectionRequestPipeline `json:"pipeline,omitempty"`
-	// The initial values for the variables the pipeline operates on and transforms throughout its steps.  A typical variable is `q` which is the query the user entered, for example:  ```json { \"q\": \"search terms\" } ```
-	Variables map[string]interface{}          `json:"variables"`
-	Tracking  *QueryCollectionRequestTracking `json:"tracking,omitempty"`
+	// The initial values for the variables the pipeline operates on and transforms throughout its steps.  The most important variable is `q` which is the query the user entered, for example:  ```json { \"q\": \"search terms\" } ```  To paginate through results, set the variables `page` and `resultsPerPage`, for example:  ```json { \"q\": \"search terms\", \"page\": 5, \"resultsPerPage\": 20 } ```  To sort results, set the variable `sort` to the name of one of your collection's schema fields, for example:  ```json { \"q\": \"search terms\", \"sort\": \"name\" } ```  To sort in reverse, prefix the schema field with a minus sign `-`, for example:  ```json { \"q\": \"search terms\", \"sort\": \"-name\" } ```
+	Variables map[string]map[string]interface{} `json:"variables"`
+	Tracking  *QueryCollectionRequestTracking   `json:"tracking,omitempty"`
 }
 
 // NewQueryCollectionRequest instantiates a new QueryCollectionRequest object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewQueryCollectionRequest(variables map[string]interface{}) *QueryCollectionRequest {
+func NewQueryCollectionRequest(variables map[string]map[string]interface{}) *QueryCollectionRequest {
 	this := QueryCollectionRequest{}
 	this.Variables = variables
 	return &this
@@ -74,9 +74,9 @@ func (o *QueryCollectionRequest) SetPipeline(v QueryCollectionRequestPipeline) {
 }
 
 // GetVariables returns the Variables field value
-func (o *QueryCollectionRequest) GetVariables() map[string]interface{} {
+func (o *QueryCollectionRequest) GetVariables() map[string]map[string]interface{} {
 	if o == nil {
-		var ret map[string]interface{}
+		var ret map[string]map[string]interface{}
 		return ret
 	}
 
@@ -85,7 +85,7 @@ func (o *QueryCollectionRequest) GetVariables() map[string]interface{} {
 
 // GetVariablesOk returns a tuple with the Variables field value
 // and a boolean to check if the value has been set.
-func (o *QueryCollectionRequest) GetVariablesOk() (*map[string]interface{}, bool) {
+func (o *QueryCollectionRequest) GetVariablesOk() (*map[string]map[string]interface{}, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -93,7 +93,7 @@ func (o *QueryCollectionRequest) GetVariablesOk() (*map[string]interface{}, bool
 }
 
 // SetVariables sets field value
-func (o *QueryCollectionRequest) SetVariables(v map[string]interface{}) {
+func (o *QueryCollectionRequest) SetVariables(v map[string]map[string]interface{}) {
 	o.Variables = v
 }
 
