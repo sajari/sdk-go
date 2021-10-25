@@ -24,7 +24,7 @@ type SendEventRequest struct {
 	// The weight assigned to the event.  Generally a sensible weight is 1. If you want to weight an event in a certain way you can use a value other than 1. For example, if you want to capture profit in an event, you could set the weight to a value that represents the profit.
 	Weight *int32 `json:"weight,omitempty"`
 	// An object made up of field-value pairs that contains additional metadata to record with the event.  Every value in the object must be one of the following primitive types:  - boolean - number - string
-	Metadata *map[string]map[string]interface{} `json:"metadata,omitempty"`
+	Metadata *map[string]interface{} `json:"metadata,omitempty"`
 }
 
 // NewSendEventRequest instantiates a new SendEventRequest object
@@ -127,9 +127,9 @@ func (o *SendEventRequest) SetWeight(v int32) {
 }
 
 // GetMetadata returns the Metadata field value if set, zero value otherwise.
-func (o *SendEventRequest) GetMetadata() map[string]map[string]interface{} {
+func (o *SendEventRequest) GetMetadata() map[string]interface{} {
 	if o == nil || o.Metadata == nil {
-		var ret map[string]map[string]interface{}
+		var ret map[string]interface{}
 		return ret
 	}
 	return *o.Metadata
@@ -137,7 +137,7 @@ func (o *SendEventRequest) GetMetadata() map[string]map[string]interface{} {
 
 // GetMetadataOk returns a tuple with the Metadata field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *SendEventRequest) GetMetadataOk() (*map[string]map[string]interface{}, bool) {
+func (o *SendEventRequest) GetMetadataOk() (*map[string]interface{}, bool) {
 	if o == nil || o.Metadata == nil {
 		return nil, false
 	}
@@ -153,8 +153,8 @@ func (o *SendEventRequest) HasMetadata() bool {
 	return false
 }
 
-// SetMetadata gets a reference to the given map[string]map[string]interface{} and assigns it to the Metadata field.
-func (o *SendEventRequest) SetMetadata(v map[string]map[string]interface{}) {
+// SetMetadata gets a reference to the given map[string]interface{} and assigns it to the Metadata field.
+func (o *SendEventRequest) SetMetadata(v map[string]interface{}) {
 	o.Metadata = &v
 }
 
