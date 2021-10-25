@@ -18,7 +18,7 @@ import (
 
 // Pipeline struct for Pipeline
 type Pipeline struct {
-	// Output only. Creation time of the pipeline.
+	// Output only. Time the pipeline was created.
 	CreateTime *time.Time   `json:"create_time,omitempty"`
 	Type       PipelineType `json:"type"`
 	// The pipeline's name.  Must start with an alphanumeric character followed by one or more alphanumeric, `_`, `-` or `.` characters. Strictly speaking, it must match the regular expression: `^[a-zA-Z0-9][a-zA-Z0-9_\\-\\.]+$`.

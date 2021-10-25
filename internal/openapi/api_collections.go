@@ -233,7 +233,7 @@ func (r ApiDeleteCollectionRequest) Execute() (interface{}, *_nethttp.Response, 
  * DeleteCollection Delete collection
  * Delete a collection and all of its associated data.
 
-> Note: this operation cannot be reversed.
+> Note: This operation cannot be reversed.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param collectionId The collection to delete, e.g. `my-collection`.
  * @return ApiDeleteCollectionRequest
@@ -545,7 +545,7 @@ func (r ApiListCollectionsRequest) Execute() (ListCollectionsResponse, *_nethttp
 
 /*
  * ListCollections List collections
- * Retrieve a list of collections in the account.
+ * Retrieve a list of collections in an account.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @return ApiListCollectionsRequest
  */
@@ -755,6 +755,186 @@ func (a *CollectionsApiService) QueryCollectionExecute(r ApiQueryCollectionReque
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
+	localVarPath := localBasePath + "/v4/collections/{collection_id}:query"
+	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+	if r.queryCollectionRequest == nil {
+		return localVarReturnValue, nil, reportError("queryCollectionRequest is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.queryCollectionRequest
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v Error
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v Error
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v Error
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v Error
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiQueryCollection2Request struct {
+	ctx                    _context.Context
+	ApiService             *CollectionsApiService
+	collectionId           string
+	queryCollectionRequest *QueryCollectionRequest
+}
+
+func (r ApiQueryCollection2Request) QueryCollectionRequest(queryCollectionRequest QueryCollectionRequest) ApiQueryCollection2Request {
+	r.queryCollectionRequest = &queryCollectionRequest
+	return r
+}
+
+func (r ApiQueryCollection2Request) Execute() (QueryCollectionResponse, *_nethttp.Response, error) {
+	return r.ApiService.QueryCollection2Execute(r)
+}
+
+/*
+ * QueryCollection2 Query collection
+ * Query the collection to search for records.
+
+The following example demonstrates how to run a simple search for a
+particular string:
+
+```json
+{
+  "variables": { "q": "search terms" }
+}
+```
+
+For more information:
+
+- See [filtering
+content](https://docs.sajari.com/user-guide/integrating-search/filters/)
+- See [tracking in the Go
+SDK](https://github.com/sajari/sdk-go/blob/v2/session.go)
+- See [tracking in the JS
+SDK](https://github.com/sajari/sajari-sdk-js/blob/master/src/session.ts)
+ * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param collectionId The collection to query, e.g. `my-collection`.
+ * @return ApiQueryCollection2Request
+*/
+func (a *CollectionsApiService) QueryCollection2(ctx _context.Context, collectionId string) ApiQueryCollection2Request {
+	return ApiQueryCollection2Request{
+		ApiService:   a,
+		ctx:          ctx,
+		collectionId: collectionId,
+	}
+}
+
+/*
+ * Execute executes the request
+ * @return QueryCollectionResponse
+ */
+func (a *CollectionsApiService) QueryCollection2Execute(r ApiQueryCollection2Request) (QueryCollectionResponse, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodPost
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  QueryCollectionResponse
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "CollectionsApiService.QueryCollection2")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
 	localVarPath := localBasePath + "/v4/collections/{collection_id}:queryCollection"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
@@ -871,16 +1051,16 @@ type ApiUpdateCollectionRequest struct {
 	ctx          _context.Context
 	ApiService   *CollectionsApiService
 	collectionId string
-	collection   *Collection
 	updateMask   *string
+	collection   *Collection
 }
 
-func (r ApiUpdateCollectionRequest) Collection(collection Collection) ApiUpdateCollectionRequest {
-	r.collection = &collection
-	return r
-}
 func (r ApiUpdateCollectionRequest) UpdateMask(updateMask string) ApiUpdateCollectionRequest {
 	r.updateMask = &updateMask
+	return r
+}
+func (r ApiUpdateCollectionRequest) Collection(collection Collection) ApiUpdateCollectionRequest {
+	r.collection = &collection
 	return r
 }
 
@@ -928,13 +1108,14 @@ func (a *CollectionsApiService) UpdateCollectionExecute(r ApiUpdateCollectionReq
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
+	if r.updateMask == nil {
+		return localVarReturnValue, nil, reportError("updateMask is required and must be specified")
+	}
 	if r.collection == nil {
 		return localVarReturnValue, nil, reportError("collection is required and must be specified")
 	}
 
-	if r.updateMask != nil {
-		localVarQueryParams.Add("update_mask", parameterToString(*r.updateMask, ""))
-	}
+	localVarQueryParams.Add("update_mask", parameterToString(*r.updateMask, ""))
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/json"}
 

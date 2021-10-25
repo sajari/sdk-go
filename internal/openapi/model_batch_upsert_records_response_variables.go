@@ -20,7 +20,7 @@ type BatchUpsertRecordsResponseVariables struct {
 	// Index of the record in `records` that these variables correspond to.
 	Index *int32 `json:"index,omitempty"`
 	// The variables.
-	Variables *map[string]interface{} `json:"variables,omitempty"`
+	Variables *map[string]map[string]interface{} `json:"variables,omitempty"`
 }
 
 // NewBatchUpsertRecordsResponseVariables instantiates a new BatchUpsertRecordsResponseVariables object
@@ -73,9 +73,9 @@ func (o *BatchUpsertRecordsResponseVariables) SetIndex(v int32) {
 }
 
 // GetVariables returns the Variables field value if set, zero value otherwise.
-func (o *BatchUpsertRecordsResponseVariables) GetVariables() map[string]interface{} {
+func (o *BatchUpsertRecordsResponseVariables) GetVariables() map[string]map[string]interface{} {
 	if o == nil || o.Variables == nil {
-		var ret map[string]interface{}
+		var ret map[string]map[string]interface{}
 		return ret
 	}
 	return *o.Variables
@@ -83,7 +83,7 @@ func (o *BatchUpsertRecordsResponseVariables) GetVariables() map[string]interfac
 
 // GetVariablesOk returns a tuple with the Variables field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *BatchUpsertRecordsResponseVariables) GetVariablesOk() (*map[string]interface{}, bool) {
+func (o *BatchUpsertRecordsResponseVariables) GetVariablesOk() (*map[string]map[string]interface{}, bool) {
 	if o == nil || o.Variables == nil {
 		return nil, false
 	}
@@ -99,8 +99,8 @@ func (o *BatchUpsertRecordsResponseVariables) HasVariables() bool {
 	return false
 }
 
-// SetVariables gets a reference to the given map[string]interface{} and assigns it to the Variables field.
-func (o *BatchUpsertRecordsResponseVariables) SetVariables(v map[string]interface{}) {
+// SetVariables gets a reference to the given map[string]map[string]interface{} and assigns it to the Variables field.
+func (o *BatchUpsertRecordsResponseVariables) SetVariables(v map[string]map[string]interface{}) {
 	o.Variables = &v
 }
 

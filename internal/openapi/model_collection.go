@@ -22,7 +22,7 @@ type Collection struct {
 	Id *string `json:"id,omitempty"`
 	// Output only. The ID of the account that owns this collection.
 	AccountId *string `json:"account_id,omitempty"`
-	// Output only. Creation time of the collection.
+	// Output only. Time the collection was created.
 	CreateTime *time.Time `json:"create_time,omitempty"`
 	// The collection's display name. You can change this at any time.
 	DisplayName string `json:"display_name"`

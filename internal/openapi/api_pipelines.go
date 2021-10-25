@@ -920,7 +920,7 @@ func (r ApiListPipelinesRequest) Execute() (ListPipelinesResponse, *_nethttp.Res
 
 /*
  * ListPipelines List pipelines
- * Retrieve a list of pipelines.
+ * Retrieve a list of pipelines in a collection.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param collectionId The collection that owns this set of pipelines, e.g. `my-collection`.
  * @return ApiListPipelinesRequest

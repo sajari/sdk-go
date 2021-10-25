@@ -19,7 +19,7 @@ import (
 type UpsertRecordResponse struct {
 	Key *RecordKey `json:"key,omitempty"`
 	// The modified variables returned by the pipeline after it has finished processing.
-	Variables *map[string]interface{} `json:"variables,omitempty"`
+	Variables *map[string]map[string]interface{} `json:"variables,omitempty"`
 }
 
 // NewUpsertRecordResponse instantiates a new UpsertRecordResponse object
@@ -72,9 +72,9 @@ func (o *UpsertRecordResponse) SetKey(v RecordKey) {
 }
 
 // GetVariables returns the Variables field value if set, zero value otherwise.
-func (o *UpsertRecordResponse) GetVariables() map[string]interface{} {
+func (o *UpsertRecordResponse) GetVariables() map[string]map[string]interface{} {
 	if o == nil || o.Variables == nil {
-		var ret map[string]interface{}
+		var ret map[string]map[string]interface{}
 		return ret
 	}
 	return *o.Variables
@@ -82,7 +82,7 @@ func (o *UpsertRecordResponse) GetVariables() map[string]interface{} {
 
 // GetVariablesOk returns a tuple with the Variables field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *UpsertRecordResponse) GetVariablesOk() (*map[string]interface{}, bool) {
+func (o *UpsertRecordResponse) GetVariablesOk() (*map[string]map[string]interface{}, bool) {
 	if o == nil || o.Variables == nil {
 		return nil, false
 	}
@@ -98,8 +98,8 @@ func (o *UpsertRecordResponse) HasVariables() bool {
 	return false
 }
 
-// SetVariables gets a reference to the given map[string]interface{} and assigns it to the Variables field.
-func (o *UpsertRecordResponse) SetVariables(v map[string]interface{}) {
+// SetVariables gets a reference to the given map[string]map[string]interface{} and assigns it to the Variables field.
+func (o *UpsertRecordResponse) SetVariables(v map[string]map[string]interface{}) {
 	o.Variables = &v
 }
 

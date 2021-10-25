@@ -21,7 +21,7 @@ type UpsertRecordRequest struct {
 	// An object made up of field-value pairs that contains the record data.
 	Record map[string]interface{} `json:"record"`
 	// The initial values for the variables the pipeline operates on and transforms throughout its steps.
-	Variables *map[string]interface{} `json:"variables,omitempty"`
+	Variables *map[string]map[string]interface{} `json:"variables,omitempty"`
 }
 
 // NewUpsertRecordRequest instantiates a new UpsertRecordRequest object
@@ -99,9 +99,9 @@ func (o *UpsertRecordRequest) SetRecord(v map[string]interface{}) {
 }
 
 // GetVariables returns the Variables field value if set, zero value otherwise.
-func (o *UpsertRecordRequest) GetVariables() map[string]interface{} {
+func (o *UpsertRecordRequest) GetVariables() map[string]map[string]interface{} {
 	if o == nil || o.Variables == nil {
-		var ret map[string]interface{}
+		var ret map[string]map[string]interface{}
 		return ret
 	}
 	return *o.Variables
@@ -109,7 +109,7 @@ func (o *UpsertRecordRequest) GetVariables() map[string]interface{} {
 
 // GetVariablesOk returns a tuple with the Variables field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *UpsertRecordRequest) GetVariablesOk() (*map[string]interface{}, bool) {
+func (o *UpsertRecordRequest) GetVariablesOk() (*map[string]map[string]interface{}, bool) {
 	if o == nil || o.Variables == nil {
 		return nil, false
 	}
@@ -125,8 +125,8 @@ func (o *UpsertRecordRequest) HasVariables() bool {
 	return false
 }
 
-// SetVariables gets a reference to the given map[string]interface{} and assigns it to the Variables field.
-func (o *UpsertRecordRequest) SetVariables(v map[string]interface{}) {
+// SetVariables gets a reference to the given map[string]map[string]interface{} and assigns it to the Variables field.
+func (o *UpsertRecordRequest) SetVariables(v map[string]map[string]interface{}) {
 	o.Variables = &v
 }
 
