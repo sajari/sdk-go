@@ -145,3 +145,45 @@ func (t *session) next(_ map[string]string) (*pipelinepb.Tracking, error) {
 		Data:     t.data,
 	}, nil
 }
+
+// Tracking provides a Session implementation where the details of the tracking
+// object are managed by an external source.
+type Tracking struct {
+	Type TrackingType
+
+	// Query ID of the query.
+	QueryID string
+
+	// Sequence number of query.
+	Sequence int
+
+	// Tracking field used to identify records in the collection.
+	// Must be unique schema field.
+	Field string
+
+	// Custom values to be included in tracking data.
+	Data map[string]string
+}
+
+func (t *Tracking) proto() (*pipelinepb.Tracking, error) {
+	pbType, err := t.Type.proto()
+	if err != nil {
+		return nil, err
+	}
+
+	return &pipelinepb.Tracking{
+		Type:     pbType,
+		QueryId:  t.QueryID,
+		Sequence: int32(t.Sequence),
+		Field:    t.Field,
+		Data:     t.Data,
+	}, nil
+}
+
+func (t *Tracking) Reset() {
+	*t = Tracking{}
+}
+
+func (t *Tracking) next(_ map[string]string) (*pipelinepb.Tracking, error) {
+	return t.proto()
+}
