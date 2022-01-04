@@ -5,7 +5,7 @@ set -eo pipefail
 cd "$(dirname "$0")"
 
 function die() {
-    echo 1>&2 $*
+    echo 1>&2 "$@"
     exit 1
 }
 
@@ -19,4 +19,4 @@ docker-entrypoint.sh generate \
     --git-user-id sajari \
     --git-repo-id sdk-go \
     --additional-properties enumClassPrefix=true \
-    -o $GEN_PATH
+    -o "$GEN_PATH"

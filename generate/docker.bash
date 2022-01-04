@@ -11,10 +11,10 @@ function die() {
 
 GEN_PATH="$(pwd)/../internal/openapi"
 
-OPENAPI_URL=${OPENAPI_URL:-https://api-gateway.sajari.com/v4/openapi.json}
+OPENAPI_URL=${OPENAPI_URL:-https://api.search.io/v4/openapi.json}
 
 if [ -z "$OPENAPI_URL" ]; then
-    die "OPENAPI_URL must be set, e.g. https://api-gateway.sajari.com/v4/openapi.json"
+    die "OPENAPI_URL must be set, e.g. https://api.search.io/v4/openapi.json"
 fi
 
 rm -rf $GEN_PATH

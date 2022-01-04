@@ -1,23 +1,23 @@
 openapi: 3.0.0
 info:
   contact:
-    email: support@sajari.com
+    email: support@search.io
     name: API Support
-    url: https://www.sajari.com/company/contact
-  description: Sajari is a smart, highly-configurable, real-time search service that
-    enables thousands of businesses worldwide to provide amazing search experiences
+    url: https://www.search.io/company/contact
+  description: Search.io is a smart, highly-configurable, real-time search service
+    that enables thousands of businesses worldwide to provide amazing search experiences
     on their websites, stores, and applications.
-  termsOfService: https://www.sajari.com/terms
-  title: Sajari API
+  termsOfService: https://www.search.io/terms
+  title: Search.io API
   version: v4
   x-logo:
-    altText: Sajari
-    url: https://cdn.sajari.net/v2/img/logo-full.svg
+    altText: Search.io
+    url: https://cdn.search.io/v2/img/search-io-wordmark-light.svg
 externalDocs:
-  description: Read more about the Sajari API
-  url: https://docs.sajari.com
+  description: Read more about the Search.io API
+  url: https://docs.search.io
 servers:
-- url: https://api-gateway.sajari.com
+- url: https://api.search.io
 security:
 - BasicAuth: []
 tags:
@@ -29,7 +29,7 @@ tags:
     Create a collection for every new set of related records that you want to search through.
   name: Collections
 - description: |-
-    In Sajari, you configure your search algorithm using pipelines.
+    In Search.io, you configure your search algorithm using pipelines.
 
     Pipelines are easily configurable YAML-based scripts that define a series of steps that are executed sequentially when indexing a record, using a record pipeline, or performing a query, using a query pipeline.
   name: Pipelines
@@ -102,8 +102,14 @@ tags:
     - Standard documents e.g. HTML, PDF, Microsoft Word Document
     - Custom data objects, if your data is not webpages or documents
 
-    The set of fields a record can have is known as its schema. Webpages indexed via Sajari's web crawler have a predefined schema that can be extended with custom fields. For custom records, you can define your own schema.
+    The set of fields a record can have is known as its schema. Webpages indexed via Search.io's web crawler have a predefined schema that can be extended with custom fields. For custom records, you can define your own schema.
   name: Records
+- name: Promotions
+- description: |-
+    Websites, e-commerce stores and apps often have dedicated landing pages for important product categories, brands, or other promotional purposes.
+
+    Instead of performing a search, Search.io has the ability to redirect users to these landing pages when a query matches certain criteria.
+  name: Redirects
 paths:
   /v4/collections:
     get:
@@ -189,8 +195,8 @@ paths:
 
         Before records can be added to a collection, the schema and pipelines for
         the collection have to be set up. Consider setting up new collections via
-        the Sajari Console, which handles the creation of the schema and pipelines
-        for you.
+        the Search.io Console, which handles the creation of the schema and
+        pipelines for you.
       operationId: CreateCollection
       parameters:
       - description: |-
@@ -227,12 +233,12 @@ paths:
                 response:
                   value:
                     code: 6
-                    message: 'collection_id: required'
                     details:
                     - '@type': type.googleapis.com/google.rpc.BadRequest
                       field_violations:
-                      - field: collection_id
-                        description: required
+                      - description: required
+                        field: collection_id
+                    message: 'collection_id: required'
               schema:
                 $ref: '#/components/schemas/Error'
           description: Returned when the request contains violations for one or more
@@ -303,8 +309,7 @@ paths:
         "200":
           content:
             application/json:
-              schema:
-                properties: {}
+              schema: {}
           description: A successful response.
         "401":
           content:
@@ -1058,6 +1063,404 @@ paths:
       summary: Set default pipeline version
       tags:
       - Pipelines
+  /v4/collections/{collection_id}/promotions:
+    get:
+      description: |-
+        Retrieve a list of promotions in a collection.
+
+        Promotion pins, exclusions and filter boosts are not returned in this call.
+      operationId: ListPromotions
+      parameters:
+      - description: The collection that owns this set of promotions, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: |-
+          The maximum number of promotions to return. The service may return fewer
+          than this value.
+
+          If unspecified, at most 50 promotions are returned.
+
+          The maximum value is 1000; values above 1000 are coerced to 1000.
+        explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: |-
+          A page token, received from a previous
+          [ListPromotions](/api#operation/ListPromotions) call.
+
+          Provide this to retrieve the subsequent page.
+
+          When paginating, all other parameters provided to
+          [ListPromotions](/api#operation/ListPromotions) must match the call that
+          provided the page token.
+        explode: true
+        in: query
+        name: page_token
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPromotionsResponse'
+          description: A successful response.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the request does not have valid authentication
+            credentials.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the user does not have permission to access the
+            resource.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the resource does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the API encounters an internal error.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: An unexpected error response.
+      summary: List promotions
+      tags:
+      - Promotions
+    post:
+      description: Create a new promotion in a collection.
+      operationId: CreatePromotion
+      parameters:
+      - description: The collection to create a promotion in, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Promotion'
+        description: The promotion to create.
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Promotion'
+          description: A successful response.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the request does not have valid authentication
+            credentials.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the user does not have permission to access the
+            resource.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the resource does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the API encounters an internal error.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: An unexpected error response.
+      summary: Create promotion
+      tags:
+      - Promotions
+  /v4/collections/{collection_id}/promotions/{promotion_id}:
+    delete:
+      description: |-
+        Delete a promotion and all of its associated data.
+
+        > Note: This operation cannot be reversed.
+      operationId: DeletePromotion
+      parameters:
+      - description: The collection the promotion belongs to, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The promotion to delete, e.g. `1234`.
+        explode: false
+        in: path
+        name: promotion_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: A successful response.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the request does not have valid authentication
+            credentials.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the user does not have permission to access the
+            resource.
+        "404":
+          content:
+            application/json:
+              examples:
+                response:
+                  value:
+                    code: 5
+                    message: resource not found
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the promotion was not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the API encounters an internal error.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: An unexpected error response.
+      summary: Delete promotion
+      tags:
+      - Promotions
+    get:
+      description: Retrieve the details of a promotion.
+      operationId: GetPromotion
+      parameters:
+      - description: The collection that owns the promotion, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The promotion to retrieve, e.g. `1234`.
+        explode: false
+        in: path
+        name: promotion_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Promotion'
+          description: A successful response.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the request does not have valid authentication
+            credentials.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the user does not have permission to access the
+            resource.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the resource does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the API encounters an internal error.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: An unexpected error response.
+      summary: Get promotion
+      tags:
+      - Promotions
+    patch:
+      description: |-
+        Update the details of a promotion.
+
+        Pass each field that you want to update in the request body. Also specify
+        the name of each field that you want to update in the `update_mask` in the
+        request URL query string. Separate multiple fields with a comma. Fields
+        included in the request body, but not included in the field mask are not
+        updated.
+
+        For example, to update the `display_name` and `start_time` fields, make a
+        `PATCH` request to the URL:
+
+        ```
+        /v4/collections/{collection_id}/promotions/{promotion_id}?update_mask=display_name,start_time
+        ```
+
+        With the JSON body:
+
+        ```
+        {
+          "display_name": "new value",
+          "start_time": "2006-01-02T15:04:05Z07:00",
+          "end_time": "2006-01-02T15:04:05Z07:00"
+        }
+        ```
+
+        > Note: In this example `end_time` is not updated because it is not
+        specified in the `update_mask`.
+      operationId: UpdatePromotion
+      parameters:
+      - description: The collection the promotion belongs to, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The promotion to update, e.g. `1234`.
+        explode: false
+        in: path
+        name: promotion_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: |-
+          The list of fields to be updated, separated by a comma, e.g.
+          `field1,field2`.
+
+          Each field should be in snake case, e.g. `display_name`, `filter_boosts`.
+
+          For each field that you want to update, provide a corresponding value in
+          the promotion object containing the new value.
+        explode: true
+        in: query
+        name: update_mask
+        required: true
+        schema:
+          type: string
+        style: form
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Promotion'
+        description: Details of the promotion to update.
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Promotion'
+          description: A successful response.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the request does not have valid authentication
+            credentials.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the user does not have permission to access the
+            resource.
+        "404":
+          content:
+            application/json:
+              examples:
+                response:
+                  value:
+                    code: 5
+                    message: resource not found
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the promotion was not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the API encounters an internal error.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: An unexpected error response.
+      summary: Update promotion
+      tags:
+      - Promotions
   /v4/collections/{collection_id}/records:batchUpsert:
     post:
       description: |-
@@ -1144,8 +1547,7 @@ paths:
         "200":
           content:
             application/json:
-              schema:
-                properties: {}
+              schema: {}
           description: A successful response.
         "401":
           content:
@@ -1243,6 +1645,76 @@ paths:
       summary: Get record
       tags:
       - Records
+  /v4/collections/{collection_id}/records:update:
+    post:
+      description: |-
+        Add or update specific fields within a record with the given values. The
+        updated record is returned in the response.
+
+        To replace all fields in a record, you should use the
+        [UpsertRecord](/api#operation/UpsertRecord) call.
+
+        Note that the update record call cannot be used to add or update indexed
+        or unique fields. For this case use the
+        [UpsertRecord](/api#operation/UpsertRecord) call.
+      operationId: UpdateRecord
+      parameters:
+      - description: The collection that contains the record to update, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRecordRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: A successful response.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the request does not have valid authentication
+            credentials.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the user does not have permission to access the
+            resource.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the resource does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the API encounters an internal error.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: An unexpected error response.
+      summary: Update record
+      tags:
+      - Records
   /v4/collections/{collection_id}/records:upsert:
     post:
       description: |-
@@ -1334,6 +1806,400 @@ paths:
       summary: Upsert record
       tags:
       - Records
+  /v4/collections/{collection_id}/redirects:
+    get:
+      description: Retrieve a list of redirects in a collection.
+      operationId: ListRedirects
+      parameters:
+      - description: The collection that owns this set of redirects, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: |-
+          The maximum number of redirects to return. The service may return fewer
+          than this value.
+
+          If unspecified, at most 50 redirects are returned.
+
+          The maximum value is 1000; values above 1000 are coerced to 1000.
+        explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: |-
+          A page token, received from a previous
+          [ListRedirects](/api#operation/ListRedirects) call.
+
+          Provide this to retrieve the subsequent page.
+
+          When paginating, all other parameters provided to
+          [ListRedirects](/api#operation/ListRedirects) must match the call that
+          provided the page token.
+        explode: true
+        in: query
+        name: page_token
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRedirectsResponse'
+          description: A successful response.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the request does not have valid authentication
+            credentials.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the user does not have permission to access the
+            resource.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the resource does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the API encounters an internal error.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: An unexpected error response.
+      summary: List redirects
+      tags:
+      - Redirects
+    post:
+      description: Create a new redirect in a collection.
+      operationId: CreateRedirect
+      parameters:
+      - description: The collection to create a redirect in, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Redirect'
+        description: The redirect to create.
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Redirect'
+          description: A successful response.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the request does not have valid authentication
+            credentials.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the user does not have permission to access the
+            resource.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the resource does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the API encounters an internal error.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: An unexpected error response.
+      summary: Create redirect
+      tags:
+      - Redirects
+  /v4/collections/{collection_id}/redirects/{redirect_id}:
+    delete:
+      description: |-
+        Delete a redirect and all of its associated data.
+
+        > Note: This operation cannot be reversed.
+      operationId: DeleteRedirect
+      parameters:
+      - description: The collection the redirect belongs to, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The redirect to delete, e.g. `1234`.
+        explode: false
+        in: path
+        name: redirect_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: A successful response.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the request does not have valid authentication
+            credentials.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the user does not have permission to access the
+            resource.
+        "404":
+          content:
+            application/json:
+              examples:
+                response:
+                  value:
+                    code: 5
+                    message: resource not found
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the redirect was not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the API encounters an internal error.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: An unexpected error response.
+      summary: Delete redirect
+      tags:
+      - Redirects
+    get:
+      description: Retrieve the details of a redirect.
+      operationId: GetRedirect
+      parameters:
+      - description: The collection that owns the redirect, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The redirect to retrieve, e.g. `1234`.
+        explode: false
+        in: path
+        name: redirect_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Redirect'
+          description: A successful response.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the request does not have valid authentication
+            credentials.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the user does not have permission to access the
+            resource.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the resource does not exist.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the API encounters an internal error.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: An unexpected error response.
+      summary: Get redirect
+      tags:
+      - Redirects
+    patch:
+      description: |-
+        Update the details of a redirect.
+
+        Pass each field that you want to update in the request body. Also specify
+        the name of each field that you want to update in the `update_mask` in the
+        request URL query string. Separate multiple fields with a comma. Fields
+        included in the request body, but not included in the field mask are not
+        updated.
+
+        For example, to update the `condition` field, make a `PATCH` request to the
+        URL:
+
+        ```
+        /v4/collections/{collection_id}/redirects/{redirect_id}?update_mask=condition
+        ```
+
+        With the JSON body:
+
+        ```
+        {
+          "condition": "new value",
+          "target": "..."
+        }
+        ```
+
+        > Note: In this example `target` is not updated because it is not specified
+        in the `update_mask`.
+      operationId: UpdateRedirect
+      parameters:
+      - description: The collection the redirect belongs to, e.g. `my-collection`.
+        explode: false
+        in: path
+        name: collection_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The redirect to update, e.g. `1234`.
+        explode: false
+        in: path
+        name: redirect_id
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: |-
+          The list of fields to be updated, separated by a comma, e.g.
+          `field1,field2`.
+
+          Each field should be in snake case, e.g. `condition`, `target`.
+
+          For each field that you want to update, provide a corresponding value in
+          the redirect object containing the new value.
+        explode: true
+        in: query
+        name: update_mask
+        required: true
+        schema:
+          type: string
+        style: form
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Redirect'
+        description: Details of the redirect to update.
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Redirect'
+          description: A successful response.
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the request does not have valid authentication
+            credentials.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the user does not have permission to access the
+            resource.
+        "404":
+          content:
+            application/json:
+              examples:
+                response:
+                  value:
+                    code: 5
+                    message: resource not found
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the redirect was not found.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Returned when the API encounters an internal error.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: An unexpected error response.
+      summary: Update redirect
+      tags:
+      - Redirects
   /v4/collections/{collection_id}/schemaFields:
     get:
       description: Retrieve a list of schema fields in a collection.
@@ -1753,7 +2619,7 @@ paths:
         For more information:
 
         - See [filtering
-        content](https://docs.sajari.com/user-guide/integrating-search/filters/)
+        content](https://docs.search.io/documentation/fundamentals/integrating-search/filters-and-sort-options)
         - See [tracking in the Go
         SDK](https://github.com/sajari/sdk-go/blob/v2/session.go)
         - See [tracking in the JS
@@ -1830,7 +2696,7 @@ paths:
         For more information:
 
         - See [filtering
-        content](https://docs.sajari.com/user-guide/integrating-search/filters/)
+        content](https://docs.search.io/documentation/fundamentals/integrating-search/filters-and-sort-options)
         - See [tracking in the Go
         SDK](https://github.com/sajari/sdk-go/blob/v2/session.go)
         - See [tracking in the JS
@@ -2013,12 +2879,12 @@ paths:
                 response:
                   value:
                     code: 6
-                    message: 'token: required'
                     details:
                     - '@type': type.googleapis.com/google.rpc.BadRequest
                       field_violations:
-                      - field: token
-                        description: required
+                      - description: required
+                        field: token
+                    message: 'token: required'
               schema:
                 $ref: '#/components/schemas/Error'
           description: Returned when the request contains violations for one or more
@@ -2109,12 +2975,12 @@ paths:
                 response:
                   value:
                     code: 6
-                    message: 'token: required'
                     details:
                     - '@type': type.googleapis.com/google.rpc.BadRequest
                       field_violations:
-                      - field: token
-                        description: required
+                      - description: required
+                        field: token
+                    message: 'token: required'
               schema:
                 $ref: '#/components/schemas/Error'
           description: Returned when the request contains violations for one or more
@@ -2170,25 +3036,45 @@ components:
       required: true
   schemas:
     ActivePromotion:
+      description: ActivePromotion is a promotion that is active for a given search.
       example:
         active_pins:
-        - '{}'
-        - '{}'
+        - position: 6
+          key:
+            field: field
+            value: value
+        - position: 6
+          key:
+            field: field
+            value: value
         promotion_id: promotion_id
         active_exclusions:
-        - '{}'
-        - '{}'
+        - key:
+            field: field
+            value: value
+        - key:
+            field: field
+            value: value
       properties:
-        promotion_id:
-          type: string
-        active_pins:
-          items:
-            $ref: '#/components/schemas/PromotionPin'
-          type: array
         active_exclusions:
+          description: The records that are excluded from the result set by the active
+            promotion.
           items:
             $ref: '#/components/schemas/PromotionExclusion'
           type: array
+        active_pins:
+          description: |-
+            The pins that belong to the active promotion. Note that the positions in
+            these pins are the positions specified at pin creation time, which is not
+            necessarily the position that a pin ends up in. For example, if a pin is
+            created at position 2, but the query that the pin is active in has zero
+            results, the pinned result actually appears in position 1.
+          items:
+            $ref: '#/components/schemas/PromotionPin'
+          type: array
+        promotion_id:
+          description: The ID of the active promotion.
+          type: string
       type: object
     BatchCreateSchemaFieldsRequest:
       example:
@@ -2227,7 +3113,7 @@ components:
         errors:
         - index: 0
           status:
-            code: 5
+            code: 6
             details:
             - value: value
               type_url: type_url
@@ -2236,7 +3122,7 @@ components:
             message: message
         - index: 0
           status:
-            code: 5
+            code: 6
             details:
             - value: value
               type_url: type_url
@@ -2244,22 +3130,22 @@ components:
               type_url: type_url
             message: message
       properties:
-        fields:
-          description: Schema fields created.
-          items:
-            $ref: '#/components/schemas/SchemaField'
-          type: array
         errors:
           description: Errors that occurred.
           items:
             $ref: '#/components/schemas/BatchCreateSchemaFieldsResponseError'
+          type: array
+        fields:
+          description: Schema fields created.
+          items:
+            $ref: '#/components/schemas/SchemaField'
           type: array
       type: object
     BatchCreateSchemaFieldsResponseError:
       example:
         index: 0
         status:
-          code: 5
+          code: 6
           details:
           - value: value
             type_url: type_url
@@ -2332,32 +3218,32 @@ components:
         variables:
         - variables:
             key: '{}'
-          index: 6
+          index: 5
         - variables:
             key: '{}'
-          index: 6
+          index: 5
         keys:
-        - index: 0
+        - index: 1
           key:
             field: field
             value: value
-        - index: 0
+        - index: 1
           key:
             field: field
             value: value
         errors:
-        - index: 1
+        - index: 0
           status:
-            code: 5
+            code: 6
             details:
             - value: value
               type_url: type_url
             - value: value
               type_url: type_url
             message: message
-        - index: 1
+        - index: 0
           status:
-            code: 5
+            code: 6
             details:
             - value: value
               type_url: type_url
@@ -2365,6 +3251,11 @@ components:
               type_url: type_url
             message: message
       properties:
+        errors:
+          description: Errors that occurred.
+          items:
+            $ref: '#/components/schemas/BatchUpsertRecordsResponseError'
+          type: array
         keys:
           description: |-
             A list of keys of the records that were inserted.
@@ -2385,17 +3276,12 @@ components:
           items:
             $ref: '#/components/schemas/BatchUpsertRecordsResponseVariables'
           type: array
-        errors:
-          description: Errors that occurred.
-          items:
-            $ref: '#/components/schemas/BatchUpsertRecordsResponseError'
-          type: array
       type: object
     BatchUpsertRecordsResponseError:
       example:
-        index: 1
+        index: 0
         status:
-          code: 5
+          code: 6
           details:
           - value: value
             type_url: type_url
@@ -2413,7 +3299,7 @@ components:
       type: object
     BatchUpsertRecordsResponseKey:
       example:
-        index: 0
+        index: 1
         key:
           field: field
           value: value
@@ -2430,7 +3316,7 @@ components:
       example:
         variables:
           key: '{}'
-        index: 6
+        index: 5
       properties:
         index:
           description: Index of the record in `records` that these variables correspond
@@ -2453,21 +3339,9 @@ components:
         id: id
         display_name: display_name
       properties:
-        id:
-          description: Output only. The collection's ID.
-          readOnly: true
-          type: string
         account_id:
           description: Output only. The ID of the account that owns this collection.
           readOnly: true
-          type: string
-        create_time:
-          description: Output only. Time the collection was created.
-          format: date-time
-          readOnly: true
-          type: string
-        display_name:
-          description: The collection's display name. You can change this at any time.
           type: string
         authorized_query_domains:
           description: |-
@@ -2481,6 +3355,18 @@ components:
           items:
             type: string
           type: array
+        create_time:
+          description: Output only. Time the collection was created.
+          format: date-time
+          readOnly: true
+          type: string
+        display_name:
+          description: The collection's display name. You can change this at any time.
+          type: string
+        id:
+          description: Output only. The collection's ID.
+          readOnly: true
+          type: string
       required:
       - display_name
       type: object
@@ -2500,12 +3386,12 @@ components:
         code:
           format: int32
           type: integer
-        message:
-          type: string
         details:
           items:
             $ref: '#/components/schemas/protobufAny'
           type: array
+        message:
+          type: string
       type: object
     GeneratePipelinesRequest:
       example:
@@ -2516,13 +3402,13 @@ components:
         - searchable_fields
         - searchable_fields
       properties:
-        searchable_fields:
-          description: Prioritized list of fields to search.
+        query_training_fields:
+          description: List of fields to train query suggestions from.
           items:
             type: string
           type: array
-        query_training_fields:
-          description: List of fields to train query suggestions from.
+        searchable_fields:
+          description: Prioritized list of fields to search.
           items:
             type: string
           type: array
@@ -2535,191 +3421,191 @@ components:
           create_time: 2000-01-23T04:56:07.000+00:00
           post_steps:
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
+            title: title
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
+            title: title
           collection_default: true
+          default_version: true
           name: name
           pre_steps:
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
+            title: title
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
-          default_version: true
+            title: title
           description: description
           version: version
         autocomplete_pipeline:
           create_time: 2000-01-23T04:56:07.000+00:00
           post_steps:
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
+            title: title
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
+            title: title
           collection_default: true
+          default_version: true
           name: name
           pre_steps:
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
+            title: title
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
-          default_version: true
+            title: title
           description: description
           version: version
         query_pipeline:
           create_time: 2000-01-23T04:56:07.000+00:00
           post_steps:
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
+            title: title
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
+            title: title
           collection_default: true
+          default_version: true
           name: name
           pre_steps:
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
+            title: title
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
-          default_version: true
+            title: title
           description: description
           version: version
       properties:
-        record_pipeline:
+        autocomplete_pipeline:
           $ref: '#/components/schemas/Pipeline'
         query_pipeline:
           $ref: '#/components/schemas/Pipeline'
-        autocomplete_pipeline:
+        record_pipeline:
           $ref: '#/components/schemas/Pipeline'
       type: object
     GetDefaultPipelineResponse:
@@ -2771,6 +3657,46 @@ components:
       required:
       - key
       type: object
+    Integration:
+      description: Integration contains integration config, e.g. filters and sort
+        options.
+      properties:
+        account_id:
+          description: |-
+            Output only. The ID of the account that owns the collection, e.g.
+            `1618535966441231024`.
+          readOnly: true
+          type: string
+        collection_id:
+          description: |-
+            Output only. The ID of the collection that owns this integration, e.g.
+            `my-collection`.
+          readOnly: true
+          type: string
+        config:
+          description: The integration's config.
+          type: object
+        create_time:
+          description: Output only. The time the integration was created.
+          format: date-time
+          readOnly: true
+          type: string
+        display_name:
+          description: The integration's display name.
+          type: string
+        id:
+          description: Output only. The integration's ID.
+          readOnly: true
+          type: string
+        update_time:
+          description: Output only. The time the integration was last updated.
+          format: date-time
+          readOnly: true
+          type: string
+      required:
+      - config
+      - display_name
+      type: object
     ListCollectionsResponse:
       example:
         next_page_token: next_page_token
@@ -2802,6 +3728,21 @@ components:
             If this field is omitted, there are no subsequent pages.
           type: string
       type: object
+    ListIntegrationsResponse:
+      description: ListIntegrations response.
+      properties:
+        integrations:
+          description: The integrations.
+          items:
+            $ref: '#/components/schemas/Integration'
+          type: array
+        next_page_token:
+          description: |-
+            A token, which can be sent as `page_token` to retrieve the next page.
+
+            If this field is omitted, there are no subsequent pages.
+          type: string
+      type: object
     ListPipelinesRequestView:
       default: VIEW_UNSPECIFIED
       description: |2-
@@ -2824,136 +3765,280 @@ components:
         - create_time: 2000-01-23T04:56:07.000+00:00
           post_steps:
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
+            title: title
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
+            title: title
           collection_default: true
+          default_version: true
           name: name
           pre_steps:
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
+            title: title
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
-          default_version: true
+            title: title
           description: description
           version: version
         - create_time: 2000-01-23T04:56:07.000+00:00
           post_steps:
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
+            title: title
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
+            title: title
           collection_default: true
+          default_version: true
           name: name
           pre_steps:
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
+            title: title
           - condition: condition
-            description: description
             annotations:
             - annotations
             - annotations
+            description: description
             id: id
-            title: title
             params:
               key:
                 bind: bind
                 constant: constant
                 description: description
                 default_value: default_value
-          default_version: true
+            title: title
           description: description
           version: version
         next_page_token: next_page_token
       properties:
-        pipelines:
-          description: The pipelines from the specified collection.
-          items:
-            $ref: '#/components/schemas/Pipeline'
-          type: array
         next_page_token:
           description: |-
             A token, which can be sent as `page_token` to retrieve the next page.
 
             If this field is omitted, there are no subsequent pages.
           type: string
+        pipelines:
+          description: The pipelines from the specified collection.
+          items:
+            $ref: '#/components/schemas/Pipeline'
+          type: array
+      type: object
+    ListPromotionsResponse:
+      example:
+        promotions:
+        - filter_boosts:
+          - filter: filter
+            boost: 0.8008282
+          - filter: filter
+            boost: 0.8008282
+          create_time: 2000-01-23T04:56:07.000+00:00
+          end_time: 2000-01-23T04:56:07.000+00:00
+          exclusions:
+          - key:
+              field: field
+              value: value
+          - key:
+              field: field
+              value: value
+          pins:
+          - position: 6
+            key:
+              field: field
+              value: value
+          - position: 6
+            key:
+              field: field
+              value: value
+          display_name: display_name
+          collection_id: collection_id
+          start_time: 2000-01-23T04:56:07.000+00:00
+          condition: condition
+          update_time: 2000-01-23T04:56:07.000+00:00
+          disabled: true
+          id: id
+          filter_conditions:
+          - filter:
+            - filter
+            - filter
+          - filter:
+            - filter
+            - filter
+          range_boosts:
+          - null_boost: 5.637377
+            field: field
+            start: 2.302136
+            boost: 1.4658129
+            end: 5.962134
+          - null_boost: 5.637377
+            field: field
+            start: 2.302136
+            boost: 1.4658129
+            end: 5.962134
+        - filter_boosts:
+          - filter: filter
+            boost: 0.8008282
+          - filter: filter
+            boost: 0.8008282
+          create_time: 2000-01-23T04:56:07.000+00:00
+          end_time: 2000-01-23T04:56:07.000+00:00
+          exclusions:
+          - key:
+              field: field
+              value: value
+          - key:
+              field: field
+              value: value
+          pins:
+          - position: 6
+            key:
+              field: field
+              value: value
+          - position: 6
+            key:
+              field: field
+              value: value
+          display_name: display_name
+          collection_id: collection_id
+          start_time: 2000-01-23T04:56:07.000+00:00
+          condition: condition
+          update_time: 2000-01-23T04:56:07.000+00:00
+          disabled: true
+          id: id
+          filter_conditions:
+          - filter:
+            - filter
+            - filter
+          - filter:
+            - filter
+            - filter
+          range_boosts:
+          - null_boost: 5.637377
+            field: field
+            start: 2.302136
+            boost: 1.4658129
+            end: 5.962134
+          - null_boost: 5.637377
+            field: field
+            start: 2.302136
+            boost: 1.4658129
+            end: 5.962134
+        next_page_token: next_page_token
+      properties:
+        next_page_token:
+          description: |-
+            A token, which can be sent as `page_token` to retrieve the next page.
+
+            If this field is omitted, there are no subsequent pages.
+          type: string
+        promotions:
+          description: The promotions.
+          items:
+            $ref: '#/components/schemas/Promotion'
+          type: array
+      type: object
+    ListRedirectsResponse:
+      example:
+        next_page_token: next_page_token
+        redirects:
+        - collection_id: collection_id
+          condition: condition
+          update_time: 2000-01-23T04:56:07.000+00:00
+          create_time: 2000-01-23T04:56:07.000+00:00
+          disabled: true
+          id: id
+          target: target
+        - collection_id: collection_id
+          condition: condition
+          update_time: 2000-01-23T04:56:07.000+00:00
+          create_time: 2000-01-23T04:56:07.000+00:00
+          disabled: true
+          id: id
+          target: target
+      properties:
+        next_page_token:
+          description: |-
+            A token, which can be sent as `page_token` to retrieve the next page.
+
+            If this field is omitted, there are no subsequent pages.
+          type: string
+        redirects:
+          description: The redirects.
+          items:
+            $ref: '#/components/schemas/Redirect'
+          type: array
       type: object
     ListSchemaFieldsResponse:
       example:
@@ -2969,6 +4054,12 @@ components:
           description: description
           array_length: 0
       properties:
+        next_page_token:
+          description: |-
+            A token, which can be sent as `page_token` to retrieve the next page.
+
+            If this field is omitted, there are no subsequent pages.
+          type: string
         schema_fields:
           description: The schema fields.
           items:
@@ -2978,17 +4069,11 @@ components:
           description: Maximum number of fields to return.
           format: int32
           type: integer
-        next_page_token:
-          description: |-
-            A token, which can be sent as `page_token` to retrieve the next page.
-
-            If this field is omitted, there are no subsequent pages.
-          type: string
       type: object
     PercentileDataPoint:
       example:
-        value: 1.2315135367772556
-        point: 7.386281948385884
+        value: 4.145608029883936
+        point: 2.027123023002322
       properties:
         point:
           description: The input point.
@@ -3004,71 +4089,81 @@ components:
         create_time: 2000-01-23T04:56:07.000+00:00
         post_steps:
         - condition: condition
-          description: description
           annotations:
           - annotations
           - annotations
+          description: description
           id: id
-          title: title
           params:
             key:
               bind: bind
               constant: constant
               description: description
               default_value: default_value
+          title: title
         - condition: condition
-          description: description
           annotations:
           - annotations
           - annotations
+          description: description
           id: id
-          title: title
           params:
             key:
               bind: bind
               constant: constant
               description: description
               default_value: default_value
+          title: title
         collection_default: true
+        default_version: true
         name: name
         pre_steps:
         - condition: condition
-          description: description
           annotations:
           - annotations
           - annotations
+          description: description
           id: id
-          title: title
           params:
             key:
               bind: bind
               constant: constant
               description: description
               default_value: default_value
+          title: title
         - condition: condition
-          description: description
           annotations:
           - annotations
           - annotations
+          description: description
           id: id
-          title: title
           params:
             key:
               bind: bind
               constant: constant
               description: description
               default_value: default_value
-        default_version: true
+          title: title
         description: description
         version: version
       properties:
+        collection_default:
+          description: Output only. Indicates if the pipeline is the collection default
+            pipeline.
+          readOnly: true
+          type: boolean
         create_time:
           description: Output only. Time the pipeline was created.
           format: date-time
           readOnly: true
           type: string
-        type:
-          $ref: '#/components/schemas/PipelineType'
+        default_version:
+          description: Output only. Indicates if the pipeline is the default version.
+          readOnly: true
+          type: boolean
+        description:
+          description: Description of the pipeline.
+          type: string
         name:
           description: |-
             The pipeline's name.
@@ -3077,28 +4172,10 @@ components:
             alphanumeric, `_`, `-` or `.` characters. Strictly speaking, it must match
             the regular expression: `^[a-zA-Z0-9][a-zA-Z0-9_\-\.]+$`.
           type: string
-        version:
-          description: |-
-            The pipeline's version.
-
-            Must start with an alphanumeric character followed by one or more
-            alphanumeric, `_`, `-` or `.` characters. Strictly speaking, it must match
-            the regular expression: `^[a-zA-Z0-9][a-zA-Z0-9_\-\.]+$`.
-          type: string
-        description:
-          description: Description of the pipeline.
-          type: string
-        pre_steps:
-          description: |-
-            Pre-steps are run before an indexing operation or query request is sent to
-            the search index.
-          items:
-            $ref: '#/components/schemas/PipelineStep'
-          type: array
         post_steps:
           description: |-
-            Post-steps are run after an indexing operation or query request has been
-            sent to the search index.
+            The post-steps that are run after an indexing operation or query request
+            has been sent to the search index.
 
             For indexing operations, the post-steps only run when creating new records.
             They do not run when updating records.
@@ -3108,15 +4185,23 @@ components:
           items:
             $ref: '#/components/schemas/PipelineStep'
           type: array
-        collection_default:
-          description: Output only. Indicates if the pipeline is the collection default
-            pipeline.
-          readOnly: true
-          type: boolean
-        default_version:
-          description: Output only. Indicates if the pipeline is the default version.
-          readOnly: true
-          type: boolean
+        pre_steps:
+          description: |-
+            The pre-steps that are run before an indexing operation or query request is
+            sent to the search index.
+          items:
+            $ref: '#/components/schemas/PipelineStep'
+          type: array
+        type:
+          $ref: '#/components/schemas/PipelineType'
+        version:
+          description: |-
+            The pipeline's version.
+
+            Must start with an alphanumeric character followed by one or more
+            alphanumeric, `_`, `-` or `.` characters. Strictly speaking, it must match
+            the regular expression: `^[a-zA-Z0-9][a-zA-Z0-9_\-\.]+$`.
+          type: string
       required:
       - name
       - type
@@ -3126,36 +4211,27 @@ components:
       description: Step creates a pipeline step.
       example:
         condition: condition
-        description: description
         annotations:
         - annotations
         - annotations
+        description: description
         id: id
-        title: title
         params:
           key:
             bind: bind
             constant: constant
             description: description
             default_value: default_value
+        title: title
       properties:
-        id:
-          description: ID of the step template.
-          type: string
-        title:
-          description: Title for the step. Overrides the default title.
-          type: string
-        description:
-          description: Description for the step. Overrides the default description.
-          type: string
-        params:
-          additionalProperties:
-            $ref: '#/components/schemas/PipelineStepParamBinding'
-          description: Bindings for the step parameters.
-          type: object
+        annotations:
+          description: Annotations added to the request when the step is run.
+          items:
+            type: string
+          type: array
         condition:
           description: |-
-            Condition expression to determine if the step should be run.
+            A condition expression to determine if the step should be run.
 
             This is a filter expression much like the query filter expression, but it
             acts upon the pipeline variables.
@@ -3163,11 +4239,20 @@ components:
             For example, to only run the step if the pipeline `q` variable is not
             empty, set this to `q != ''`.
           type: string
-        annotations:
-          description: Annotations added to the request when the step is run.
-          items:
-            type: string
-          type: array
+        description:
+          description: Description for the step. Overrides the default description.
+          type: string
+        id:
+          description: ID of the step template.
+          type: string
+        params:
+          additionalProperties:
+            $ref: '#/components/schemas/PipelineStepParamBinding'
+          description: Bindings for the step parameters.
+          type: object
+        title:
+          description: Title for the step. Overrides the default title.
+          type: string
       required:
       - id
       type: object
@@ -3181,8 +4266,8 @@ components:
         bind:
           description: Bind the step parameter to a pipeline variable.
           type: string
-        description:
-          description: Set the description of the step parameter.
+        constant:
+          description: Bind the step parameter to a constant value.
           type: string
         default_value:
           description: |-
@@ -3191,8 +4276,8 @@ components:
             This allows you to set a default value for the step parameter when it
             is not bound to a pipeline variable.
           type: string
-        constant:
-          description: Bind the step parameter to a constant value.
+        description:
+          description: Set the description of the step parameter.
           type: string
       type: object
     PipelineType:
@@ -3206,89 +4291,321 @@ components:
       - RECORD
       - QUERY
       type: string
+    Promotion:
+      description: |-
+        Promotion contains a trigger, determining which searches it should be active
+        for, and a list of alterations that should be made to search results when it
+        is active.
+      example:
+        filter_boosts:
+        - filter: filter
+          boost: 0.8008282
+        - filter: filter
+          boost: 0.8008282
+        create_time: 2000-01-23T04:56:07.000+00:00
+        end_time: 2000-01-23T04:56:07.000+00:00
+        exclusions:
+        - key:
+            field: field
+            value: value
+        - key:
+            field: field
+            value: value
+        pins:
+        - position: 6
+          key:
+            field: field
+            value: value
+        - position: 6
+          key:
+            field: field
+            value: value
+        display_name: display_name
+        collection_id: collection_id
+        start_time: 2000-01-23T04:56:07.000+00:00
+        condition: condition
+        update_time: 2000-01-23T04:56:07.000+00:00
+        disabled: true
+        id: id
+        filter_conditions:
+        - filter:
+          - filter
+          - filter
+        - filter:
+          - filter
+          - filter
+        range_boosts:
+        - null_boost: 5.637377
+          field: field
+          start: 2.302136
+          boost: 1.4658129
+          end: 5.962134
+        - null_boost: 5.637377
+          field: field
+          start: 2.302136
+          boost: 1.4658129
+          end: 5.962134
+      properties:
+        collection_id:
+          description: Output only. The ID of the collection that owns this promotion.
+          readOnly: true
+          type: string
+        condition:
+          description: |-
+            A condition expression applied to a search request that determines which
+            searches the promotion is active for.
+
+            For example, to apply the promotion's pins and boosts whenever a user
+            searches for 'shoes' set condition to `q = 'shoes'`.
+          type: string
+        create_time:
+          description: Output only. Time the promotion was created.
+          format: date-time
+          readOnly: true
+          type: string
+        disabled:
+          description: If disabled, the promotion is never triggered.
+          type: boolean
+        display_name:
+          description: The promotion's display name.
+          type: string
+        end_time:
+          description: If specified, the promotion is considered disabled after this
+            time.
+          format: date-time
+          type: string
+        exclusions:
+          description: The records to exclude from search results, if the promotion
+            is enabled.
+          items:
+            $ref: '#/components/schemas/PromotionExclusion'
+          type: array
+        filter_boosts:
+          description: The filter boosts to apply to searches, if the promotion is
+            enabled.
+          items:
+            $ref: '#/components/schemas/PromotionFilterBoost'
+          type: array
+        filter_conditions:
+          description: |-
+            The conditions applied to the filters passed from the user. A query must
+            match at least one of these in order to trigger the promotion.
+          items:
+            $ref: '#/components/schemas/PromotionFilterCondition'
+          type: array
+        id:
+          description: The promotion's ID.
+          type: string
+        pins:
+          description: The items to fix to specific positions in the search results.
+          items:
+            $ref: '#/components/schemas/PromotionPin'
+          type: array
+        range_boosts:
+          description: The range boosts to apply to searches, if the promotion is
+            enabled.
+          items:
+            $ref: '#/components/schemas/PromotionRangeBoost'
+          type: array
+        start_time:
+          description: If specified, the promotion is considered disabled before this
+            time.
+          format: date-time
+          type: string
+        update_time:
+          description: Output only. Time the promotion was last updated.
+          format: date-time
+          readOnly: true
+          type: string
+      required:
+      - condition
+      - display_name
+      type: object
+    PromotionExclusion:
+      example:
+        key:
+          field: field
+          value: value
+      properties:
+        key:
+          $ref: '#/components/schemas/RecordKey'
+      type: object
+    PromotionFilterBoost:
+      example:
+        filter: filter
+        boost: 0.8008282
+      properties:
+        boost:
+          description: |-
+            Number that determines the size of the boost that is applied to matching
+            records.
+
+            Must be greater than or equal to 0 and less than or equal to 1.
+          format: float
+          type: number
+        filter:
+          description: |-
+            Filter expression that applies a relevance boost to records matching this
+            filter.
+
+            This is a filter expression much like the query filter expression.
+          type: string
+      type: object
+    PromotionFilterCondition:
+      description: |-
+        A set of filters of the form `field = 'value'`. Matches a query if the set of
+        filters in the condition matches exactly the set of filters associated with
+        it.
+      example:
+        filter:
+        - filter
+        - filter
+      properties:
+        filter:
+          description: A filter of the form `field = 'value'`.
+          items:
+            type: string
+          type: array
+      type: object
+    PromotionPin:
+      example:
+        position: 6
+        key:
+          field: field
+          value: value
+      properties:
+        key:
+          $ref: '#/components/schemas/RecordKey'
+        position:
+          description: |-
+            Position the record should occupy in search results. The top position is
+            position 1.
+
+            Doesn't need to be contiguous with other pins, i.e. there can be gaps in
+            the pinned set that are filled with organic results.
+
+            In the case where there are insufficient search results pinned items are
+            collapsed.
+          format: int32
+          type: integer
+      type: object
+    PromotionRangeBoost:
+      example:
+        null_boost: 5.637377
+        field: field
+        start: 2.302136
+        boost: 1.4658129
+        end: 5.962134
+      properties:
+        boost:
+          description: |-
+            Number that determines the size of the boost that is applied to matching
+            records.
+            Must be greater than or equal to 0 and less than or equal to 1.
+          format: float
+          type: number
+        end:
+          description: The end value to apply 1 boost to.
+          format: float
+          type: number
+        field:
+          description: The field to apply the boost to.
+          type: string
+        null_boost:
+          description: |-
+            The boost given to null/empty values.
+            Must be greater than or equal to 0 and less than or equal to 1.
+            The default value is 0.
+          format: float
+          type: number
+        start:
+          description: The start value to apply 0 boost to.
+          format: float
+          type: number
+      type: object
     QueryAggregateResult:
       description: A query aggregate result contains results of aggregations.
       example:
         date:
           dates:
-            key: 2
+            key: 9
         percentile:
           percentiles:
-          - value: 1.2315135367772556
-            point: 7.386281948385884
-          - value: 1.2315135367772556
-            point: 7.386281948385884
+          - value: 4.145608029883936
+            point: 2.027123023002322
+          - value: 4.145608029883936
+            point: 2.027123023002322
           cdf:
-          - value: 1.2315135367772556
-            point: 7.386281948385884
-          - value: 1.2315135367772556
-            point: 7.386281948385884
+          - value: 4.145608029883936
+            point: 2.027123023002322
+          - value: 4.145608029883936
+            point: 2.027123023002322
         metric:
-          value: 1.4658129805029452
+          value: 3.616076749251911
         buckets:
           buckets:
             key:
+              count: 2
               name: name
-              count: 5
         count:
           counts:
-            key: 5
+            key: 7
         analysis:
-          coverage: 7
-          min_length: 3
-          avg_length: 4.145608
-          cardinality: 9
-          max_length: 2
+          coverage: 1
+          avg_length: 0.8008282
+          min_length: 5
+          cardinality: 6
+          max_length: 5
       properties:
-        metric:
-          $ref: '#/components/schemas/QueryAggregateResultMetric'
-        count:
-          $ref: '#/components/schemas/QueryAggregateResultCount'
-        buckets:
-          $ref: '#/components/schemas/QueryAggregateResultBuckets'
-        date:
-          $ref: '#/components/schemas/QueryAggregateResultDate'
         analysis:
           $ref: '#/components/schemas/QueryAggregateResultAnalysis'
+        buckets:
+          $ref: '#/components/schemas/QueryAggregateResultBuckets'
+        count:
+          $ref: '#/components/schemas/QueryAggregateResultCount'
+        date:
+          $ref: '#/components/schemas/QueryAggregateResultDate'
+        metric:
+          $ref: '#/components/schemas/QueryAggregateResultMetric'
         percentile:
           $ref: '#/components/schemas/QueryAggregateResultPercentile'
       type: object
     QueryAggregateResultAnalysis:
       example:
-        coverage: 7
-        min_length: 3
-        avg_length: 4.145608
-        cardinality: 9
-        max_length: 2
+        coverage: 1
+        avg_length: 0.8008282
+        min_length: 5
+        cardinality: 6
+        max_length: 5
       properties:
-        coverage:
-          description: Coverage is the number of records which have a value set.
-          format: int32
-          type: integer
+        avg_length:
+          description: Average number of items in an array field.
+          format: float
+          type: number
         cardinality:
           description: Cardinality is the number of different values in a field.
           format: int32
           type: integer
-        min_length:
-          description: Minimum length of an array field.
+        coverage:
+          description: Coverage is the number of records which have a value set.
           format: int32
           type: integer
         max_length:
           description: Maximum number of values in an array field.
           format: int32
           type: integer
-        avg_length:
-          description: Average number of items in an array field.
-          format: float
-          type: number
+        min_length:
+          description: Minimum length of an array field.
+          format: int32
+          type: integer
       type: object
     QueryAggregateResultBuckets:
       description: Buckets is a full set of buckets computed in an aggregation.
       example:
         buckets:
           key:
+            count: 2
             name: name
-            count: 5
       properties:
         buckets:
           additionalProperties:
@@ -3298,22 +4615,22 @@ components:
     QueryAggregateResultBucketsBucket:
       description: Bucket is the result of a bucket aggregate.
       example:
+        count: 2
         name: name
-        count: 5
       properties:
-        name:
-          description: Name of bucket.
-          type: string
         count:
           description: Number of records in the bucket.
           format: int32
           type: integer
+        name:
+          description: Name of bucket.
+          type: string
       type: object
     QueryAggregateResultCount:
       description: Count contains the counts for the set of values returned.
       example:
         counts:
-          key: 5
+          key: 7
       properties:
         counts:
           additionalProperties:
@@ -3324,7 +4641,7 @@ components:
     QueryAggregateResultDate:
       example:
         dates:
-          key: 2
+          key: 9
       properties:
         dates:
           additionalProperties:
@@ -3337,7 +4654,7 @@ components:
         Metric represents the metric type requested, represented by an
         Enumeration Type.
       example:
-        value: 1.4658129805029452
+        value: 3.616076749251911
       properties:
         value:
           format: double
@@ -3349,23 +4666,23 @@ components:
         step.
       example:
         percentiles:
-        - value: 1.2315135367772556
-          point: 7.386281948385884
-        - value: 1.2315135367772556
-          point: 7.386281948385884
+        - value: 4.145608029883936
+          point: 2.027123023002322
+        - value: 4.145608029883936
+          point: 2.027123023002322
         cdf:
-        - value: 1.2315135367772556
-          point: 7.386281948385884
-        - value: 1.2315135367772556
-          point: 7.386281948385884
+        - value: 4.145608029883936
+          point: 2.027123023002322
+        - value: 4.145608029883936
+          point: 2.027123023002322
       properties:
-        percentiles:
-          description: The percentile data points.
+        cdf:
+          description: The cumulative distribution function (CDF) data points.
           items:
             $ref: '#/components/schemas/PercentileDataPoint'
           type: array
-        cdf:
-          description: The cumulative distribution function (CDF) data points.
+        percentiles:
+          description: The percentile data points.
           items:
             $ref: '#/components/schemas/PercentileDataPoint'
           type: array
@@ -3380,13 +4697,15 @@ components:
           key: '{}'
         tracking:
           sequence: 0
-          query_id: query_id
-          field: field
           data:
             key: data
+          field: field
+          query_id: query_id
       properties:
         pipeline:
           $ref: '#/components/schemas/QueryCollectionRequestPipeline'
+        tracking:
+          $ref: '#/components/schemas/QueryCollectionRequestTracking'
         variables:
           additionalProperties:
             type: object
@@ -3422,8 +4741,6 @@ components:
             { "q": "search terms", "sort": "-name" }
             ```
           type: object
-        tracking:
-          $ref: '#/components/schemas/QueryCollectionRequestTracking'
       required:
       - variables
       type: object
@@ -3451,13 +4768,22 @@ components:
     QueryCollectionRequestTracking:
       example:
         sequence: 0
-        query_id: query_id
-        field: field
         data:
           key: data
+        field: field
+        query_id: query_id
       properties:
-        type:
-          $ref: '#/components/schemas/QueryCollectionRequestTrackingType'
+        data:
+          additionalProperties:
+            type: string
+          description: Custom values to be included in tracking data.
+          type: object
+        field:
+          description: |-
+            Tracking field used to identify records in the collection.
+
+            Must be unique schema field.
+          type: string
         query_id:
           description: Query ID of the query. If this is empty, then one is generated.
           type: string
@@ -3465,17 +4791,8 @@ components:
           description: Sequence number of query.
           format: int32
           type: integer
-        field:
-          description: |-
-            Tracking field used to identify records in the collection.
-
-            Must be unique schema field.
-          type: string
-        data:
-          additionalProperties:
-            type: string
-          description: Custom values to be included in tracking data.
-          type: object
+        type:
+          $ref: '#/components/schemas/QueryCollectionRequestTrackingType'
       type: object
     QueryCollectionRequestTrackingType:
       default: TYPE_UNSPECIFIED
@@ -3485,16 +4802,15 @@ components:
          - NONE: No tracking.
          - CLICK: Click tracking.
 
-        A click token will be generated for each result. Results which do not
-        receive clicks will fall down rankings, and similarly low-ranked
-        records which receive clicks will be moved up the rankings.
+        A click token is be generated for each result. Results which do not
+        receive clicks fall down the rankings, and similarly low-ranked
+        records which receive clicks are moved up the rankings.
          - POS_NEG: Pos/neg tracking.
 
-        Pos/neg tokens will be generated for each result. Each record in the
-        result set can be marked with pos/neg value for the search. This is
-        then fed back into the ranking algorithm to improve future results.
-        Unlike `CLICK`, if no tokens are reported for records then no action is
-        taken.
+        Pos/neg tokens are generated for each result. Each record in the result
+        set can be marked with pos/neg value for the search. This is then fed
+        back into the ranking algorithm to improve future results. Unlike
+        `CLICK`, if no tokens are reported for records then no action is taken.
       enum:
       - TYPE_UNSPECIFIED
       - NONE
@@ -3508,105 +4824,130 @@ components:
           version: version
         variables:
           key: '{}'
+        feature_score_weight: 7.386281948385884
         redirects:
           key:
             id: id
             target: target
             token: token
         processing_duration: processing_duration
-        total_size: total_size
         aggregate_filters:
           key:
             date:
               dates:
-                key: 2
+                key: 9
             percentile:
               percentiles:
-              - value: 1.2315135367772556
-                point: 7.386281948385884
-              - value: 1.2315135367772556
-                point: 7.386281948385884
+              - value: 4.145608029883936
+                point: 2.027123023002322
+              - value: 4.145608029883936
+                point: 2.027123023002322
               cdf:
-              - value: 1.2315135367772556
-                point: 7.386281948385884
-              - value: 1.2315135367772556
-                point: 7.386281948385884
+              - value: 4.145608029883936
+                point: 2.027123023002322
+              - value: 4.145608029883936
+                point: 2.027123023002322
             metric:
-              value: 1.4658129805029452
+              value: 3.616076749251911
             buckets:
               buckets:
                 key:
+                  count: 2
                   name: name
-                  count: 5
             count:
               counts:
-                key: 5
+                key: 7
             analysis:
-              coverage: 7
-              min_length: 3
-              avg_length: 4.145608
-              cardinality: 9
-              max_length: 2
+              coverage: 1
+              avg_length: 0.8008282
+              min_length: 5
+              cardinality: 6
+              max_length: 5
+        total_size: total_size
         aggregates:
           key:
             date:
               dates:
-                key: 2
+                key: 9
             percentile:
               percentiles:
-              - value: 1.2315135367772556
-                point: 7.386281948385884
-              - value: 1.2315135367772556
-                point: 7.386281948385884
+              - value: 4.145608029883936
+                point: 2.027123023002322
+              - value: 4.145608029883936
+                point: 2.027123023002322
               cdf:
-              - value: 1.2315135367772556
-                point: 7.386281948385884
-              - value: 1.2315135367772556
-                point: 7.386281948385884
+              - value: 4.145608029883936
+                point: 2.027123023002322
+              - value: 4.145608029883936
+                point: 2.027123023002322
             metric:
-              value: 1.4658129805029452
+              value: 3.616076749251911
             buckets:
               buckets:
                 key:
+                  count: 2
                   name: name
-                  count: 5
             count:
               counts:
-                key: 5
+                key: 7
             analysis:
-              coverage: 7
-              min_length: 3
-              avg_length: 4.145608
-              cardinality: 9
-              max_length: 2
+              coverage: 1
+              avg_length: 0.8008282
+              min_length: 5
+              cardinality: 6
+              max_length: 5
         active_promotions:
         - active_pins:
-          - '{}'
-          - '{}'
+          - position: 6
+            key:
+              field: field
+              value: value
+          - position: 6
+            key:
+              field: field
+              value: value
           promotion_id: promotion_id
           active_exclusions:
-          - '{}'
-          - '{}'
+          - key:
+              field: field
+              value: value
+          - key:
+              field: field
+              value: value
         - active_pins:
-          - '{}'
-          - '{}'
+          - position: 6
+            key:
+              field: field
+              value: value
+          - position: 6
+            key:
+              field: field
+              value: value
           promotion_id: promotion_id
           active_exclusions:
-          - '{}'
-          - '{}'
+          - key:
+              field: field
+              value: value
+          - key:
+              field: field
+              value: value
         results:
-        - score: 0.8008281904610115
+        - score: 6.84685269835264
+          feature_score: 1.2315135367772556
           record: '{}'
-          index_score: 6.027456183070403
+          index_score: 1.0246457001441578
+          neural_score: 1.4894159098541704
           token:
             pos_neg:
               neg: neg
               pos: pos
             click:
               token: token
-        - score: 0.8008281904610115
+        - score: 6.84685269835264
+          feature_score: 1.2315135367772556
           record: '{}'
-          index_score: 6.027456183070403
+          index_score: 1.0246457001441578
+          neural_score: 1.4894159098541704
           token:
             pos_neg:
               neg: neg
@@ -3614,14 +4955,44 @@ components:
             click:
               token: token
       properties:
+        active_promotions:
+          description: A list of the promotions activated when running the query.
+          items:
+            $ref: '#/components/schemas/ActivePromotion'
+          type: array
+        aggregate_filters:
+          additionalProperties:
+            $ref: '#/components/schemas/QueryAggregateResult'
+          description: The aggregates run with filters.
+          type: object
+        aggregates:
+          additionalProperties:
+            $ref: '#/components/schemas/QueryAggregateResult'
+          description: The aggregates returned by the query.
+          type: object
+        feature_score_weight:
+          description: |-
+            The weight applied to the features in the query, used for analyzing the
+            index, neural and feature components for results.
+
+            For each result:
+
+            ```
+            score = max(index_score, neural_score) * (1 - feature_score_weight) +
+                    feature_score * feature_score_weight
+            ```
+          format: double
+          type: number
         pipeline:
           $ref: '#/components/schemas/QueryCollectionResponsePipeline'
-        variables:
+        processing_duration:
+          description: The total time taken to perform the query.
+          type: string
+        redirects:
           additionalProperties:
-            type: object
-          description: |-
-            The modified variables returned by the pipeline after it has finished
-            processing.
+            $ref: '#/components/schemas/RedirectResult'
+          description: A mapping of redirects triggered for all possible variations
+            of the query.
           type: object
         results:
           description: The results returned by the query.
@@ -3632,30 +5003,13 @@ components:
           description: The total number of results that match the query.
           format: int64
           type: string
-        processing_duration:
-          description: The total time taken to perform the query.
-          type: string
-        aggregates:
+        variables:
           additionalProperties:
-            $ref: '#/components/schemas/QueryAggregateResult'
-          description: The aggregates returned by the query.
+            type: object
+          description: |-
+            The modified variables returned by the pipeline after it has finished
+            processing.
           type: object
-        aggregate_filters:
-          additionalProperties:
-            $ref: '#/components/schemas/QueryAggregateResult'
-          description: The aggregates run with filters.
-          type: object
-        redirects:
-          additionalProperties:
-            $ref: '#/components/schemas/RedirectResult'
-          description: A mapping of redirects triggered for all possible variations
-            of the query.
-          type: object
-        active_promotions:
-          description: A list of the promotions activated when running the query.
-          items:
-            $ref: '#/components/schemas/ActivePromotion'
-          type: array
       type: object
     QueryCollectionResponsePipeline:
       description: The resolved query pipeline that was used to run the query.
@@ -3672,9 +5026,11 @@ components:
       type: object
     QueryResult:
       example:
-        score: 0.8008281904610115
+        score: 6.84685269835264
+        feature_score: 1.2315135367772556
         record: '{}'
-        index_score: 6.027456183070403
+        index_score: 1.0246457001441578
+        neural_score: 1.4894159098541704
         token:
           pos_neg:
             neg: neg
@@ -3682,18 +5038,43 @@ components:
           click:
             token: token
       properties:
+        feature_score:
+          description: |-
+            The feature score of the result.
+
+            This is a value between 0 and 1 representing the business-specific ranking
+            of the result as determined by the ranking adjustments. See [Ranking
+            adjustments](https://docs.search.io/documentation/fundamentals/search-settings/ranking-adjustments)
+            for more information.
+          format: double
+          type: number
+        index_score:
+          description: |-
+            The index score of the result.
+
+            This is a value between 0 and 1 representing the relevance of the result
+            using traditional keyword search. The higher the score the more relevant
+            the result is.
+          format: double
+          type: number
+        neural_score:
+          description: |-
+            The neural score of the result.
+
+            This is a value between 0 and 1 representing the relevance of the result
+            using Neuralsearch®, using AI-based search.
+          format: double
+          type: number
         record:
           description: An object made up of field-value pairs that contains the record
             data.
           type: object
         score:
           description: |-
-            The normalized score attributed to this record.
-            Combines the index score and feature score.
-          format: double
-          type: number
-        index_score:
-          description: Index score.
+            The overall relevance of the result.
+
+            This is a value between 0 and 1 that combines the index, neural and feature
+            scores. The higher the score the more relevant the result is.
           format: double
           type: number
         token:
@@ -3732,9 +5113,9 @@ components:
         neg: neg
         pos: pos
       properties:
-        pos:
-          type: string
         neg:
+          type: string
+        pos:
           type: string
       type: object
     RecordKey:
@@ -3758,36 +5139,42 @@ components:
       description: |-
         Redirect contains a target that you can redirect users to if their search
         query matches a certain condition.
+      example:
+        collection_id: collection_id
+        condition: condition
+        update_time: 2000-01-23T04:56:07.000+00:00
+        create_time: 2000-01-23T04:56:07.000+00:00
+        disabled: true
+        id: id
+        target: target
       properties:
-        id:
-          description: Output only. The redirect's ID.
-          readOnly: true
-          type: string
         collection_id:
           description: Output only. The ID of the collection that owns this redirect.
           readOnly: true
+          type: string
+        condition:
+          description: |-
+            A condition expression applied to a search request that determines whether
+            a search is redirected.
+
+            For example, to redirect if the user's query is `apples`, set condition to
+            `q = 'apples'`.
           type: string
         create_time:
           description: Output only. Time the redirect was created.
           format: date-time
           readOnly: true
           type: string
-        update_time:
-          description: Output only. Time the redirect was last updated.
-          format: date-time
+        disabled:
+          description: If disabled, the redirect is never triggered.
+          type: boolean
+        id:
+          description: Output only. The redirect's ID.
           readOnly: true
-          type: string
-        condition:
-          description: |-
-            Condition expression applied to a search request that determines whether a
-            search is redirected.
-
-            For example, to redirect if the user's query is `apples`, set condition to
-            `q = 'apples'`.
           type: string
         target:
           description: |-
-            Target to redirect the user to if their query matches `condition`.
+            The target to redirect the user to if their query matches `condition`.
 
             For searches performed in a browser, target is usually a URL but it can be
             any value that your integration can interpret as a redirect.
@@ -3796,9 +5183,11 @@ components:
             a URL template string. For apps, target might be a unique identifier used
             to send the user to the correct view.
           type: string
-        disabled:
-          description: If disabled, the redirect will never be triggered.
-          type: boolean
+        update_time:
+          description: Output only. Time the redirect was last updated.
+          format: date-time
+          readOnly: true
+          type: string
       required:
       - condition
       - target
@@ -3816,7 +5205,7 @@ components:
           description: The redirect's ID.
           type: string
         target:
-          description: Target to redirect the user to.
+          description: The target to redirect the user to.
           type: string
         token:
           description: |-
@@ -3834,16 +5223,6 @@ components:
         description: description
         array_length: 0
       properties:
-        name:
-          description: The name of the field.
-          type: string
-        description:
-          description: The description of the field.
-          type: string
-        type:
-          $ref: '#/components/schemas/SchemaFieldType'
-        mode:
-          $ref: '#/components/schemas/SchemaFieldMode'
         array:
           description: |-
             Array indicates if the field is an array of values.
@@ -3861,6 +5240,16 @@ components:
             to `true` and `array_length` to `4`.
           format: int32
           type: integer
+        description:
+          description: The description of the field.
+          type: string
+        mode:
+          $ref: '#/components/schemas/SchemaFieldMode'
+        name:
+          description: The name of the field.
+          type: string
+        type:
+          $ref: '#/components/schemas/SchemaFieldType'
       required:
       - mode
       - name
@@ -3913,6 +5302,19 @@ components:
         weight: 0
         token: token
       properties:
+        metadata:
+          additionalProperties:
+            type: object
+          description: |-
+            An object made up of field-value pairs that contains additional metadata to
+            record with the event.
+
+            Every value in the object must be one of the following primitive types:
+
+            - boolean
+            - number
+            - string
+          type: object
         name:
           description: The name of event, e.g. `click`, `purchase`.
           type: string
@@ -3931,19 +5333,6 @@ components:
             represents the profit.
           format: int32
           type: integer
-        metadata:
-          additionalProperties:
-            type: object
-          description: |-
-            An object made up of field-value pairs that contains additional metadata to
-            record with the event.
-
-            Every value in the object must be one of the following primitive types:
-
-            - boolean
-            - number
-            - string
-          type: object
       required:
       - name
       - token
@@ -3954,11 +5343,11 @@ components:
       example:
         pipeline: pipeline
       properties:
-        type:
-          $ref: '#/components/schemas/PipelineType'
         pipeline:
           description: The name of the pipeline to use when not otherwise specified.
           type: string
+        type:
+          $ref: '#/components/schemas/PipelineType'
       required:
       - pipeline
       - type
@@ -3987,7 +5376,7 @@ components:
         You can find out more about this error model and how to work with it in the
         [API Design Guide](https://cloud.google.com/apis/design/errors).
       example:
-        code: 5
+        code: 6
         details:
         - value: value
           type_url: type_url
@@ -3999,12 +5388,6 @@ components:
           description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
           format: int32
           type: integer
-        message:
-          description: |-
-            A developer-facing error message, which should be in English. Any
-            user-facing error message should be localized and sent in the
-            [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
-          type: string
         details:
           description: |-
             A list of messages that carry the error details.  There is a common set of
@@ -4012,6 +5395,41 @@ components:
           items:
             $ref: '#/components/schemas/protobufAny'
           type: array
+        message:
+          description: |-
+            A developer-facing error message, which should be in English. Any
+            user-facing error message should be localized and sent in the
+            [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+          type: string
+      type: object
+    UpdateRecordRequest:
+      example:
+        record:
+          key: '{}'
+        update_mask: update_mask
+        key:
+          field: field
+          value: value
+      properties:
+        key:
+          $ref: '#/components/schemas/RecordKey'
+        record:
+          additionalProperties:
+            type: object
+          description: The record to update.
+          type: object
+        update_mask:
+          description: |-
+            The list of fields to be updated, separated by a comma, e.g.
+            `field1,field2`.
+
+            For each field that you want to update, provide a corresponding value in
+            the record object containing the new value.
+          type: string
+      required:
+      - key
+      - record
+      - update_mask
       type: object
     UpsertRecordRequest:
       example:
@@ -4213,7 +5631,7 @@ components:
   securitySchemes:
     BasicAuth:
       description: |-
-        The Sajari API uses API keys to authenticate requests.
+        The Search.io API uses API keys to authenticate requests.
 
         You should provide either your account's API key or your collection's API key. The type of key you provide depends on the required level of access for the request you are making. To administer your account (e.g. create and delete collections) you should provide an account key. For most other requests (e.g. query collection) you should provide a collection key.
 
@@ -4221,10 +5639,10 @@ components:
 
         Authentication to the API is performed via [HTTP Basic Auth](http://en.wikipedia.org/wiki/Basic_access_authentication). Provide your API key ID as the basic auth username value. Provide your API key secret as the basic auth password value.
 
-        ```$ curl https://api-gateway.sajari.com -u <key_id>:<key_secret>```
+        ```$ curl https://api.search.io -u <key_id>:<key_secret>```
 
-        You can find your account's API keys in the [Sajari Console account credentials](https://www.sajari.com/console/project/credentials) page. You can find your collection's API keys in the [Sajari Console collection credentials](https://www.sajari.com/console/collection/credentials) page.
+        You can find your account's API keys in the [Search.io Console account credentials](https://app.search.io/project/credentials) page. You can find your collection's API keys in the [Search.io Console collection credentials](https://app.search.io/collection/credentials) page.
 
-        All API requests must be made over [HTTPS](http://en.wikipedia.org/wiki/HTTP_Secure). Calls made over plain HTTP will fail. API requests without authentication will also fail.
+        All API requests must be made over [HTTPS](http://en.wikipedia.org/wiki/HTTP_Secure). Calls made over plain HTTP fail. API requests without authentication also fail.
       scheme: basic
       type: http

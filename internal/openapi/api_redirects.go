@@ -24,35 +24,34 @@ var (
 	_ _context.Context
 )
 
-// RecordsApiService RecordsApi service
-type RecordsApiService service
+// RedirectsApiService RedirectsApi service
+type RedirectsApiService service
 
-type ApiBatchUpsertRecordsRequest struct {
-	ctx                       _context.Context
-	ApiService                *RecordsApiService
-	collectionId              string
-	batchUpsertRecordsRequest *BatchUpsertRecordsRequest
+type ApiCreateRedirectRequest struct {
+	ctx          _context.Context
+	ApiService   *RedirectsApiService
+	collectionId string
+	redirect     *Redirect
 }
 
-func (r ApiBatchUpsertRecordsRequest) BatchUpsertRecordsRequest(batchUpsertRecordsRequest BatchUpsertRecordsRequest) ApiBatchUpsertRecordsRequest {
-	r.batchUpsertRecordsRequest = &batchUpsertRecordsRequest
+func (r ApiCreateRedirectRequest) Redirect(redirect Redirect) ApiCreateRedirectRequest {
+	r.redirect = &redirect
 	return r
 }
 
-func (r ApiBatchUpsertRecordsRequest) Execute() (BatchUpsertRecordsResponse, *_nethttp.Response, error) {
-	return r.ApiService.BatchUpsertRecordsExecute(r)
+func (r ApiCreateRedirectRequest) Execute() (Redirect, *_nethttp.Response, error) {
+	return r.ApiService.CreateRedirectExecute(r)
 }
 
 /*
- * BatchUpsertRecords Batch upsert records
- * The batch version of the
-[UpsertRecord](/api#operation/UpsertRecord) call.
+ * CreateRedirect Create redirect
+ * Create a new redirect in a collection.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param collectionId The collection to upsert the records in, e.g. `my-collection`.
- * @return ApiBatchUpsertRecordsRequest
-*/
-func (a *RecordsApiService) BatchUpsertRecords(ctx _context.Context, collectionId string) ApiBatchUpsertRecordsRequest {
-	return ApiBatchUpsertRecordsRequest{
+ * @param collectionId The collection to create a redirect in, e.g. `my-collection`.
+ * @return ApiCreateRedirectRequest
+ */
+func (a *RedirectsApiService) CreateRedirect(ctx _context.Context, collectionId string) ApiCreateRedirectRequest {
+	return ApiCreateRedirectRequest{
 		ApiService:   a,
 		ctx:          ctx,
 		collectionId: collectionId,
@@ -61,31 +60,31 @@ func (a *RecordsApiService) BatchUpsertRecords(ctx _context.Context, collectionI
 
 /*
  * Execute executes the request
- * @return BatchUpsertRecordsResponse
+ * @return Redirect
  */
-func (a *RecordsApiService) BatchUpsertRecordsExecute(r ApiBatchUpsertRecordsRequest) (BatchUpsertRecordsResponse, *_nethttp.Response, error) {
+func (a *RedirectsApiService) CreateRedirectExecute(r ApiCreateRedirectRequest) (Redirect, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  BatchUpsertRecordsResponse
+		localVarReturnValue  Redirect
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RecordsApiService.BatchUpsertRecords")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RedirectsApiService.CreateRedirect")
 	if err != nil {
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4/collections/{collection_id}/records:batchUpsert"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/redirects"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.batchUpsertRecordsRequest == nil {
-		return localVarReturnValue, nil, reportError("batchUpsertRecordsRequest is required and must be specified")
+	if r.redirect == nil {
+		return localVarReturnValue, nil, reportError("redirect is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -106,7 +105,7 @@ func (a *RecordsApiService) BatchUpsertRecordsExecute(r ApiBatchUpsertRecordsReq
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.batchUpsertRecordsRequest
+	localVarPostBody = r.redirect
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -190,34 +189,33 @@ func (a *RecordsApiService) BatchUpsertRecordsExecute(r ApiBatchUpsertRecordsReq
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiDeleteRecordRequest struct {
-	ctx                 _context.Context
-	ApiService          *RecordsApiService
-	collectionId        string
-	deleteRecordRequest *DeleteRecordRequest
+type ApiDeleteRedirectRequest struct {
+	ctx          _context.Context
+	ApiService   *RedirectsApiService
+	collectionId string
+	redirectId   string
 }
 
-func (r ApiDeleteRecordRequest) DeleteRecordRequest(deleteRecordRequest DeleteRecordRequest) ApiDeleteRecordRequest {
-	r.deleteRecordRequest = &deleteRecordRequest
-	return r
-}
-
-func (r ApiDeleteRecordRequest) Execute() (interface{}, *_nethttp.Response, error) {
-	return r.ApiService.DeleteRecordExecute(r)
+func (r ApiDeleteRedirectRequest) Execute() (interface{}, *_nethttp.Response, error) {
+	return r.ApiService.DeleteRedirectExecute(r)
 }
 
 /*
- * DeleteRecord Delete record
- * Delete a record with the given key.
+ * DeleteRedirect Delete redirect
+ * Delete a redirect and all of its associated data.
+
+> Note: This operation cannot be reversed.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param collectionId The collection that contains the record to delete, e.g. `my-collection`.
- * @return ApiDeleteRecordRequest
- */
-func (a *RecordsApiService) DeleteRecord(ctx _context.Context, collectionId string) ApiDeleteRecordRequest {
-	return ApiDeleteRecordRequest{
+ * @param collectionId The collection the redirect belongs to, e.g. `my-collection`.
+ * @param redirectId The redirect to delete, e.g. `1234`.
+ * @return ApiDeleteRedirectRequest
+*/
+func (a *RedirectsApiService) DeleteRedirect(ctx _context.Context, collectionId string, redirectId string) ApiDeleteRedirectRequest {
+	return ApiDeleteRedirectRequest{
 		ApiService:   a,
 		ctx:          ctx,
 		collectionId: collectionId,
+		redirectId:   redirectId,
 	}
 }
 
@@ -225,9 +223,9 @@ func (a *RecordsApiService) DeleteRecord(ctx _context.Context, collectionId stri
  * Execute executes the request
  * @return interface{}
  */
-func (a *RecordsApiService) DeleteRecordExecute(r ApiDeleteRecordRequest) (interface{}, *_nethttp.Response, error) {
+func (a *RedirectsApiService) DeleteRedirectExecute(r ApiDeleteRedirectRequest) (interface{}, *_nethttp.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodPost
+		localVarHTTPMethod   = _nethttp.MethodDelete
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -235,23 +233,21 @@ func (a *RecordsApiService) DeleteRecordExecute(r ApiDeleteRecordRequest) (inter
 		localVarReturnValue  interface{}
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RecordsApiService.DeleteRecord")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RedirectsApiService.DeleteRedirect")
 	if err != nil {
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4/collections/{collection_id}/records:delete"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/redirects/{redirect_id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"redirect_id"+"}", _neturl.PathEscape(parameterToString(r.redirectId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.deleteRecordRequest == nil {
-		return localVarReturnValue, nil, reportError("deleteRecordRequest is required and must be specified")
-	}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHTTPContentTypes := []string{}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -267,8 +263,6 @@ func (a *RecordsApiService) DeleteRecordExecute(r ApiDeleteRecordRequest) (inter
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	// body params
-	localVarPostBody = r.deleteRecordRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -352,31 +346,191 @@ func (a *RecordsApiService) DeleteRecordExecute(r ApiDeleteRecordRequest) (inter
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiGetRecordRequest struct {
-	ctx              _context.Context
-	ApiService       *RecordsApiService
-	collectionId     string
-	getRecordRequest *GetRecordRequest
+type ApiGetRedirectRequest struct {
+	ctx          _context.Context
+	ApiService   *RedirectsApiService
+	collectionId string
+	redirectId   string
 }
 
-func (r ApiGetRecordRequest) GetRecordRequest(getRecordRequest GetRecordRequest) ApiGetRecordRequest {
-	r.getRecordRequest = &getRecordRequest
-	return r
-}
-
-func (r ApiGetRecordRequest) Execute() (map[string]interface{}, *_nethttp.Response, error) {
-	return r.ApiService.GetRecordExecute(r)
+func (r ApiGetRedirectRequest) Execute() (Redirect, *_nethttp.Response, error) {
+	return r.ApiService.GetRedirectExecute(r)
 }
 
 /*
- * GetRecord Get record
- * Retrieve a record with the given key.
+ * GetRedirect Get redirect
+ * Retrieve the details of a redirect.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param collectionId The collection that contains the record to retrieve, e.g. `my-collection`.
- * @return ApiGetRecordRequest
+ * @param collectionId The collection that owns the redirect, e.g. `my-collection`.
+ * @param redirectId The redirect to retrieve, e.g. `1234`.
+ * @return ApiGetRedirectRequest
  */
-func (a *RecordsApiService) GetRecord(ctx _context.Context, collectionId string) ApiGetRecordRequest {
-	return ApiGetRecordRequest{
+func (a *RedirectsApiService) GetRedirect(ctx _context.Context, collectionId string, redirectId string) ApiGetRedirectRequest {
+	return ApiGetRedirectRequest{
+		ApiService:   a,
+		ctx:          ctx,
+		collectionId: collectionId,
+		redirectId:   redirectId,
+	}
+}
+
+/*
+ * Execute executes the request
+ * @return Redirect
+ */
+func (a *RedirectsApiService) GetRedirectExecute(r ApiGetRedirectRequest) (Redirect, *_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+		localVarReturnValue  Redirect
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RedirectsApiService.GetRedirect")
+	if err != nil {
+		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/redirects/{redirect_id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"redirect_id"+"}", _neturl.PathEscape(parameterToString(r.redirectId, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 401 {
+			var v Error
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 403 {
+			var v Error
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 404 {
+			var v Error
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v Error
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		var v Error
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiListRedirectsRequest struct {
+	ctx          _context.Context
+	ApiService   *RedirectsApiService
+	collectionId string
+	pageSize     *int32
+	pageToken    *string
+}
+
+func (r ApiListRedirectsRequest) PageSize(pageSize int32) ApiListRedirectsRequest {
+	r.pageSize = &pageSize
+	return r
+}
+func (r ApiListRedirectsRequest) PageToken(pageToken string) ApiListRedirectsRequest {
+	r.pageToken = &pageToken
+	return r
+}
+
+func (r ApiListRedirectsRequest) Execute() (ListRedirectsResponse, *_nethttp.Response, error) {
+	return r.ApiService.ListRedirectsExecute(r)
+}
+
+/*
+ * ListRedirects List redirects
+ * Retrieve a list of redirects in a collection.
+ * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param collectionId The collection that owns this set of redirects, e.g. `my-collection`.
+ * @return ApiListRedirectsRequest
+ */
+func (a *RedirectsApiService) ListRedirects(ctx _context.Context, collectionId string) ApiListRedirectsRequest {
+	return ApiListRedirectsRequest{
 		ApiService:   a,
 		ctx:          ctx,
 		collectionId: collectionId,
@@ -385,35 +539,38 @@ func (a *RecordsApiService) GetRecord(ctx _context.Context, collectionId string)
 
 /*
  * Execute executes the request
- * @return map[string]interface{}
+ * @return ListRedirectsResponse
  */
-func (a *RecordsApiService) GetRecordExecute(r ApiGetRecordRequest) (map[string]interface{}, *_nethttp.Response, error) {
+func (a *RedirectsApiService) ListRedirectsExecute(r ApiListRedirectsRequest) (ListRedirectsResponse, *_nethttp.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodPost
+		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  map[string]interface{}
+		localVarReturnValue  ListRedirectsResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RecordsApiService.GetRecord")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RedirectsApiService.ListRedirects")
 	if err != nil {
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4/collections/{collection_id}/records:get"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/redirects"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.getRecordRequest == nil {
-		return localVarReturnValue, nil, reportError("getRecordRequest is required and must be specified")
-	}
 
+	if r.pageSize != nil {
+		localVarQueryParams.Add("page_size", parameterToString(*r.pageSize, ""))
+	}
+	if r.pageToken != nil {
+		localVarQueryParams.Add("page_token", parameterToString(*r.pageToken, ""))
+	}
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHTTPContentTypes := []string{}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -429,8 +586,6 @@ func (a *RecordsApiService) GetRecordExecute(r ApiGetRecordRequest) (map[string]
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	// body params
-	localVarPostBody = r.getRecordRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -514,265 +669,104 @@ func (a *RecordsApiService) GetRecordExecute(r ApiGetRecordRequest) (map[string]
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiUpdateRecordRequest struct {
-	ctx                 _context.Context
-	ApiService          *RecordsApiService
-	collectionId        string
-	updateRecordRequest *UpdateRecordRequest
+type ApiUpdateRedirectRequest struct {
+	ctx          _context.Context
+	ApiService   *RedirectsApiService
+	collectionId string
+	redirectId   string
+	updateMask   *string
+	redirect     *Redirect
 }
 
-func (r ApiUpdateRecordRequest) UpdateRecordRequest(updateRecordRequest UpdateRecordRequest) ApiUpdateRecordRequest {
-	r.updateRecordRequest = &updateRecordRequest
+func (r ApiUpdateRedirectRequest) UpdateMask(updateMask string) ApiUpdateRedirectRequest {
+	r.updateMask = &updateMask
+	return r
+}
+func (r ApiUpdateRedirectRequest) Redirect(redirect Redirect) ApiUpdateRedirectRequest {
+	r.redirect = &redirect
 	return r
 }
 
-func (r ApiUpdateRecordRequest) Execute() (map[string]interface{}, *_nethttp.Response, error) {
-	return r.ApiService.UpdateRecordExecute(r)
+func (r ApiUpdateRedirectRequest) Execute() (Redirect, *_nethttp.Response, error) {
+	return r.ApiService.UpdateRedirectExecute(r)
 }
 
 /*
- * UpdateRecord Update record
- * Add or update specific fields within a record with the given values. The
-updated record is returned in the response.
+ * UpdateRedirect Update redirect
+ * Update the details of a redirect.
 
-To replace all fields in a record, you should use the
-[UpsertRecord](/api#operation/UpsertRecord) call.
+Pass each field that you want to update in the request body. Also specify
+the name of each field that you want to update in the `update_mask` in the
+request URL query string. Separate multiple fields with a comma. Fields
+included in the request body, but not included in the field mask are not
+updated.
 
-Note that the update record call cannot be used to add or update indexed
-or unique fields. For this case use the
-[UpsertRecord](/api#operation/UpsertRecord) call.
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param collectionId The collection that contains the record to update, e.g. `my-collection`.
- * @return ApiUpdateRecordRequest
-*/
-func (a *RecordsApiService) UpdateRecord(ctx _context.Context, collectionId string) ApiUpdateRecordRequest {
-	return ApiUpdateRecordRequest{
-		ApiService:   a,
-		ctx:          ctx,
-		collectionId: collectionId,
-	}
-}
+For example, to update the `condition` field, make a `PATCH` request to the
+URL:
 
-/*
- * Execute executes the request
- * @return map[string]interface{}
- */
-func (a *RecordsApiService) UpdateRecordExecute(r ApiUpdateRecordRequest) (map[string]interface{}, *_nethttp.Response, error) {
-	var (
-		localVarHTTPMethod   = _nethttp.MethodPost
-		localVarPostBody     interface{}
-		localVarFormFileName string
-		localVarFileName     string
-		localVarFileBytes    []byte
-		localVarReturnValue  map[string]interface{}
-	)
+```
+/v4/collections/{collection_id}/redirects/{redirect_id}?update_mask=condition
+```
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RecordsApiService.UpdateRecord")
-	if err != nil {
-		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
-	}
+With the JSON body:
 
-	localVarPath := localBasePath + "/v4/collections/{collection_id}/records:update"
-	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
-	if r.updateRecordRequest == nil {
-		return localVarReturnValue, nil, reportError("updateRecordRequest is required and must be specified")
-	}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = r.updateRecordRequest
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 401 {
-			var v Error
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		if localVarHTTPResponse.StatusCode == 403 {
-			var v Error
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v Error
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		if localVarHTTPResponse.StatusCode == 500 {
-			var v Error
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		var v Error
-		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-		if err != nil {
-			newErr.error = err.Error()
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		newErr.model = v
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-type ApiUpsertRecordRequest struct {
-	ctx                 _context.Context
-	ApiService          *RecordsApiService
-	collectionId        string
-	upsertRecordRequest *UpsertRecordRequest
-}
-
-func (r ApiUpsertRecordRequest) UpsertRecordRequest(upsertRecordRequest UpsertRecordRequest) ApiUpsertRecordRequest {
-	r.upsertRecordRequest = &upsertRecordRequest
-	return r
-}
-
-func (r ApiUpsertRecordRequest) Execute() (UpsertRecordResponse, *_nethttp.Response, error) {
-	return r.ApiService.UpsertRecordExecute(r)
-}
-
-/*
- * UpsertRecord Upsert record
- * If the record does not exist in the collection it is inserted. If it does
-exist it is updated.
-
-If no pipeline is specified, the default record pipeline is used to process
-the record.
-
-If the record is inserted, the response contains the key of the inserted
-record. You can use this if you need to retrieve or delete the record. If
-the record is updated, the response does not contain a key. Callers can use
-this as a signal to determine if the record is inserted/created or updated.
-
-For example, to add a single product from your ecommerce store to a
-collection, use the following call:
-
-```json
+```
 {
-  "pipeline": {
-    "name": "my-pipeline",
-    "version": "1"
-  },
-  "record": {
-    "id": "54hdc7h2334h",
-    "name": "Smart TV",
-    "price": 1999,
-    "brand": "Acme",
-    "description": "...",
-    "in_stock": true
-  }
+  "condition": "new value",
+  "target": "..."
 }
 ```
+
+> Note: In this example `target` is not updated because it is not specified
+in the `update_mask`.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param collectionId The collection to upsert the record in, e.g. `my-collection`.
- * @return ApiUpsertRecordRequest
+ * @param collectionId The collection the redirect belongs to, e.g. `my-collection`.
+ * @param redirectId The redirect to update, e.g. `1234`.
+ * @return ApiUpdateRedirectRequest
 */
-func (a *RecordsApiService) UpsertRecord(ctx _context.Context, collectionId string) ApiUpsertRecordRequest {
-	return ApiUpsertRecordRequest{
+func (a *RedirectsApiService) UpdateRedirect(ctx _context.Context, collectionId string, redirectId string) ApiUpdateRedirectRequest {
+	return ApiUpdateRedirectRequest{
 		ApiService:   a,
 		ctx:          ctx,
 		collectionId: collectionId,
+		redirectId:   redirectId,
 	}
 }
 
 /*
  * Execute executes the request
- * @return UpsertRecordResponse
+ * @return Redirect
  */
-func (a *RecordsApiService) UpsertRecordExecute(r ApiUpsertRecordRequest) (UpsertRecordResponse, *_nethttp.Response, error) {
+func (a *RedirectsApiService) UpdateRedirectExecute(r ApiUpdateRedirectRequest) (Redirect, *_nethttp.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodPost
+		localVarHTTPMethod   = _nethttp.MethodPatch
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  UpsertRecordResponse
+		localVarReturnValue  Redirect
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RecordsApiService.UpsertRecord")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RedirectsApiService.UpdateRedirect")
 	if err != nil {
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4/collections/{collection_id}/records:upsert"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/redirects/{redirect_id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"redirect_id"+"}", _neturl.PathEscape(parameterToString(r.redirectId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.upsertRecordRequest == nil {
-		return localVarReturnValue, nil, reportError("upsertRecordRequest is required and must be specified")
+	if r.updateMask == nil {
+		return localVarReturnValue, nil, reportError("updateMask is required and must be specified")
+	}
+	if r.redirect == nil {
+		return localVarReturnValue, nil, reportError("redirect is required and must be specified")
 	}
 
+	localVarQueryParams.Add("update_mask", parameterToString(*r.updateMask, ""))
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/json"}
 
@@ -791,7 +785,7 @@ func (a *RecordsApiService) UpsertRecordExecute(r ApiUpsertRecordRequest) (Upser
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.upsertRecordRequest
+	localVarPostBody = r.redirect
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err

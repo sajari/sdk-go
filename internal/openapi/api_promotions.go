@@ -24,35 +24,34 @@ var (
 	_ _context.Context
 )
 
-// RecordsApiService RecordsApi service
-type RecordsApiService service
+// PromotionsApiService PromotionsApi service
+type PromotionsApiService service
 
-type ApiBatchUpsertRecordsRequest struct {
-	ctx                       _context.Context
-	ApiService                *RecordsApiService
-	collectionId              string
-	batchUpsertRecordsRequest *BatchUpsertRecordsRequest
+type ApiCreatePromotionRequest struct {
+	ctx          _context.Context
+	ApiService   *PromotionsApiService
+	collectionId string
+	promotion    *Promotion
 }
 
-func (r ApiBatchUpsertRecordsRequest) BatchUpsertRecordsRequest(batchUpsertRecordsRequest BatchUpsertRecordsRequest) ApiBatchUpsertRecordsRequest {
-	r.batchUpsertRecordsRequest = &batchUpsertRecordsRequest
+func (r ApiCreatePromotionRequest) Promotion(promotion Promotion) ApiCreatePromotionRequest {
+	r.promotion = &promotion
 	return r
 }
 
-func (r ApiBatchUpsertRecordsRequest) Execute() (BatchUpsertRecordsResponse, *_nethttp.Response, error) {
-	return r.ApiService.BatchUpsertRecordsExecute(r)
+func (r ApiCreatePromotionRequest) Execute() (Promotion, *_nethttp.Response, error) {
+	return r.ApiService.CreatePromotionExecute(r)
 }
 
 /*
- * BatchUpsertRecords Batch upsert records
- * The batch version of the
-[UpsertRecord](/api#operation/UpsertRecord) call.
+ * CreatePromotion Create promotion
+ * Create a new promotion in a collection.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param collectionId The collection to upsert the records in, e.g. `my-collection`.
- * @return ApiBatchUpsertRecordsRequest
-*/
-func (a *RecordsApiService) BatchUpsertRecords(ctx _context.Context, collectionId string) ApiBatchUpsertRecordsRequest {
-	return ApiBatchUpsertRecordsRequest{
+ * @param collectionId The collection to create a promotion in, e.g. `my-collection`.
+ * @return ApiCreatePromotionRequest
+ */
+func (a *PromotionsApiService) CreatePromotion(ctx _context.Context, collectionId string) ApiCreatePromotionRequest {
+	return ApiCreatePromotionRequest{
 		ApiService:   a,
 		ctx:          ctx,
 		collectionId: collectionId,
@@ -61,31 +60,31 @@ func (a *RecordsApiService) BatchUpsertRecords(ctx _context.Context, collectionI
 
 /*
  * Execute executes the request
- * @return BatchUpsertRecordsResponse
+ * @return Promotion
  */
-func (a *RecordsApiService) BatchUpsertRecordsExecute(r ApiBatchUpsertRecordsRequest) (BatchUpsertRecordsResponse, *_nethttp.Response, error) {
+func (a *PromotionsApiService) CreatePromotionExecute(r ApiCreatePromotionRequest) (Promotion, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  BatchUpsertRecordsResponse
+		localVarReturnValue  Promotion
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RecordsApiService.BatchUpsertRecords")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PromotionsApiService.CreatePromotion")
 	if err != nil {
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4/collections/{collection_id}/records:batchUpsert"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/promotions"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.batchUpsertRecordsRequest == nil {
-		return localVarReturnValue, nil, reportError("batchUpsertRecordsRequest is required and must be specified")
+	if r.promotion == nil {
+		return localVarReturnValue, nil, reportError("promotion is required and must be specified")
 	}
 
 	// to determine the Content-Type header
@@ -106,7 +105,7 @@ func (a *RecordsApiService) BatchUpsertRecordsExecute(r ApiBatchUpsertRecordsReq
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.batchUpsertRecordsRequest
+	localVarPostBody = r.promotion
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -190,34 +189,33 @@ func (a *RecordsApiService) BatchUpsertRecordsExecute(r ApiBatchUpsertRecordsReq
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiDeleteRecordRequest struct {
-	ctx                 _context.Context
-	ApiService          *RecordsApiService
-	collectionId        string
-	deleteRecordRequest *DeleteRecordRequest
+type ApiDeletePromotionRequest struct {
+	ctx          _context.Context
+	ApiService   *PromotionsApiService
+	collectionId string
+	promotionId  string
 }
 
-func (r ApiDeleteRecordRequest) DeleteRecordRequest(deleteRecordRequest DeleteRecordRequest) ApiDeleteRecordRequest {
-	r.deleteRecordRequest = &deleteRecordRequest
-	return r
-}
-
-func (r ApiDeleteRecordRequest) Execute() (interface{}, *_nethttp.Response, error) {
-	return r.ApiService.DeleteRecordExecute(r)
+func (r ApiDeletePromotionRequest) Execute() (interface{}, *_nethttp.Response, error) {
+	return r.ApiService.DeletePromotionExecute(r)
 }
 
 /*
- * DeleteRecord Delete record
- * Delete a record with the given key.
+ * DeletePromotion Delete promotion
+ * Delete a promotion and all of its associated data.
+
+> Note: This operation cannot be reversed.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param collectionId The collection that contains the record to delete, e.g. `my-collection`.
- * @return ApiDeleteRecordRequest
- */
-func (a *RecordsApiService) DeleteRecord(ctx _context.Context, collectionId string) ApiDeleteRecordRequest {
-	return ApiDeleteRecordRequest{
+ * @param collectionId The collection the promotion belongs to, e.g. `my-collection`.
+ * @param promotionId The promotion to delete, e.g. `1234`.
+ * @return ApiDeletePromotionRequest
+*/
+func (a *PromotionsApiService) DeletePromotion(ctx _context.Context, collectionId string, promotionId string) ApiDeletePromotionRequest {
+	return ApiDeletePromotionRequest{
 		ApiService:   a,
 		ctx:          ctx,
 		collectionId: collectionId,
+		promotionId:  promotionId,
 	}
 }
 
@@ -225,9 +223,9 @@ func (a *RecordsApiService) DeleteRecord(ctx _context.Context, collectionId stri
  * Execute executes the request
  * @return interface{}
  */
-func (a *RecordsApiService) DeleteRecordExecute(r ApiDeleteRecordRequest) (interface{}, *_nethttp.Response, error) {
+func (a *PromotionsApiService) DeletePromotionExecute(r ApiDeletePromotionRequest) (interface{}, *_nethttp.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodPost
+		localVarHTTPMethod   = _nethttp.MethodDelete
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -235,23 +233,21 @@ func (a *RecordsApiService) DeleteRecordExecute(r ApiDeleteRecordRequest) (inter
 		localVarReturnValue  interface{}
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RecordsApiService.DeleteRecord")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PromotionsApiService.DeletePromotion")
 	if err != nil {
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4/collections/{collection_id}/records:delete"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/promotions/{promotion_id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"promotion_id"+"}", _neturl.PathEscape(parameterToString(r.promotionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.deleteRecordRequest == nil {
-		return localVarReturnValue, nil, reportError("deleteRecordRequest is required and must be specified")
-	}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHTTPContentTypes := []string{}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -267,8 +263,6 @@ func (a *RecordsApiService) DeleteRecordExecute(r ApiDeleteRecordRequest) (inter
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	// body params
-	localVarPostBody = r.deleteRecordRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -352,68 +346,63 @@ func (a *RecordsApiService) DeleteRecordExecute(r ApiDeleteRecordRequest) (inter
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiGetRecordRequest struct {
-	ctx              _context.Context
-	ApiService       *RecordsApiService
-	collectionId     string
-	getRecordRequest *GetRecordRequest
+type ApiGetPromotionRequest struct {
+	ctx          _context.Context
+	ApiService   *PromotionsApiService
+	collectionId string
+	promotionId  string
 }
 
-func (r ApiGetRecordRequest) GetRecordRequest(getRecordRequest GetRecordRequest) ApiGetRecordRequest {
-	r.getRecordRequest = &getRecordRequest
-	return r
-}
-
-func (r ApiGetRecordRequest) Execute() (map[string]interface{}, *_nethttp.Response, error) {
-	return r.ApiService.GetRecordExecute(r)
+func (r ApiGetPromotionRequest) Execute() (Promotion, *_nethttp.Response, error) {
+	return r.ApiService.GetPromotionExecute(r)
 }
 
 /*
- * GetRecord Get record
- * Retrieve a record with the given key.
+ * GetPromotion Get promotion
+ * Retrieve the details of a promotion.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param collectionId The collection that contains the record to retrieve, e.g. `my-collection`.
- * @return ApiGetRecordRequest
+ * @param collectionId The collection that owns the promotion, e.g. `my-collection`.
+ * @param promotionId The promotion to retrieve, e.g. `1234`.
+ * @return ApiGetPromotionRequest
  */
-func (a *RecordsApiService) GetRecord(ctx _context.Context, collectionId string) ApiGetRecordRequest {
-	return ApiGetRecordRequest{
+func (a *PromotionsApiService) GetPromotion(ctx _context.Context, collectionId string, promotionId string) ApiGetPromotionRequest {
+	return ApiGetPromotionRequest{
 		ApiService:   a,
 		ctx:          ctx,
 		collectionId: collectionId,
+		promotionId:  promotionId,
 	}
 }
 
 /*
  * Execute executes the request
- * @return map[string]interface{}
+ * @return Promotion
  */
-func (a *RecordsApiService) GetRecordExecute(r ApiGetRecordRequest) (map[string]interface{}, *_nethttp.Response, error) {
+func (a *PromotionsApiService) GetPromotionExecute(r ApiGetPromotionRequest) (Promotion, *_nethttp.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodPost
+		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  map[string]interface{}
+		localVarReturnValue  Promotion
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RecordsApiService.GetRecord")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PromotionsApiService.GetPromotion")
 	if err != nil {
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4/collections/{collection_id}/records:get"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/promotions/{promotion_id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"promotion_id"+"}", _neturl.PathEscape(parameterToString(r.promotionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.getRecordRequest == nil {
-		return localVarReturnValue, nil, reportError("getRecordRequest is required and must be specified")
-	}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHTTPContentTypes := []string{}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -429,8 +418,6 @@ func (a *RecordsApiService) GetRecordExecute(r ApiGetRecordRequest) (map[string]
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	// body params
-	localVarPostBody = r.getRecordRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -514,39 +501,38 @@ func (a *RecordsApiService) GetRecordExecute(r ApiGetRecordRequest) (map[string]
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiUpdateRecordRequest struct {
-	ctx                 _context.Context
-	ApiService          *RecordsApiService
-	collectionId        string
-	updateRecordRequest *UpdateRecordRequest
+type ApiListPromotionsRequest struct {
+	ctx          _context.Context
+	ApiService   *PromotionsApiService
+	collectionId string
+	pageSize     *int32
+	pageToken    *string
 }
 
-func (r ApiUpdateRecordRequest) UpdateRecordRequest(updateRecordRequest UpdateRecordRequest) ApiUpdateRecordRequest {
-	r.updateRecordRequest = &updateRecordRequest
+func (r ApiListPromotionsRequest) PageSize(pageSize int32) ApiListPromotionsRequest {
+	r.pageSize = &pageSize
+	return r
+}
+func (r ApiListPromotionsRequest) PageToken(pageToken string) ApiListPromotionsRequest {
+	r.pageToken = &pageToken
 	return r
 }
 
-func (r ApiUpdateRecordRequest) Execute() (map[string]interface{}, *_nethttp.Response, error) {
-	return r.ApiService.UpdateRecordExecute(r)
+func (r ApiListPromotionsRequest) Execute() (ListPromotionsResponse, *_nethttp.Response, error) {
+	return r.ApiService.ListPromotionsExecute(r)
 }
 
 /*
- * UpdateRecord Update record
- * Add or update specific fields within a record with the given values. The
-updated record is returned in the response.
+ * ListPromotions List promotions
+ * Retrieve a list of promotions in a collection.
 
-To replace all fields in a record, you should use the
-[UpsertRecord](/api#operation/UpsertRecord) call.
-
-Note that the update record call cannot be used to add or update indexed
-or unique fields. For this case use the
-[UpsertRecord](/api#operation/UpsertRecord) call.
+Promotion pins, exclusions and filter boosts are not returned in this call.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param collectionId The collection that contains the record to update, e.g. `my-collection`.
- * @return ApiUpdateRecordRequest
+ * @param collectionId The collection that owns this set of promotions, e.g. `my-collection`.
+ * @return ApiListPromotionsRequest
 */
-func (a *RecordsApiService) UpdateRecord(ctx _context.Context, collectionId string) ApiUpdateRecordRequest {
-	return ApiUpdateRecordRequest{
+func (a *PromotionsApiService) ListPromotions(ctx _context.Context, collectionId string) ApiListPromotionsRequest {
+	return ApiListPromotionsRequest{
 		ApiService:   a,
 		ctx:          ctx,
 		collectionId: collectionId,
@@ -555,35 +541,38 @@ func (a *RecordsApiService) UpdateRecord(ctx _context.Context, collectionId stri
 
 /*
  * Execute executes the request
- * @return map[string]interface{}
+ * @return ListPromotionsResponse
  */
-func (a *RecordsApiService) UpdateRecordExecute(r ApiUpdateRecordRequest) (map[string]interface{}, *_nethttp.Response, error) {
+func (a *PromotionsApiService) ListPromotionsExecute(r ApiListPromotionsRequest) (ListPromotionsResponse, *_nethttp.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodPost
+		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  map[string]interface{}
+		localVarReturnValue  ListPromotionsResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RecordsApiService.UpdateRecord")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PromotionsApiService.ListPromotions")
 	if err != nil {
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4/collections/{collection_id}/records:update"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/promotions"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.updateRecordRequest == nil {
-		return localVarReturnValue, nil, reportError("updateRecordRequest is required and must be specified")
-	}
 
+	if r.pageSize != nil {
+		localVarQueryParams.Add("page_size", parameterToString(*r.pageSize, ""))
+	}
+	if r.pageToken != nil {
+		localVarQueryParams.Add("page_token", parameterToString(*r.pageToken, ""))
+	}
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHTTPContentTypes := []string{}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -599,8 +588,6 @@ func (a *RecordsApiService) UpdateRecordExecute(r ApiUpdateRecordRequest) (map[s
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	// body params
-	localVarPostBody = r.updateRecordRequest
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -684,95 +671,105 @@ func (a *RecordsApiService) UpdateRecordExecute(r ApiUpdateRecordRequest) (map[s
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiUpsertRecordRequest struct {
-	ctx                 _context.Context
-	ApiService          *RecordsApiService
-	collectionId        string
-	upsertRecordRequest *UpsertRecordRequest
+type ApiUpdatePromotionRequest struct {
+	ctx          _context.Context
+	ApiService   *PromotionsApiService
+	collectionId string
+	promotionId  string
+	updateMask   *string
+	promotion    *Promotion
 }
 
-func (r ApiUpsertRecordRequest) UpsertRecordRequest(upsertRecordRequest UpsertRecordRequest) ApiUpsertRecordRequest {
-	r.upsertRecordRequest = &upsertRecordRequest
+func (r ApiUpdatePromotionRequest) UpdateMask(updateMask string) ApiUpdatePromotionRequest {
+	r.updateMask = &updateMask
+	return r
+}
+func (r ApiUpdatePromotionRequest) Promotion(promotion Promotion) ApiUpdatePromotionRequest {
+	r.promotion = &promotion
 	return r
 }
 
-func (r ApiUpsertRecordRequest) Execute() (UpsertRecordResponse, *_nethttp.Response, error) {
-	return r.ApiService.UpsertRecordExecute(r)
+func (r ApiUpdatePromotionRequest) Execute() (Promotion, *_nethttp.Response, error) {
+	return r.ApiService.UpdatePromotionExecute(r)
 }
 
 /*
- * UpsertRecord Upsert record
- * If the record does not exist in the collection it is inserted. If it does
-exist it is updated.
+ * UpdatePromotion Update promotion
+ * Update the details of a promotion.
 
-If no pipeline is specified, the default record pipeline is used to process
-the record.
+Pass each field that you want to update in the request body. Also specify
+the name of each field that you want to update in the `update_mask` in the
+request URL query string. Separate multiple fields with a comma. Fields
+included in the request body, but not included in the field mask are not
+updated.
 
-If the record is inserted, the response contains the key of the inserted
-record. You can use this if you need to retrieve or delete the record. If
-the record is updated, the response does not contain a key. Callers can use
-this as a signal to determine if the record is inserted/created or updated.
+For example, to update the `display_name` and `start_time` fields, make a
+`PATCH` request to the URL:
 
-For example, to add a single product from your ecommerce store to a
-collection, use the following call:
+```
+/v4/collections/{collection_id}/promotions/{promotion_id}?update_mask=display_name,start_time
+```
 
-```json
+With the JSON body:
+
+```
 {
-  "pipeline": {
-    "name": "my-pipeline",
-    "version": "1"
-  },
-  "record": {
-    "id": "54hdc7h2334h",
-    "name": "Smart TV",
-    "price": 1999,
-    "brand": "Acme",
-    "description": "...",
-    "in_stock": true
-  }
+  "display_name": "new value",
+  "start_time": "2006-01-02T15:04:05Z07:00",
+  "end_time": "2006-01-02T15:04:05Z07:00"
 }
 ```
+
+> Note: In this example `end_time` is not updated because it is not
+specified in the `update_mask`.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param collectionId The collection to upsert the record in, e.g. `my-collection`.
- * @return ApiUpsertRecordRequest
+ * @param collectionId The collection the promotion belongs to, e.g. `my-collection`.
+ * @param promotionId The promotion to update, e.g. `1234`.
+ * @return ApiUpdatePromotionRequest
 */
-func (a *RecordsApiService) UpsertRecord(ctx _context.Context, collectionId string) ApiUpsertRecordRequest {
-	return ApiUpsertRecordRequest{
+func (a *PromotionsApiService) UpdatePromotion(ctx _context.Context, collectionId string, promotionId string) ApiUpdatePromotionRequest {
+	return ApiUpdatePromotionRequest{
 		ApiService:   a,
 		ctx:          ctx,
 		collectionId: collectionId,
+		promotionId:  promotionId,
 	}
 }
 
 /*
  * Execute executes the request
- * @return UpsertRecordResponse
+ * @return Promotion
  */
-func (a *RecordsApiService) UpsertRecordExecute(r ApiUpsertRecordRequest) (UpsertRecordResponse, *_nethttp.Response, error) {
+func (a *PromotionsApiService) UpdatePromotionExecute(r ApiUpdatePromotionRequest) (Promotion, *_nethttp.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodPost
+		localVarHTTPMethod   = _nethttp.MethodPatch
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  UpsertRecordResponse
+		localVarReturnValue  Promotion
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RecordsApiService.UpsertRecord")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PromotionsApiService.UpdatePromotion")
 	if err != nil {
 		return localVarReturnValue, nil, GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v4/collections/{collection_id}/records:upsert"
+	localVarPath := localBasePath + "/v4/collections/{collection_id}/promotions/{promotion_id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"collection_id"+"}", _neturl.PathEscape(parameterToString(r.collectionId, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"promotion_id"+"}", _neturl.PathEscape(parameterToString(r.promotionId, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
-	if r.upsertRecordRequest == nil {
-		return localVarReturnValue, nil, reportError("upsertRecordRequest is required and must be specified")
+	if r.updateMask == nil {
+		return localVarReturnValue, nil, reportError("updateMask is required and must be specified")
+	}
+	if r.promotion == nil {
+		return localVarReturnValue, nil, reportError("promotion is required and must be specified")
 	}
 
+	localVarQueryParams.Add("update_mask", parameterToString(*r.updateMask, ""))
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/json"}
 
@@ -791,7 +788,7 @@ func (a *RecordsApiService) UpsertRecordExecute(r ApiUpsertRecordRequest) (Upser
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.upsertRecordRequest
+	localVarPostBody = r.promotion
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
