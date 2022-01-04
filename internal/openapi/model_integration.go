@@ -16,45 +16,77 @@ import (
 	"time"
 )
 
-// Redirect Redirect contains a target that you can redirect users to if their search query matches a certain condition.
-type Redirect struct {
-	// Output only. The ID of the collection that owns this redirect.
+// Integration Integration contains integration config, e.g. filters and sort options.
+type Integration struct {
+	// Output only. The ID of the account that owns the collection, e.g. `1618535966441231024`.
+	AccountId *string `json:"account_id,omitempty"`
+	// Output only. The ID of the collection that owns this integration, e.g. `my-collection`.
 	CollectionId *string `json:"collection_id,omitempty"`
-	// A condition expression applied to a search request that determines whether a search is redirected.  For example, to redirect if the user's query is `apples`, set condition to `q = 'apples'`.
-	Condition string `json:"condition"`
-	// Output only. Time the redirect was created.
+	// The integration's config.
+	Config map[string]interface{} `json:"config"`
+	// Output only. The time the integration was created.
 	CreateTime *time.Time `json:"create_time,omitempty"`
-	// If disabled, the redirect is never triggered.
-	Disabled *bool `json:"disabled,omitempty"`
-	// Output only. The redirect's ID.
+	// The integration's display name.
+	DisplayName string `json:"display_name"`
+	// Output only. The integration's ID.
 	Id *string `json:"id,omitempty"`
-	// The target to redirect the user to if their query matches `condition`.  For searches performed in a browser, target is usually a URL but it can be any value that your integration can interpret as a redirect.  For example, for URLs that you need to resolve at runtime, target might be a URL template string. For apps, target might be a unique identifier used to send the user to the correct view.
-	Target string `json:"target"`
-	// Output only. Time the redirect was last updated.
+	// Output only. The time the integration was last updated.
 	UpdateTime *time.Time `json:"update_time,omitempty"`
 }
 
-// NewRedirect instantiates a new Redirect object
+// NewIntegration instantiates a new Integration object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewRedirect(condition string, target string) *Redirect {
-	this := Redirect{}
-	this.Condition = condition
-	this.Target = target
+func NewIntegration(config map[string]interface{}, displayName string) *Integration {
+	this := Integration{}
+	this.Config = config
+	this.DisplayName = displayName
 	return &this
 }
 
-// NewRedirectWithDefaults instantiates a new Redirect object
+// NewIntegrationWithDefaults instantiates a new Integration object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewRedirectWithDefaults() *Redirect {
-	this := Redirect{}
+func NewIntegrationWithDefaults() *Integration {
+	this := Integration{}
 	return &this
+}
+
+// GetAccountId returns the AccountId field value if set, zero value otherwise.
+func (o *Integration) GetAccountId() string {
+	if o == nil || o.AccountId == nil {
+		var ret string
+		return ret
+	}
+	return *o.AccountId
+}
+
+// GetAccountIdOk returns a tuple with the AccountId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Integration) GetAccountIdOk() (*string, bool) {
+	if o == nil || o.AccountId == nil {
+		return nil, false
+	}
+	return o.AccountId, true
+}
+
+// HasAccountId returns a boolean if a field has been set.
+func (o *Integration) HasAccountId() bool {
+	if o != nil && o.AccountId != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetAccountId gets a reference to the given string and assigns it to the AccountId field.
+func (o *Integration) SetAccountId(v string) {
+	o.AccountId = &v
 }
 
 // GetCollectionId returns the CollectionId field value if set, zero value otherwise.
-func (o *Redirect) GetCollectionId() string {
+func (o *Integration) GetCollectionId() string {
 	if o == nil || o.CollectionId == nil {
 		var ret string
 		return ret
@@ -64,7 +96,7 @@ func (o *Redirect) GetCollectionId() string {
 
 // GetCollectionIdOk returns a tuple with the CollectionId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Redirect) GetCollectionIdOk() (*string, bool) {
+func (o *Integration) GetCollectionIdOk() (*string, bool) {
 	if o == nil || o.CollectionId == nil {
 		return nil, false
 	}
@@ -72,7 +104,7 @@ func (o *Redirect) GetCollectionIdOk() (*string, bool) {
 }
 
 // HasCollectionId returns a boolean if a field has been set.
-func (o *Redirect) HasCollectionId() bool {
+func (o *Integration) HasCollectionId() bool {
 	if o != nil && o.CollectionId != nil {
 		return true
 	}
@@ -81,36 +113,36 @@ func (o *Redirect) HasCollectionId() bool {
 }
 
 // SetCollectionId gets a reference to the given string and assigns it to the CollectionId field.
-func (o *Redirect) SetCollectionId(v string) {
+func (o *Integration) SetCollectionId(v string) {
 	o.CollectionId = &v
 }
 
-// GetCondition returns the Condition field value
-func (o *Redirect) GetCondition() string {
+// GetConfig returns the Config field value
+func (o *Integration) GetConfig() map[string]interface{} {
 	if o == nil {
-		var ret string
+		var ret map[string]interface{}
 		return ret
 	}
 
-	return o.Condition
+	return o.Config
 }
 
-// GetConditionOk returns a tuple with the Condition field value
+// GetConfigOk returns a tuple with the Config field value
 // and a boolean to check if the value has been set.
-func (o *Redirect) GetConditionOk() (*string, bool) {
+func (o *Integration) GetConfigOk() (*map[string]interface{}, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.Condition, true
+	return &o.Config, true
 }
 
-// SetCondition sets field value
-func (o *Redirect) SetCondition(v string) {
-	o.Condition = v
+// SetConfig sets field value
+func (o *Integration) SetConfig(v map[string]interface{}) {
+	o.Config = v
 }
 
 // GetCreateTime returns the CreateTime field value if set, zero value otherwise.
-func (o *Redirect) GetCreateTime() time.Time {
+func (o *Integration) GetCreateTime() time.Time {
 	if o == nil || o.CreateTime == nil {
 		var ret time.Time
 		return ret
@@ -120,7 +152,7 @@ func (o *Redirect) GetCreateTime() time.Time {
 
 // GetCreateTimeOk returns a tuple with the CreateTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Redirect) GetCreateTimeOk() (*time.Time, bool) {
+func (o *Integration) GetCreateTimeOk() (*time.Time, bool) {
 	if o == nil || o.CreateTime == nil {
 		return nil, false
 	}
@@ -128,7 +160,7 @@ func (o *Redirect) GetCreateTimeOk() (*time.Time, bool) {
 }
 
 // HasCreateTime returns a boolean if a field has been set.
-func (o *Redirect) HasCreateTime() bool {
+func (o *Integration) HasCreateTime() bool {
 	if o != nil && o.CreateTime != nil {
 		return true
 	}
@@ -137,44 +169,36 @@ func (o *Redirect) HasCreateTime() bool {
 }
 
 // SetCreateTime gets a reference to the given time.Time and assigns it to the CreateTime field.
-func (o *Redirect) SetCreateTime(v time.Time) {
+func (o *Integration) SetCreateTime(v time.Time) {
 	o.CreateTime = &v
 }
 
-// GetDisabled returns the Disabled field value if set, zero value otherwise.
-func (o *Redirect) GetDisabled() bool {
-	if o == nil || o.Disabled == nil {
-		var ret bool
+// GetDisplayName returns the DisplayName field value
+func (o *Integration) GetDisplayName() string {
+	if o == nil {
+		var ret string
 		return ret
 	}
-	return *o.Disabled
+
+	return o.DisplayName
 }
 
-// GetDisabledOk returns a tuple with the Disabled field value if set, nil otherwise
+// GetDisplayNameOk returns a tuple with the DisplayName field value
 // and a boolean to check if the value has been set.
-func (o *Redirect) GetDisabledOk() (*bool, bool) {
-	if o == nil || o.Disabled == nil {
+func (o *Integration) GetDisplayNameOk() (*string, bool) {
+	if o == nil {
 		return nil, false
 	}
-	return o.Disabled, true
+	return &o.DisplayName, true
 }
 
-// HasDisabled returns a boolean if a field has been set.
-func (o *Redirect) HasDisabled() bool {
-	if o != nil && o.Disabled != nil {
-		return true
-	}
-
-	return false
-}
-
-// SetDisabled gets a reference to the given bool and assigns it to the Disabled field.
-func (o *Redirect) SetDisabled(v bool) {
-	o.Disabled = &v
+// SetDisplayName sets field value
+func (o *Integration) SetDisplayName(v string) {
+	o.DisplayName = v
 }
 
 // GetId returns the Id field value if set, zero value otherwise.
-func (o *Redirect) GetId() string {
+func (o *Integration) GetId() string {
 	if o == nil || o.Id == nil {
 		var ret string
 		return ret
@@ -184,7 +208,7 @@ func (o *Redirect) GetId() string {
 
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Redirect) GetIdOk() (*string, bool) {
+func (o *Integration) GetIdOk() (*string, bool) {
 	if o == nil || o.Id == nil {
 		return nil, false
 	}
@@ -192,7 +216,7 @@ func (o *Redirect) GetIdOk() (*string, bool) {
 }
 
 // HasId returns a boolean if a field has been set.
-func (o *Redirect) HasId() bool {
+func (o *Integration) HasId() bool {
 	if o != nil && o.Id != nil {
 		return true
 	}
@@ -201,36 +225,12 @@ func (o *Redirect) HasId() bool {
 }
 
 // SetId gets a reference to the given string and assigns it to the Id field.
-func (o *Redirect) SetId(v string) {
+func (o *Integration) SetId(v string) {
 	o.Id = &v
 }
 
-// GetTarget returns the Target field value
-func (o *Redirect) GetTarget() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Target
-}
-
-// GetTargetOk returns a tuple with the Target field value
-// and a boolean to check if the value has been set.
-func (o *Redirect) GetTargetOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Target, true
-}
-
-// SetTarget sets field value
-func (o *Redirect) SetTarget(v string) {
-	o.Target = v
-}
-
 // GetUpdateTime returns the UpdateTime field value if set, zero value otherwise.
-func (o *Redirect) GetUpdateTime() time.Time {
+func (o *Integration) GetUpdateTime() time.Time {
 	if o == nil || o.UpdateTime == nil {
 		var ret time.Time
 		return ret
@@ -240,7 +240,7 @@ func (o *Redirect) GetUpdateTime() time.Time {
 
 // GetUpdateTimeOk returns a tuple with the UpdateTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *Redirect) GetUpdateTimeOk() (*time.Time, bool) {
+func (o *Integration) GetUpdateTimeOk() (*time.Time, bool) {
 	if o == nil || o.UpdateTime == nil {
 		return nil, false
 	}
@@ -248,7 +248,7 @@ func (o *Redirect) GetUpdateTimeOk() (*time.Time, bool) {
 }
 
 // HasUpdateTime returns a boolean if a field has been set.
-func (o *Redirect) HasUpdateTime() bool {
+func (o *Integration) HasUpdateTime() bool {
 	if o != nil && o.UpdateTime != nil {
 		return true
 	}
@@ -257,29 +257,29 @@ func (o *Redirect) HasUpdateTime() bool {
 }
 
 // SetUpdateTime gets a reference to the given time.Time and assigns it to the UpdateTime field.
-func (o *Redirect) SetUpdateTime(v time.Time) {
+func (o *Integration) SetUpdateTime(v time.Time) {
 	o.UpdateTime = &v
 }
 
-func (o Redirect) MarshalJSON() ([]byte, error) {
+func (o Integration) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
+	if o.AccountId != nil {
+		toSerialize["account_id"] = o.AccountId
+	}
 	if o.CollectionId != nil {
 		toSerialize["collection_id"] = o.CollectionId
 	}
 	if true {
-		toSerialize["condition"] = o.Condition
+		toSerialize["config"] = o.Config
 	}
 	if o.CreateTime != nil {
 		toSerialize["create_time"] = o.CreateTime
 	}
-	if o.Disabled != nil {
-		toSerialize["disabled"] = o.Disabled
+	if true {
+		toSerialize["display_name"] = o.DisplayName
 	}
 	if o.Id != nil {
 		toSerialize["id"] = o.Id
-	}
-	if true {
-		toSerialize["target"] = o.Target
 	}
 	if o.UpdateTime != nil {
 		toSerialize["update_time"] = o.UpdateTime
@@ -287,38 +287,38 @@ func (o Redirect) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableRedirect struct {
-	value *Redirect
+type NullableIntegration struct {
+	value *Integration
 	isSet bool
 }
 
-func (v NullableRedirect) Get() *Redirect {
+func (v NullableIntegration) Get() *Integration {
 	return v.value
 }
 
-func (v *NullableRedirect) Set(val *Redirect) {
+func (v *NullableIntegration) Set(val *Integration) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableRedirect) IsSet() bool {
+func (v NullableIntegration) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableRedirect) Unset() {
+func (v *NullableIntegration) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableRedirect(val *Redirect) *NullableRedirect {
-	return &NullableRedirect{value: val, isSet: true}
+func NewNullableIntegration(val *Integration) *NullableIntegration {
+	return &NullableIntegration{value: val, isSet: true}
 }
 
-func (v NullableRedirect) MarshalJSON() ([]byte, error) {
+func (v NullableIntegration) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableRedirect) UnmarshalJSON(src []byte) error {
+func (v *NullableIntegration) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
