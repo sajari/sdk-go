@@ -7,6 +7,8 @@
 
 The official [Search.io](https://www.search.io) Go client library.
 
+Search.io offers a search and discovery service with Neuralsearch®, the world's first instant AI search technology. Businesses of all sizes use Search.io to build site search and discovery solutions that maximize e-commerce revenue, optimize on-site customer experience, and scale their online presence.
+
 ## Table of contents
 
 - [Requirements](#requirements)
