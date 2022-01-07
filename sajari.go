@@ -1,4 +1,4 @@
-// Package sajari provides functionality for interacting with Sajari APIs.
+// Package sajari provides functionality for interacting with Search.io APIs.
 package sajari // import "code.sajari.com/sdk-go"
 
 import (
@@ -17,17 +17,18 @@ const (
 	overrideHostname = "api.sajari.com"
 )
 
-// New creates a new Client which can be used to make requests to Sajari services.
-func New(project, collection string, opts ...Opt) (*Client, error) {
+// New creates a new Client which can be used to make requests to Search.io
+// services.
+func New(accountID, collectionID string, opts ...Opt) (*Client, error) {
 	c := &Client{
-		Project:    project,
-		Collection: collection,
+		Project:    accountID,
+		Collection: collectionID,
 	}
 
 	c.openAPI.config = openapi.NewConfiguration()
 	c.openAPI.config.UserAgent = userAgent
 	c.openAPI.config.DefaultHeader = map[string]string{
-		"Account-Id": project,
+		"Account-Id": accountID,
 	}
 
 	defaultOpts := []Opt{
@@ -55,7 +56,7 @@ func (c *Client) newContext(ctx context.Context) context.Context {
 	return internal.NewContext(ctx, c.Project, c.Collection)
 }
 
-// Client is a type which makes requests to the Sajari Engine.
+// Client is a type which makes requests to Search.io.
 type Client struct {
 	Project    string
 	Collection string
