@@ -1,11 +1,11 @@
-# Sajari APIs Go client
+# Search.io SDK for Go
 
 [![Go reference](https://pkg.go.dev/badge/github.com/sajari/sdk-go.svg)](https://pkg.go.dev/github.com/sajari/sdk-go)
 [![Build status](https://github.com/sajari/sdk-go/workflows/Go/badge.svg?branch=v2)](https://github.com/sajari/sdk-go/actions)
 [![Report card](https://goreportcard.com/badge/code.sajari.com/sdk-go)](https://goreportcard.com/report/code.sajari.com/sdk-go)
 [![Sourcegraph](https://sourcegraph.com/github.com/sajari/sdk-go/-/badge.svg)](https://sourcegraph.com/github.com/sajari/sdk-go)
 
-The official [Sajari](https://www.sajari.com) Go client library.
+The official [Search.io](https://www.search.io) Go client library.
 
 ## Table of contents
 
@@ -49,11 +49,11 @@ Below are a few simple examples that will help get you up and running.
 
 To start you need to create a client to make calls to the API.
 
-You can get your project, collection, key ID and key secret from the [Sajari console](https://www.sajari.com/console).
+You can get your account ID, collection ID, key ID and key secret from the [Search.io console](https://app.search.io).
 
 ```go
 creds := sajari.KeyCredentials("key-id", "key-secret")
-client, err := sajari.New("project", "collection", sajari.WithCredentials(creds))
+client, err := sajari.New("account_id", "collection_id", sajari.WithCredentials(creds))
 if err != nil {
 	// handle
 }
@@ -136,7 +136,7 @@ if err != nil {
 
 An existing record in your collection can be entirely replaced using the `ReplaceRecord` method on a record `Pipeline`.
 
-When calling `ReplaceRecord` Sajari actually performs an upsert. If the record is an existing record, Sajari will perform a diff between the old and new records and applies your changes—this is extremely efficient. Because `ReplaceRecord` can both insert and update it is typically preferred over `CreateRecord` when [adding a record](#adding-a-record).
+When calling `ReplaceRecord` Search.io actually performs an upsert. If the record is an existing record, Search.io performs a diff between the old and new records and applies your changes—this is extremely efficient. Because `ReplaceRecord` can both insert and update it is typically preferred over `CreateRecord` when [adding a record](#adding-a-record).
 
 > Note: if you want to make granular changes to the record it is best to use [`MutateRecord`](#mutating-a-record).
 

@@ -11,7 +11,7 @@ import (
 
 func ExampleNew() {
 	creds := sajari.KeyCredentials("key-id", "key-secret")
-	client, err := sajari.New("project", "collection", sajari.WithCredentials(creds))
+	client, err := sajari.New("account_id", "collection_id", sajari.WithCredentials(creds))
 	if err != nil {
 		// handle
 	}
@@ -20,7 +20,7 @@ func ExampleNew() {
 
 func ExampleClient_GetRecord() {
 	creds := sajari.KeyCredentials("key-id", "key-secret")
-	client, err := sajari.New("project", "collection", sajari.WithCredentials(creds))
+	client, err := sajari.New("account_id", "collection_id", sajari.WithCredentials(creds))
 	if err != nil {
 		// handle
 	}
@@ -37,7 +37,7 @@ func ExampleClient_GetRecord() {
 
 func ExampleClient_GetRecord_errNoSuchRecord() {
 	creds := sajari.KeyCredentials("key-id", "key-secret")
-	client, err := sajari.New("project", "collection", sajari.WithCredentials(creds))
+	client, err := sajari.New("account_id", "collection_id", sajari.WithCredentials(creds))
 	if err != nil {
 		// handle
 	}
@@ -56,7 +56,7 @@ func ExampleClient_GetRecord_errNoSuchRecord() {
 
 func ExampleClient_MutateRecord() {
 	creds := sajari.KeyCredentials("key-id", "key-secret")
-	client, err := sajari.New("project", "collection", sajari.WithCredentials(creds))
+	client, err := sajari.New("account_id", "collection_id", sajari.WithCredentials(creds))
 	if err != nil {
 		// handle
 	}
@@ -88,7 +88,7 @@ func ExampleClient_MutateRecord() {
 
 func ExampleClient_DeleteRecord() {
 	creds := sajari.KeyCredentials("key-id", "key-secret")
-	client, err := sajari.New("project", "collection", sajari.WithCredentials(creds))
+	client, err := sajari.New("account_id", "collection_id", sajari.WithCredentials(creds))
 	if err != nil {
 		// handle
 	}
@@ -104,7 +104,7 @@ func ExampleClient_DeleteRecord() {
 
 func ExamplePipeline_CreateRecord() {
 	creds := sajari.KeyCredentials("key-id", "key-secret")
-	client, err := sajari.New("project", "collection", sajari.WithCredentials(creds))
+	client, err := sajari.New("account_id", "collection_id", sajari.WithCredentials(creds))
 	if err != nil {
 		// handle
 	}
@@ -132,7 +132,7 @@ func ExamplePipeline_CreateRecord() {
 
 func ExamplePipeline_ReplaceRecord() {
 	creds := sajari.KeyCredentials("key-id", "key-secret")
-	client, err := sajari.New("project", "collection", sajari.WithCredentials(creds))
+	client, err := sajari.New("account_id", "collection_id", sajari.WithCredentials(creds))
 	if err != nil {
 		// handle
 	}
@@ -162,7 +162,7 @@ func ExamplePipeline_ReplaceRecord() {
 
 func ExamplePipeline_Search() {
 	creds := sajari.KeyCredentials("key-id", "key-secret")
-	client, err := sajari.New("project", "collection", sajari.WithCredentials(creds))
+	client, err := sajari.New("account_id", "collection_id", sajari.WithCredentials(creds))
 	if err != nil {
 		// handle
 	}
@@ -189,7 +189,7 @@ func ExamplePipeline_Search() {
 
 func ExamplePipeline_Search_noDefaultPipelineError() {
 	creds := sajari.KeyCredentials("key-id", "key-secret")
-	client, err := sajari.New("project", "collection", sajari.WithCredentials(creds))
+	client, err := sajari.New("account_id", "collection_id", sajari.WithCredentials(creds))
 	if err != nil {
 		// handle
 	}
@@ -213,7 +213,7 @@ func ExamplePipeline_Search_noDefaultPipelineError() {
 
 func ExamplePipeline_Search_Tracking() {
 	creds := sajari.KeyCredentials("key-id", "key-secret")
-	client, err := sajari.New("project", "collection", sajari.WithCredentials(creds))
+	client, err := sajari.New("account_id", "collection_id", sajari.WithCredentials(creds))
 	if err != nil {
 		// handle
 	}
