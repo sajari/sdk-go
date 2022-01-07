@@ -211,7 +211,7 @@ func ExamplePipeline_Search_noDefaultPipelineError() {
 	}
 }
 
-func ExamplePipeline_Search_Tracking() {
+func ExampleTracking() {
 	creds := sajari.KeyCredentials("key-id", "key-secret")
 	client, err := sajari.New("account_id", "collection_id", sajari.WithCredentials(creds))
 	if err != nil {
