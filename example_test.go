@@ -210,3 +210,29 @@ func ExamplePipeline_Search_noDefaultPipelineError() {
 		// handle other error cases
 	}
 }
+
+func ExamplePipeline_Search_Tracking() {
+	creds := sajari.KeyCredentials("key-id", "key-secret")
+	client, err := sajari.New("project", "collection", sajari.WithCredentials(creds))
+	if err != nil {
+		// handle
+	}
+	defer client.Close()
+
+	pipeline := client.Pipeline("query", "")
+
+	values := map[string]string{
+		"q": "your search terms",
+	}
+
+	_, _, err = pipeline.Search(context.Background(), values, &sajari.Tracking{
+		Type:     sajari.TrackingPosNeg,
+		QueryID:  "4216691599",
+		Sequence: 1,
+		Field:    "id",
+		Data:     map[string]string{},
+	})
+	if err != nil {
+		// handle
+	}
+}

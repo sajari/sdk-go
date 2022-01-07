@@ -19,7 +19,7 @@ func NonTrackedSession() Session {
 // changed significantly).
 //
 // A common session handler would be:
-//   WebSearchSeassion("q", NewSession())
+//   WebSearchSession("q", NewSession())
 func WebSearchSession(queryLabel string, s Session) Session {
 	return &webSearchSession{
 		Session:    s,
