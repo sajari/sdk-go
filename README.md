@@ -255,7 +255,7 @@ for _, r := range res.Results {
 }
 ```
 
-#### Sessions
+#### Tracking
 
 If you don't want tracking enabled, then use `NonTrackedSession`. For example your `Search` call might look like:
 
