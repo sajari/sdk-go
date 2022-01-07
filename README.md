@@ -255,6 +255,41 @@ for _, r := range res.Results {
 }
 ```
 
+#### Sessions
+
+If you don't want tracking enabled, then use `NonTrackedSession`. For example your `Search` call might look like:
+
+```go
+res, _, err := pipeline.Search(context.Background(), values, sajari.NonTrackedSession())
+if err != nil {
+	// handle
+}
+```
+
+If you're tracking website-style searches, then use `WebSearchSession`. For example your `Search` call might look like:
+
+```go
+res, _, err := pipeline.Search(context.Background(), values, sajari.WebSearchSession("q", sajari.NewSession()))
+if err != nil {
+	// handle
+}
+```
+
+If you want to manage the details of tracking externally, use `Tracking`. For example your `Search` call might look like:
+
+```go
+res, _, err := pipeline.Search(context.Background(), values, sajari.Tracking{
+	Type:     sajari.TrackingPosNeg,
+	QueryID:  "4216691599",
+	Sequence: 1,
+	Field:    "id",
+	Data:     map[string]string{},
+})
+if err != nil {
+	// handle
+}
+```
+
 ## Development
 
 Pull requests from the community are welcome. If you submit one, please keep the following guidelines in mind:
