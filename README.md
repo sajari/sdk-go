@@ -1,6 +1,6 @@
 # Search.io SDK for Go
 
-[![Go reference](https://pkg.go.dev/badge/github.com/sajari/sdk-go.svg)](https://pkg.go.dev/github.com/sajari/sdk-go)
+[![Go reference](https://pkg.go.dev/badge/code.sajari.com/sdk-go.svg)](https://pkg.go.dev/code.sajari.com/sdk-go)
 [![Build status](https://github.com/sajari/sdk-go/workflows/Go/badge.svg?branch=v2)](https://github.com/sajari/sdk-go/actions)
 [![Report card](https://goreportcard.com/badge/code.sajari.com/sdk-go)](https://goreportcard.com/report/code.sajari.com/sdk-go)
 [![Sourcegraph](https://sourcegraph.com/github.com/sajari/sdk-go/-/badge.svg)](https://sourcegraph.com/github.com/sajari/sdk-go)
