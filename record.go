@@ -37,8 +37,8 @@ type Key struct {
 	value interface{}
 }
 
-// NewKey creates a new Key with a field and value.  Field must be marked as unique in
-// the collection schema.
+// NewKey creates a new key with a field and value. Field must be marked as
+// unique in the collection schema.
 func NewKey(field string, value interface{}) *Key {
 	return &Key{
 		field: field,
@@ -46,12 +46,18 @@ func NewKey(field string, value interface{}) *Key {
 	}
 }
 
+// Field returns the key's field.
+func (k *Key) Field() string { return k.field }
+
+// Value returns the key's value.
+func (k *Key) Value() interface{} { return k.value }
+
 // String implements Stringer.
 func (k *Key) String() string {
 	if k == nil {
 		return ""
 	}
-	return fmt.Sprintf("Key{Field: %q, Value: %q}", k.field, k.value)
+	return fmt.Sprintf("Key{Field: %v, Value: %v}", k.field, k.value)
 }
 
 type keys []*Key

@@ -20,3 +20,21 @@ func TestKeyIterator_Next_Done(t *testing.T) {
 		t.Errorf("Next() error = %v, want wrapped ErrDone", err)
 	}
 }
+
+func TestKey_String(t *testing.T) {
+	tests := []struct {
+		key  *Key
+		want string
+	}{
+		{NewKey("id", 1234), "Key{Field: id, Value: 1234}"},
+		{NewKey("id", "1234"), "Key{Field: id, Value: 1234}"},
+		{NewKey("url", "https://example.com"), "Key{Field: url, Value: https://example.com}"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.want, func(t *testing.T) {
+			if got := tt.key.String(); got != tt.want {
+				t.Errorf("Key.String() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
