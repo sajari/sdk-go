@@ -115,7 +115,7 @@ func Values(m map[string]interface{}) (map[string]*enginev2pb.Value, error) {
 	for k, v := range m {
 		vv, err := Value(v)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("could not convert value for %v: %w", k, err)
 		}
 		values[k] = vv
 	}

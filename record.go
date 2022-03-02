@@ -24,7 +24,7 @@ type Record map[string]interface{}
 func (r Record) proto() (*enginev2pb.Record, error) {
 	values, err := protoutil.Values(r)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not convert record to values: %w", err)
 	}
 	return &enginev2pb.Record{
 		Values: values,
