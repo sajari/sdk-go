@@ -11,7 +11,7 @@ import (
 	"code.sajari.com/sdk-go/internal/openapi"
 	"code.sajari.com/sdk-go/internal/protoutil"
 
-	enginepb "code.sajari.com/protogen-go/sajari/engine/v2"
+	enginev2pb "code.sajari.com/protogen-go/sajari/engine/v2"
 )
 
 // ErrNoSuchRecord is returned when a record was requested but there is no such
@@ -21,12 +21,12 @@ var ErrNoSuchRecord = errors.New("no such record")
 // Record is a set of field-value pairs representing a record in a collection.
 type Record map[string]interface{}
 
-func (r Record) proto() (*enginepb.Record, error) {
+func (r Record) proto() (*enginev2pb.Record, error) {
 	values, err := protoutil.Values(r)
 	if err != nil {
 		return nil, err
 	}
-	return &enginepb.Record{
+	return &enginev2pb.Record{
 		Values: values,
 	}, nil
 }
@@ -62,8 +62,8 @@ func (k *Key) String() string {
 
 type keys []*Key
 
-func (ks keys) proto() ([]*enginepb.Key, error) {
-	out := make([]*enginepb.Key, 0, len(ks))
+func (ks keys) proto() ([]*enginev2pb.Key, error) {
+	out := make([]*enginev2pb.Key, 0, len(ks))
 	for _, k := range ks {
 		pbk, err := k.proto()
 		if err != nil {
@@ -74,7 +74,7 @@ func (ks keys) proto() ([]*enginepb.Key, error) {
 	return out, nil
 }
 
-func (k *Key) proto() (*enginepb.Key, error) {
+func (k *Key) proto() (*enginev2pb.Key, error) {
 	if k == nil {
 		return nil, fmt.Errorf("empty key")
 	}
@@ -82,13 +82,13 @@ func (k *Key) proto() (*enginepb.Key, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not marshal key value: %v", err)
 	}
-	return &enginepb.Key{
+	return &enginev2pb.Key{
 		Field: k.field,
 		Value: vv,
 	}, nil
 }
 
-func keyFromProto(k *enginepb.Key) (*Key, error) {
+func keyFromProto(k *enginev2pb.Key) (*Key, error) {
 	if k == nil {
 		return nil, nil
 	}
@@ -103,7 +103,7 @@ func keyFromProto(k *enginepb.Key) (*Key, error) {
 	return NewKey(k.Field, val), nil
 }
 
-type pbKeys []*enginepb.Key
+type pbKeys []*enginev2pb.Key
 
 func (pbks pbKeys) keys() ([]*Key, error) {
 	out := make([]*Key, 0, len(pbks))
@@ -117,7 +117,7 @@ func (pbks pbKeys) keys() ([]*Key, error) {
 	return out, nil
 }
 
-func recordFromProto(pbr *enginepb.Record) (Record, error) {
+func recordFromProto(pbr *enginev2pb.Record) (Record, error) {
 	d := make(Record)
 	for k, v := range pbr.Values {
 		vv, err := protoutil.FromProto(v)
@@ -145,7 +145,7 @@ func (c *Client) MutateRecord(ctx context.Context, k *Key, fms ...RecordMutation
 		return err
 	}
 
-	_, err = enginepb.NewStoreClient(c.ClientConn).MutateRecord(c.newContext(ctx), &enginepb.MutateRecordRequest{
+	_, err = enginev2pb.NewStoreClient(c.ClientConn).MutateRecord(c.newContext(ctx), &enginev2pb.MutateRecordRequest{
 		Key:            pbk,
 		FieldMutations: pbfms,
 	})
@@ -162,8 +162,8 @@ func (c *Client) MutateRecord(ctx context.Context, k *Key, fms ...RecordMutation
 
 type recordMutations []RecordMutation
 
-func (rms recordMutations) proto() ([]*enginepb.MutateRecordRequest_FieldMutation, error) {
-	out := make([]*enginepb.MutateRecordRequest_FieldMutation, 0, len(rms))
+func (rms recordMutations) proto() ([]*enginev2pb.MutateRecordRequest_FieldMutation, error) {
+	out := make([]*enginev2pb.MutateRecordRequest_FieldMutation, 0, len(rms))
 	for _, rm := range rms {
 		rmpb, err := rm.proto()
 		if err != nil {
@@ -185,7 +185,7 @@ func (c *Client) DeleteRecord(ctx context.Context, k *Key) error {
 		return err
 	}
 
-	_, err = enginepb.NewStoreClient(c.ClientConn).DeleteRecord(c.newContext(ctx), &enginepb.DeleteRecordRequest{
+	_, err = enginev2pb.NewStoreClient(c.ClientConn).DeleteRecord(c.newContext(ctx), &enginev2pb.DeleteRecordRequest{
 		Key: pbk,
 	})
 	if err != nil {
@@ -241,7 +241,7 @@ func (c *Client) GetRecord(ctx context.Context, k *Key) (Record, error) {
 		return nil, err
 	}
 
-	resp, err := enginepb.NewStoreClient(c.ClientConn).GetRecord(c.newContext(ctx), &enginepb.GetRecordRequest{
+	resp, err := enginev2pb.NewStoreClient(c.ClientConn).GetRecord(c.newContext(ctx), &enginev2pb.GetRecordRequest{
 		Key: pbk,
 	})
 	if err != nil {
@@ -310,7 +310,7 @@ func (it *KeyIterator) Next() (*Key, error) {
 }
 
 func (it *KeyIterator) fetch(ctx context.Context) (ks []*Key, token string, err error) {
-	resp, err := enginepb.NewStoreClient(it.c.ClientConn).ListKeys(it.c.newContext(ctx), &enginepb.ListKeysRequest{
+	resp, err := enginev2pb.NewStoreClient(it.c.ClientConn).ListKeys(it.c.newContext(ctx), &enginev2pb.ListKeysRequest{
 		Field:     it.field,
 		PageSize:  0,
 		PageToken: it.token,
@@ -339,7 +339,7 @@ func SetFields(m map[string]interface{}) []RecordMutation {
 // RecordMutation is an interface satisfied by all record mutations defined
 // in this package.
 type RecordMutation interface {
-	proto() (*enginepb.MutateRecordRequest_FieldMutation, error)
+	proto() (*enginev2pb.MutateRecordRequest_FieldMutation, error)
 }
 
 type setField struct {
@@ -347,15 +347,15 @@ type setField struct {
 	value interface{}
 }
 
-func (s setField) proto() (*enginepb.MutateRecordRequest_FieldMutation, error) {
+func (s setField) proto() (*enginev2pb.MutateRecordRequest_FieldMutation, error) {
 	v, err := protoutil.Value(s.value)
 	if err != nil {
 		return nil, err
 	}
 
-	return &enginepb.MutateRecordRequest_FieldMutation{
+	return &enginev2pb.MutateRecordRequest_FieldMutation{
 		Field: s.field,
-		Mutation: &enginepb.MutateRecordRequest_FieldMutation_Set{
+		Mutation: &enginev2pb.MutateRecordRequest_FieldMutation_Set{
 			Set: v,
 		},
 	}, nil

@@ -3,7 +3,7 @@ package sajari
 import (
 	"context"
 
-	interactionpb "code.sajari.com/protogen-go/sajari/interaction/v2"
+	interactionv2pb "code.sajari.com/protogen-go/sajari/interaction/v2"
 )
 
 // Interaction creates a new Interaction which can be used to register
@@ -28,7 +28,7 @@ type InteractionOptions struct {
 
 // ConsumeToken registers an interaction corresponding to a token.
 func (i *Interaction) ConsumeToken(ctx context.Context, token string, options InteractionOptions) error {
-	_, err := interactionpb.NewInteractionClient(i.c.ClientConn).ConsumeToken(ctx, &interactionpb.ConsumeTokenRequest{
+	_, err := interactionv2pb.NewInteractionClient(i.c.ClientConn).ConsumeToken(ctx, &interactionv2pb.ConsumeTokenRequest{
 		Token:      token,
 		Identifier: options.Identifier,
 		Weight:     options.Weight,

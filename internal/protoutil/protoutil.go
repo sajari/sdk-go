@@ -5,16 +5,16 @@ import (
 	"strconv"
 	"time"
 
-	pb "code.sajari.com/protogen-go/sajari/engine/v2"
+	enginev2pb "code.sajari.com/protogen-go/sajari/engine/v2"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 )
 
-func FromProto(v *pb.Value) (interface{}, error) {
+func FromProto(v *enginev2pb.Value) (interface{}, error) {
 	switch v := v.Value.(type) {
-	case *pb.Value_Single:
+	case *enginev2pb.Value_Single:
 		return v.Single, nil
 
-	case *pb.Value_Repeated_:
+	case *enginev2pb.Value_Repeated_:
 		return v.Repeated.Values, nil
 
 	default:
@@ -22,12 +22,12 @@ func FromProto(v *pb.Value) (interface{}, error) {
 	}
 }
 
-func Single(x interface{}) (*pb.Value, error) {
+func Single(x interface{}) (*enginev2pb.Value, error) {
 	switch x := x.(type) {
 	case int, uint, int64, uint64, int32, uint32, int16, uint16,
 		int8, uint8, float32, float64, string, bool:
-		return &pb.Value{
-			Value: &pb.Value_Single{
+		return &enginev2pb.Value{
+			Value: &enginev2pb.Value_Single{
 				Single: fmt.Sprintf("%v", x),
 			},
 		}, nil
@@ -37,26 +37,26 @@ func Single(x interface{}) (*pb.Value, error) {
 	}
 }
 
-func Value(x interface{}) (*pb.Value, error) {
+func Value(x interface{}) (*enginev2pb.Value, error) {
 	switch x := x.(type) {
 	case string:
-		return &pb.Value{
-			Value: &pb.Value_Single{
+		return &enginev2pb.Value{
+			Value: &enginev2pb.Value_Single{
 				Single: x,
 			},
 		}, nil
 
 	case int, uint, int64, uint64, int32, uint32, int16, uint16,
 		int8, uint8, float32, float64, bool:
-		return &pb.Value{
-			Value: &pb.Value_Single{
+		return &enginev2pb.Value{
+			Value: &enginev2pb.Value_Single{
 				Single: fmt.Sprintf("%v", x),
 			},
 		}, nil
 
 	case time.Time:
-		return &pb.Value{
-			Value: &pb.Value_Single{
+		return &enginev2pb.Value{
+			Value: &enginev2pb.Value_Single{
 				Single: strconv.FormatInt(x.Unix(), 10),
 			},
 		}, nil
@@ -101,17 +101,17 @@ func Value(x interface{}) (*pb.Value, error) {
 		return nil, fmt.Errorf("unsupported value: %T", x)
 	}
 
-	return &pb.Value{
-		Value: &pb.Value_Repeated_{
-			Repeated: &pb.Value_Repeated{
+	return &enginev2pb.Value{
+		Value: &enginev2pb.Value_Repeated_{
+			Repeated: &enginev2pb.Value_Repeated{
 				Values: vs,
 			},
 		},
 	}, nil
 }
 
-func Values(m map[string]interface{}) (map[string]*pb.Value, error) {
-	values := make(map[string]*pb.Value, len(m))
+func Values(m map[string]interface{}) (map[string]*enginev2pb.Value, error) {
+	values := make(map[string]*enginev2pb.Value, len(m))
 	for k, v := range m {
 		vv, err := Value(v)
 		if err != nil {

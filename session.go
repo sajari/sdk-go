@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 
-	pipelinepb "code.sajari.com/protogen-go/sajari/pipeline/v2"
+	pipelinev2pb "code.sajari.com/protogen-go/sajari/pipeline/v2"
 )
 
 // NonTrackedSession creates a session with no tracking enabled.
@@ -39,7 +39,7 @@ func (w *webSearchSession) Reset() {
 	w.Session.Reset()
 }
 
-func (w *webSearchSession) next(values map[string]string) (*pipelinepb.Tracking, error) {
+func (w *webSearchSession) next(values map[string]string) (*pipelinev2pb.Tracking, error) {
 	text, ok := values[w.queryLabel]
 	if !ok {
 		w.Reset()
@@ -62,18 +62,18 @@ const (
 	TrackingPosNeg TrackingType = "POS_NEG" // Positive/negative interaction tokens should be returned with results.
 )
 
-func (t TrackingType) proto() (pipelinepb.Tracking_Type, error) {
+func (t TrackingType) proto() (pipelinev2pb.Tracking_Type, error) {
 	switch t {
 	case TrackingNone:
-		return pipelinepb.Tracking_NONE, nil
+		return pipelinev2pb.Tracking_NONE, nil
 
 	case TrackingClick:
-		return pipelinepb.Tracking_CLICK, nil
+		return pipelinev2pb.Tracking_CLICK, nil
 
 	case TrackingPosNeg:
-		return pipelinepb.Tracking_POS_NEG, nil
+		return pipelinev2pb.Tracking_POS_NEG, nil
 	}
-	return pipelinepb.Tracking_NONE, fmt.Errorf("unknown TrackingType: %v", t)
+	return pipelinev2pb.Tracking_NONE, fmt.Errorf("unknown TrackingType: %v", t)
 }
 
 // Session is an interface which defines session handling for search.
@@ -82,7 +82,7 @@ type Session interface {
 	Reset()
 
 	// next returns the next tracking data to be used in the query.
-	next(values map[string]string) (*pipelinepb.Tracking, error)
+	next(values map[string]string) (*pipelinev2pb.Tracking, error)
 }
 
 // NewSession creates a Session which generates tracking information for
@@ -124,7 +124,7 @@ func (t *session) Reset() {
 }
 
 // Next implements Session.
-func (t *session) next(_ map[string]string) (*pipelinepb.Tracking, error) {
+func (t *session) next(_ map[string]string) (*pipelinev2pb.Tracking, error) {
 	if t.queryID == "" {
 		t.queryID = randString() // match JS
 		t.sequence = 0
@@ -137,7 +137,7 @@ func (t *session) next(_ map[string]string) (*pipelinepb.Tracking, error) {
 		return nil, err
 	}
 
-	return &pipelinepb.Tracking{
+	return &pipelinev2pb.Tracking{
 		Type:     pbType,
 		QueryId:  t.queryID,
 		Sequence: int32(t.sequence),
@@ -165,13 +165,13 @@ type Tracking struct {
 	Data map[string]string
 }
 
-func (t *Tracking) proto() (*pipelinepb.Tracking, error) {
+func (t *Tracking) proto() (*pipelinev2pb.Tracking, error) {
 	pbType, err := t.Type.proto()
 	if err != nil {
 		return nil, err
 	}
 
-	return &pipelinepb.Tracking{
+	return &pipelinev2pb.Tracking{
 		Type:     pbType,
 		QueryId:  t.QueryID,
 		Sequence: int32(t.Sequence),
@@ -184,6 +184,6 @@ func (t *Tracking) Reset() {
 	*t = Tracking{}
 }
 
-func (t *Tracking) next(_ map[string]string) (*pipelinepb.Tracking, error) {
+func (t *Tracking) next(_ map[string]string) (*pipelinev2pb.Tracking, error) {
 	return t.proto()
 }
