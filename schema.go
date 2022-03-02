@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	pb "code.sajari.com/protogen-go/sajari/engine/v2"
+	enginev2pb "code.sajari.com/protogen-go/sajari/engine/v2"
 )
 
 // Schema returns the schema (list of fields) for the collection.
@@ -63,8 +63,8 @@ func (it *FieldIterator) Next() (Field, error) {
 }
 
 func (it *FieldIterator) fetch(ctx context.Context) ([]Field, string, error) {
-	resp, err := pb.NewSchemaClient(it.c.ClientConn).ListFields(it.c.newContext(ctx),
-		&pb.ListFieldsRequest{
+	resp, err := enginev2pb.NewSchemaClient(it.c.ClientConn).ListFields(it.c.newContext(ctx),
+		&enginev2pb.ListFieldsRequest{
 			PageToken: it.token,
 		})
 	if err != nil {
@@ -82,7 +82,7 @@ func (it *FieldIterator) fetch(ctx context.Context) ([]Field, string, error) {
 	return fs, resp.GetNextPageToken(), nil
 }
 
-func fieldFromProto(f *pb.Field) (Field, error) {
+func fieldFromProto(f *enginev2pb.Field) (Field, error) {
 	t, err := typeFromProto(f.GetType())
 	if err != nil {
 		return Field{}, err
@@ -152,14 +152,14 @@ type FieldIndex struct {
 	Description string
 }
 
-func (f FieldIndex) proto() *pb.FieldIndex {
-	return &pb.FieldIndex{
+func (f FieldIndex) proto() *enginev2pb.FieldIndex {
+	return &enginev2pb.FieldIndex{
 		Spec:        f.Spec,
 		Description: f.Description,
 	}
 }
 
-func (f Field) proto() (*pb.Field, error) {
+func (f Field) proto() (*enginev2pb.Field, error) {
 	t, err := f.Type.proto()
 	if err != nil {
 		return nil, err
@@ -170,7 +170,7 @@ func (f Field) proto() (*pb.Field, error) {
 		return nil, err
 	}
 
-	return &pb.Field{
+	return &enginev2pb.Field{
 		Name:        f.Name,
 		Description: f.Description,
 		Type:        t,
@@ -179,24 +179,24 @@ func (f Field) proto() (*pb.Field, error) {
 	}, nil
 }
 
-func typeFromProto(t pb.Field_Type) (FieldType, error) {
+func typeFromProto(t enginev2pb.Field_Type) (FieldType, error) {
 	switch t {
-	case pb.Field_STRING:
+	case enginev2pb.Field_STRING:
 		return TypeString, nil
 
-	case pb.Field_INTEGER:
+	case enginev2pb.Field_INTEGER:
 		return TypeInteger, nil
 
-	case pb.Field_FLOAT:
+	case enginev2pb.Field_FLOAT:
 		return TypeFloat, nil
 
-	case pb.Field_DOUBLE:
+	case enginev2pb.Field_DOUBLE:
 		return TypeDouble, nil
 
-	case pb.Field_BOOLEAN:
+	case enginev2pb.Field_BOOLEAN:
 		return TypeBoolean, nil
 
-	case pb.Field_TIMESTAMP:
+	case enginev2pb.Field_TIMESTAMP:
 		return TypeTimestamp, nil
 
 	default:
@@ -204,15 +204,15 @@ func typeFromProto(t pb.Field_Type) (FieldType, error) {
 	}
 }
 
-func modeFromProto(m pb.Field_Mode) (FieldMode, error) {
+func modeFromProto(m enginev2pb.Field_Mode) (FieldMode, error) {
 	switch m {
-	case pb.Field_NULLABLE:
+	case enginev2pb.Field_NULLABLE:
 		return ModeNullable, nil
 
-	case pb.Field_REQUIRED:
+	case enginev2pb.Field_REQUIRED:
 		return ModeRequired, nil
 
-	case pb.Field_UNIQUE:
+	case enginev2pb.Field_UNIQUE:
 		return ModeUnique, nil
 
 	default:
@@ -230,16 +230,16 @@ const (
 	ModeUnique   FieldMode = "UNIQUE"   // Field value must be unique (and hence also set).
 )
 
-func (m FieldMode) proto() (pb.Field_Mode, error) {
+func (m FieldMode) proto() (enginev2pb.Field_Mode, error) {
 	switch m {
 	case ModeNullable:
-		return pb.Field_NULLABLE, nil
+		return enginev2pb.Field_NULLABLE, nil
 	case ModeRequired:
-		return pb.Field_REQUIRED, nil
+		return enginev2pb.Field_REQUIRED, nil
 	case ModeUnique:
-		return pb.Field_UNIQUE, nil
+		return enginev2pb.Field_UNIQUE, nil
 	default:
-		return pb.Field_NULLABLE, fmt.Errorf("unknown mode: %q", string(m))
+		return enginev2pb.Field_NULLABLE, fmt.Errorf("unknown mode: %q", string(m))
 	}
 }
 
@@ -256,27 +256,27 @@ const (
 	TypeTimestamp FieldType = "TIMESTAMP"
 )
 
-func (t FieldType) proto() (pb.Field_Type, error) {
+func (t FieldType) proto() (enginev2pb.Field_Type, error) {
 	switch t {
 	case TypeString:
-		return pb.Field_STRING, nil
+		return enginev2pb.Field_STRING, nil
 
 	case TypeInteger:
-		return pb.Field_INTEGER, nil
+		return enginev2pb.Field_INTEGER, nil
 
 	case TypeFloat:
-		return pb.Field_FLOAT, nil
+		return enginev2pb.Field_FLOAT, nil
 
 	case TypeDouble:
-		return pb.Field_DOUBLE, nil
+		return enginev2pb.Field_DOUBLE, nil
 
 	case TypeBoolean:
-		return pb.Field_BOOLEAN, nil
+		return enginev2pb.Field_BOOLEAN, nil
 
 	case TypeTimestamp:
-		return pb.Field_TIMESTAMP, nil
+		return enginev2pb.Field_TIMESTAMP, nil
 	}
-	return pb.Field_STRING, fmt.Errorf("unknown type: '%v'", string(t))
+	return enginev2pb.Field_STRING, fmt.Errorf("unknown type: '%v'", string(t))
 }
 
 // CreateField creates a new field in the schema.
@@ -286,7 +286,7 @@ func (s *Schema) CreateField(ctx context.Context, f Field) error {
 		return err
 	}
 
-	_, err = pb.NewSchemaClient(s.c.ClientConn).CreateField(s.c.newContext(ctx), &pb.CreateFieldRequest{
+	_, err = enginev2pb.NewSchemaClient(s.c.ClientConn).CreateField(s.c.newContext(ctx), &enginev2pb.CreateFieldRequest{
 		Field: pbf,
 	})
 	return err
@@ -299,7 +299,7 @@ func (s *Schema) MutateField(ctx context.Context, name string, m FieldMutation) 
 		return err
 	}
 
-	_, err = pb.NewSchemaClient(s.c.ClientConn).MutateField(ctx, &pb.MutateFieldRequest{
+	_, err = enginev2pb.NewSchemaClient(s.c.ClientConn).MutateField(ctx, &enginev2pb.MutateFieldRequest{
 		Name:     name,
 		Mutation: pbm,
 	})
@@ -308,8 +308,8 @@ func (s *Schema) MutateField(ctx context.Context, name string, m FieldMutation) 
 
 type fieldMutations []FieldMutation
 
-func (ms fieldMutations) proto() ([]*pb.MutateFieldRequest_Mutation, error) {
-	out := make([]*pb.MutateFieldRequest_Mutation, 0, len(ms))
+func (ms fieldMutations) proto() ([]*enginev2pb.MutateFieldRequest_Mutation, error) {
+	out := make([]*enginev2pb.MutateFieldRequest_Mutation, 0, len(ms))
 	for _, m := range ms {
 		x, err := m.proto()
 		if err != nil {
@@ -327,9 +327,9 @@ func FieldNameMutation(name string) FieldMutation {
 
 type fieldNameMutation string
 
-func (n fieldNameMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
-	return &pb.MutateFieldRequest_Mutation{
-		Mutation: &pb.MutateFieldRequest_Mutation_Name{
+func (n fieldNameMutation) proto() (*enginev2pb.MutateFieldRequest_Mutation, error) {
+	return &enginev2pb.MutateFieldRequest_Mutation{
+		Mutation: &enginev2pb.MutateFieldRequest_Mutation_Name{
 			Name: string(n),
 		},
 	}, nil
@@ -342,13 +342,13 @@ func FieldTypeMutation(ty FieldType) FieldMutation {
 
 type fieldTypeMutation FieldType
 
-func (t fieldTypeMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
+func (t fieldTypeMutation) proto() (*enginev2pb.MutateFieldRequest_Mutation, error) {
 	ty, err := FieldType(t).proto()
 	if err != nil {
 		return nil, err
 	}
-	return &pb.MutateFieldRequest_Mutation{
-		Mutation: &pb.MutateFieldRequest_Mutation_Type{
+	return &enginev2pb.MutateFieldRequest_Mutation{
+		Mutation: &enginev2pb.MutateFieldRequest_Mutation_Type{
 			Type: ty,
 		},
 	}, nil
@@ -361,14 +361,14 @@ func FieldModeMutation(m FieldMode) FieldMutation {
 
 type fieldModeMutation FieldMode
 
-func (m fieldModeMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
+func (m fieldModeMutation) proto() (*enginev2pb.MutateFieldRequest_Mutation, error) {
 	pbm, err := FieldMode(m).proto()
 	if err != nil {
 		return nil, err
 	}
 
-	return &pb.MutateFieldRequest_Mutation{
-		Mutation: &pb.MutateFieldRequest_Mutation_Mode{
+	return &enginev2pb.MutateFieldRequest_Mutation{
+		Mutation: &enginev2pb.MutateFieldRequest_Mutation_Mode{
 			Mode: pbm,
 		},
 	}, nil
@@ -381,9 +381,9 @@ func FieldAddIndexMutation(x FieldIndex) FieldMutation {
 
 type fieldAddIndexMutation FieldIndex
 
-func (i fieldAddIndexMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
-	return &pb.MutateFieldRequest_Mutation{
-		Mutation: &pb.MutateFieldRequest_Mutation_AddIndex{
+func (i fieldAddIndexMutation) proto() (*enginev2pb.MutateFieldRequest_Mutation, error) {
+	return &enginev2pb.MutateFieldRequest_Mutation{
+		Mutation: &enginev2pb.MutateFieldRequest_Mutation_AddIndex{
 			AddIndex: FieldIndex(i).proto(),
 		},
 	}, nil
@@ -396,9 +396,9 @@ func FieldRepeatedMutation(repeated bool) FieldMutation {
 
 type fieldRepeatedMutation bool
 
-func (u fieldRepeatedMutation) proto() (*pb.MutateFieldRequest_Mutation, error) {
-	return &pb.MutateFieldRequest_Mutation{
-		Mutation: &pb.MutateFieldRequest_Mutation_Repeated{
+func (u fieldRepeatedMutation) proto() (*enginev2pb.MutateFieldRequest_Mutation, error) {
+	return &enginev2pb.MutateFieldRequest_Mutation{
+		Mutation: &enginev2pb.MutateFieldRequest_Mutation_Repeated{
 			Repeated: bool(u),
 		},
 	}, nil
@@ -406,5 +406,5 @@ func (u fieldRepeatedMutation) proto() (*pb.MutateFieldRequest_Mutation, error) 
 
 // FieldMutation is an interface which is satisfied by schema field mutations.
 type FieldMutation interface {
-	proto() (*pb.MutateFieldRequest_Mutation, error)
+	proto() (*enginev2pb.MutateFieldRequest_Mutation, error)
 }

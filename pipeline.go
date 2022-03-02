@@ -13,8 +13,8 @@ import (
 
 	"code.sajari.com/sdk-go/internal/protoutil"
 
-	enginepb "code.sajari.com/protogen-go/sajari/engine/v2"
-	pipelinepb "code.sajari.com/protogen-go/sajari/pipeline/v2"
+	enginev2pb "code.sajari.com/protogen-go/sajari/engine/v2"
+	pipelinev2pb "code.sajari.com/protogen-go/sajari/pipeline/v2"
 )
 
 // PipelineType represents the type of a pipeline.
@@ -70,13 +70,13 @@ func (p *Pipeline) Search(ctx context.Context, params map[string]string, s Sessi
 		return nil, nil, err
 	}
 
-	r := &pipelinepb.SearchRequest{
+	r := &pipelinev2pb.SearchRequest{
 		Pipeline: p.proto(),
 		Tracking: pbTracking,
 		Values:   protoutil.Struct(params),
 	}
 
-	resp, err := pipelinepb.NewQueryClient(p.c.ClientConn).Search(p.c.newContext(ctx), r)
+	resp, err := pipelinev2pb.NewQueryClient(p.c.ClientConn).Search(p.c.newContext(ctx), r)
 	if err != nil {
 		s, ok := status.FromError(err)
 		if ok {
@@ -100,7 +100,7 @@ func (p *Pipeline) Search(ctx context.Context, params map[string]string, s Sessi
 	return results, m, nil
 }
 
-func processResponse(pbResp *pipelinepb.QueryResults, tokens ...*pipelinepb.Token) (*Results, error) {
+func processResponse(pbResp *pipelinev2pb.QueryResults, tokens ...*pipelinev2pb.Token) (*Results, error) {
 	pbResults := pbResp.GetResults()
 	results := make([]Result, 0, len(pbResults))
 	for i, pbr := range pbResults {
@@ -122,12 +122,12 @@ func processResponse(pbResp *pipelinepb.QueryResults, tokens ...*pipelinepb.Toke
 
 		if len(tokens) > i {
 			switch t := tokens[i].Token.(type) {
-			case *pipelinepb.Token_Click_:
+			case *pipelinev2pb.Token_Click_:
 				r.Tokens = map[string]interface{}{
 					"click": t.Click.GetToken(),
 				}
 
-			case *pipelinepb.Token_PosNeg_:
+			case *pipelinev2pb.Token_PosNeg_:
 				r.Tokens = map[string]interface{}{
 					"pos": t.PosNeg.GetPos(),
 					"neg": t.PosNeg.GetNeg(),
@@ -170,16 +170,16 @@ func processResponse(pbResp *pipelinepb.QueryResults, tokens ...*pipelinepb.Toke
 	return resp, nil
 }
 
-func processAggregateResult(v *enginepb.QueryAggregateResult) (interface{}, error) {
+func processAggregateResult(v *enginev2pb.QueryAggregateResult) (interface{}, error) {
 	switch v := v.AggregateResult.(type) {
-	case *enginepb.QueryAggregateResult_Count_:
+	case *enginev2pb.QueryAggregateResult_Count_:
 		counts := make(map[string]int, len(v.Count.Counts))
 		for ck, cv := range v.Count.Counts {
 			counts[ck] = int(cv)
 		}
 		return CountResult(counts), nil
 
-	case *enginepb.QueryAggregateResult_Buckets_:
+	case *enginev2pb.QueryAggregateResult_Buckets_:
 		buckets := make(map[string]BucketResult, len(v.Buckets.Buckets))
 		for bk, bv := range v.Buckets.Buckets {
 			buckets[bk] = BucketResult{
@@ -189,31 +189,31 @@ func processAggregateResult(v *enginepb.QueryAggregateResult) (interface{}, erro
 		}
 		return BucketsResult(buckets), nil
 
-	case *enginepb.QueryAggregateResult_Metric_:
+	case *enginev2pb.QueryAggregateResult_Metric_:
 		return v.Metric.Value, nil
 
-	case *enginepb.QueryAggregateResult_Date_:
+	case *enginev2pb.QueryAggregateResult_Date_:
 		dates := make(map[string]int, len(v.Date.Dates))
 		for ck, cv := range v.Date.Dates {
 			dates[ck] = int(cv)
 		}
 		return DateResult(dates), nil
 
-	case *enginepb.QueryAggregateResult_Analysis_:
+	case *enginev2pb.QueryAggregateResult_Analysis_:
 		switch vv := v.Analysis.Value.(type) {
-		case *enginepb.QueryAggregateResult_Analysis_Coverage:
+		case *enginev2pb.QueryAggregateResult_Analysis_Coverage:
 			return vv.Coverage, nil
 
-		case *enginepb.QueryAggregateResult_Analysis_Cardinality:
+		case *enginev2pb.QueryAggregateResult_Analysis_Cardinality:
 			return vv.Cardinality, nil
 
-		case *enginepb.QueryAggregateResult_Analysis_MinLen:
+		case *enginev2pb.QueryAggregateResult_Analysis_MinLen:
 			return vv.MinLen, nil
 
-		case *enginepb.QueryAggregateResult_Analysis_MaxLen:
+		case *enginev2pb.QueryAggregateResult_Analysis_MaxLen:
 			return vv.MaxLen, nil
 
-		case *enginepb.QueryAggregateResult_Analysis_AvgLen:
+		case *enginev2pb.QueryAggregateResult_Analysis_AvgLen:
 			return vv.AvgLen, nil
 
 		default:
@@ -225,7 +225,7 @@ func processAggregateResult(v *enginepb.QueryAggregateResult) (interface{}, erro
 	}
 }
 
-func processAggregatesResultMap(pbResp map[string]*enginepb.QueryAggregateResult) (map[string]interface{}, error) {
+func processAggregatesResultMap(pbResp map[string]*enginev2pb.QueryAggregateResult) (map[string]interface{}, error) {
 	out := make(map[string]interface{}, len(pbResp))
 	for k, v := range pbResp {
 		x, err := processAggregateResult(v)
@@ -273,8 +273,8 @@ type Result struct {
 	IndexScore float64
 }
 
-func (p *Pipeline) proto() *pipelinepb.Identifier {
-	return &pipelinepb.Identifier{
+func (p *Pipeline) proto() *pipelinev2pb.Identifier {
+	return &pipelinev2pb.Identifier{
 		Name:    p.name,
 		Version: p.version,
 	}
@@ -288,7 +288,7 @@ func (p *Pipeline) CreateRecord(ctx context.Context, values map[string]string, r
 		return nil, nil, err
 	}
 
-	resp, err := pipelinepb.NewStoreClient(p.c.ClientConn).CreateRecord(p.c.newContext(ctx), &pipelinepb.CreateRecordRequest{
+	resp, err := pipelinev2pb.NewStoreClient(p.c.ClientConn).CreateRecord(p.c.newContext(ctx), &pipelinev2pb.CreateRecordRequest{
 		Pipeline: p.proto(),
 		Values:   protoutil.Struct(values),
 		Record:   pbr,
@@ -322,7 +322,7 @@ func (p *Pipeline) ReplaceRecord(ctx context.Context, values map[string]string, 
 		return nil, nil, err
 	}
 
-	resp, err := pipelinepb.NewStoreClient(p.c.ClientConn).ReplaceRecord(p.c.newContext(ctx), &pipelinepb.ReplaceRecordRequest{
+	resp, err := pipelinev2pb.NewStoreClient(p.c.ClientConn).ReplaceRecord(p.c.newContext(ctx), &pipelinev2pb.ReplaceRecordRequest{
 		Pipeline: p.proto(),
 		Values:   protoutil.Struct(values),
 		Record:   pbr,
